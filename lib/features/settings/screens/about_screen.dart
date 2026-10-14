@@ -74,13 +74,6 @@ class AboutScreen extends ConsumerWidget {
             subtitle: Text(l10n.aboutSourceCodeHint),
             onTap: () => ref.read(urlOpenerProvider)(GarageLinks.sourceCode),
           ),
-          ListTile(
-            contentPadding: EdgeInsets.zero,
-            leading: const Icon(Icons.hub_outlined),
-            title: const Text('HrvaLabs'),
-            trailing: const Icon(Icons.open_in_new),
-            onTap: () => ref.read(urlOpenerProvider)(GarageLinks.hrvaLabs),
-          ),
           // The failure log was always kept and was reachable only over
           // `adb logcat` on a wired device, which no tester in the field has.
           // This is the difference between "it said something went wrong" and
@@ -131,6 +124,15 @@ class AboutScreen extends ConsumerWidget {
                 AppInfo.build,
               ),
             ),
+          ),
+          // Keep attribution after the existing actions, so adding a brand
+          // link does not displace diagnostics and licensing controls.
+          ListTile(
+            contentPadding: EdgeInsets.zero,
+            leading: const Icon(Icons.hub_outlined),
+            title: const Text('HrvaLabs'),
+            trailing: const Icon(Icons.open_in_new),
+            onTap: () => ref.read(urlOpenerProvider)(GarageLinks.hrvaLabs),
           ),
         ],
       ),
