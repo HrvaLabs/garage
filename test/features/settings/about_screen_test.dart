@@ -123,6 +123,16 @@ void main() {
     );
   });
 
+  testWidgets('links the app to HrvaLabs', (tester) async {
+    final opened = await pumpAbout(tester);
+
+    await tester.scrollUntilVisible(find.text('HrvaLabs'), 100);
+    await tester.tap(find.text('HrvaLabs'));
+    await tester.pumpAndSettle();
+
+    expect(opened.urls, [GarageLinks.hrvaLabs]);
+  });
+
   testWidgets('leads to the diagnostics, so a report can carry a cause', (
     tester,
   ) async {
