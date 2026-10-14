@@ -23,6 +23,9 @@ abstract final class GarageLinks {
 
   static final Uri privacyPolicy = Uri.parse('https://$host/privacy');
 
+  /// The independent lab behind Garage and related projects.
+  static final Uri hrvaLabs = Uri.parse('https://hrvalabs.net/');
+
   /// Where the source is, which under the AGPL is not a courtesy.
   ///
   /// Section 13 obliges an instance people reach over a network to offer them
