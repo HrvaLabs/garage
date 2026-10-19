@@ -7716,7 +7716,9 @@ which tab to open on when there is no address to read, as for a screen a test
 builds bare. Android writes nothing; it shows no address, and a tab it never
 writes is one thing fewer to go wrong there. *Cost:* each tab moved to is an
 entry in the browser's history, as every other move is, so Back walks back
-through the tabs before it leaves the page. Written over the current entry,
+through the tabs before it leaves the page. One is not: a tab still moving
+when a page is pushed over it is never written (open in known-bugs), and
+Back to its page shows it at the old address. Written over the current entry,
 a tab would have been the one move Back could not undo. Back to a tab writes
 nothing, since a name written there would bury the entry Forward returns to.
 And a page whose tab has been written is no longer the page `push` returned:
@@ -7930,7 +7932,7 @@ same menu on a right-click, at the pointer: the ⋮'s items and its handler,
 and only where the ⋮ is shown, so a driver's part, a member's row for
 somebody who is not an admin, a finished guest pass, a car with nothing to
 remove and a driver's tyre set offer nothing on a right-click either
-(`ContextMenuRegion`, `lib/core/widgets/context_menu_region.dart:22`). It is
+(`ContextMenuRegion`, `lib/core/widgets/context_menu_region.dart:24`). It is
 Material's menu, as the ⋮'s is, and a route, so the page's keys go quiet
 under it. The region is there at every width and does nothing on a phone,
 which has no right-click. In a browser the page's text is a selection, whose
@@ -8002,17 +8004,18 @@ that pump a phone's window in Croatian read word for word as they did before
 the desktop work began; the harness now draws the app's frame around them.
 
 **The guard.** `test/ci/desktop_idioms_test.dart` holds each phone idiom to
-the one file that adapts it, the way `test/ci/modal_surfaces_test.dart`
-holds the modal helpers: a `FloatingActionButton` and the scaffold's
-floating slot to `PrimaryAction` and the two scaffolds, the bottom bar to the
-tab scaffold, a bottom sheet to `adaptive.dart`, Material's date and time
-pickers to `date_pickers.dart`, `SnackBarBehavior` to `window_snackbars.dart`;
-and nowhere a snackbar given its own width, margin or behaviour, an ink
-splash picked by hand, or a `NavigationRail`. Each was broken once and seen
-to fail. It reads the source with the comments taken out and the strings
-kept, so a `//` inside a string, a URL's, hides nothing after it on the
-line, as stripping everything after `//` would have. It holds what is
-written, not what is drawn: a button floated by hand in a `Stack` passes it.
+the one file that adapts it, the way `test/ci/modal_surfaces_test.dart` holds
+the modal helpers: a `FloatingActionButton` to `PrimaryAction` alone, the
+scaffold's floating slot to `PrimaryAction` and the two scaffolds, the bottom
+bar and its slot to the tab scaffold, a bottom sheet to `adaptive.dart`,
+Material's date and time pickers to `date_pickers.dart`, `SnackBarBehavior`
+to `window_snackbars.dart`; and nowhere a snackbar given its own width,
+margin or behaviour, an ink splash picked by hand, or a `NavigationRail`.
+Each was broken once and seen to fail. It reads the source with the comments
+taken out and the strings kept, so a `//` inside a string, a URL's, hides
+nothing after it on the line, as stripping everything after `//` would have.
+It holds what is written, not what is drawn: a button floated by hand in a
+`Stack` passes it.
 
 What is drawn is held by a desk's layout test on eight screens, at 1440 by
 900 in the app's frame: the dashboard, the timeline, vehicles, the planner,
@@ -8034,8 +8037,8 @@ sheet and no Material date dialog. The timeline's filter, a form's car and
 its date opened beside the click; `/`, `n` and `?` did what they say; a tyre
 set's right-click opened its menu, and `n` under it opened nothing. Two
 things the look found are in known-bugs: the first sign-in once drew the
-admin's sidebar without the console, and the back arrow that grows under a
-dialog grows under a popover and a menu too.
+admin's sidebar without the console, and the back arrow that grew under a
+dialog grew under a popover and a menu too, since fixed.
 
 **Open.** What reads wrong at a desk is not done yet:
 

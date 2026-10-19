@@ -629,9 +629,12 @@ column's end. The bar belongs to the page, not to its text, as a tab strip
 does (decision 32); a page with a strip has it under the bar, and the strip
 draws the rule itself. A bar across the whole window, sidebar included, is a
 phone's, so this one stops at the sidebar, and its back arrow comes only when
-there is somewhere to go back to: a page opened by its address has an empty
-stack. Left to right: the back arrow, the crumbs over the title, the page's
-own actions, and a slot (`trailing`) for what a page offers beyond them.
+there is somewhere to go back to, a page under this one, read from the page's
+own route as the app bar reads it (`lib/core/widgets/page_scaffold.dart:136`):
+a page opened by its address has none, and a popover, a menu or a dialog over
+a page is not one. Left to right: the back arrow, the crumbs over the title,
+the page's own actions, and a slot (`trailing`) for what a page offers beyond
+them.
 
 On every page that slot holds the quick-add, `QuickAddButton`
 (`lib/features/dashboard/widgets/quick_add_button.dart:20`): a button labelled
@@ -766,7 +769,7 @@ paints its bar in. Off the web nothing is named.
 In a browser at a wide window a page's text can be selected and copied, as a
 web page's can (decision 199). Both scaffolds put `SelectablePage`
 (`lib/core/widgets/selectable_page.dart:34`) around a page's content under
-its top bar (`lib/core/widgets/page_scaffold.dart:151`, and
+its top bar (`lib/core/widgets/page_scaffold.dart:153`, and
 `lib/core/widgets/garage_bottom_nav.dart:175` and
 `lib/core/widgets/garage_bottom_nav.dart:198` for a tab), so the sidebar,
 the bar and a tab strip stay controls and only the page is text. A mouse
@@ -932,19 +935,19 @@ and the view's scope wraps; `WidgetsApp` gives its own navigator the web's
 edge, but an app routed by go_router does not use that navigator. It was so
 before the keys, and they do not change it.
 
-`test/core/widgets/desktop_shortcuts_test.dart:65` presses the keys, with
+`test/core/widgets/desktop_shortcuts_test.dart:66` presses the keys, with
 the page's text clicked in a browser too
-(`test/core/widgets/desktop_shortcuts_test.dart:354`), and Tab past them
-(`test/core/widgets/desktop_shortcuts_test.dart:416`);
+(`test/core/widgets/desktop_shortcuts_test.dart:355`), and Tab past them
+(`test/core/widgets/desktop_shortcuts_test.dart:417`);
 `test/core/widgets/focus_rings_test.dart:64` draws the ring.
 
 ## Right-click and new tabs
 
 On a wide window a row with a ⋮ opens the same menu on a right-click, at
 the pointer (decision 199). `ContextMenuRegion`
-(`lib/core/widgets/context_menu_region.dart:22`) is handed the ⋮'s items and
+(`lib/core/widgets/context_menu_region.dart:24`) is handed the ⋮'s items and
 its handler, and is `enabled` exactly where the ⋮ is shown
-(`lib/core/widgets/context_menu_region.dart:40`): a part for somebody who is
+(`lib/core/widgets/context_menu_region.dart:42`): a part for somebody who is
 not a driver, a member for an admin, a guest pass while it is open, a car on
 the console while it has a window to remove, a tyre set for somebody who is
 not a driver. Where the ⋮ is hidden there is no right-click menu. Nine rows
@@ -953,12 +956,12 @@ Upkeep tab), a member of the garage, an observation, an incident, a car on
 the console, a tyre set, a guest pass, and the route on route trends. A menu
 whose items act themselves (`PopupMenuItem.onTap`, the tyres' and the
 passes') is handed a handler that does nothing. It is Material's own menu,
-`showMenu` (`lib/core/widgets/context_menu_region.dart:71`), as a ⋮'s is, so
+`showMenu` (`lib/core/widgets/context_menu_region.dart:73`), as a ⋮'s is, so
 the two look alike; its top is at the pointer, and it grows to the right of
 the pointer on the left half of the window and to the left of it on the
 right half, as Material places a menu. The region is there at every width
 with nothing to do on a phone
-(`lib/core/widgets/context_menu_region.dart:55`), so a window resized across
+(`lib/core/widgets/context_menu_region.dart:57`), so a window resized across
 the line keeps the row under it: a phone has no right-click, and a long
 press there is the row's already.
 
@@ -966,7 +969,7 @@ press there is the row's already.
 right-click shows Copy and Select all, decided when a press has been held
 long enough to be told from a tap. A row's right-click held that long showed
 both menus. The row claims a press of the secondary button as it goes down
-(`lib/core/widgets/context_menu_region.dart:99`), so the selection is told
+(`lib/core/widgets/context_menu_region.dart:101`), so the selection is told
 it lost the press and shows nothing, and the row's menu opens on the press,
 as a desk's does. A right-click on the page's text beside a row is still the
 selection's.

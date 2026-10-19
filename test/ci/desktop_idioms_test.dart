@@ -12,7 +12,10 @@ import 'package:flutter_test/flutter_test.dart';
 /// It reads the source, so it holds what is written, not what is drawn. A
 /// button that floats itself in a `Stack` is not a `FloatingActionButton`,
 /// and passes; a `//` inside a string within a string's `${}` is read as a
-/// comment, and hides the rest of its line.
+/// comment, and hides the rest of its line; and in a `SnackBar`'s own
+/// arguments a ternary whose first branch is a variable called `width`,
+/// `margin` or `behavior` (`wide ? width : null`) reads as that argument
+/// given, and fails.
 void main() {
   /// Strings and comments, whichever starts first: a `//` inside a string, a
   /// URL's say, is part of the string, and what follows it on the line is
@@ -100,6 +103,12 @@ void main() {
   test('a bottom bar only in the tab scaffold, which a desk gives a '
       'sidebar', () {
     expect(using(r'\b(NavigationBar|BottomNavigationBar)\b'), [
+      'lib/core/widgets/garage_bottom_nav.dart',
+    ]);
+  });
+
+  test('and only the tab scaffold is given the bottom bar\'s slot', () {
+    expect(using(r'\bbottomNavigationBar\s*:'), [
       'lib/core/widgets/garage_bottom_nav.dart',
     ]);
   });

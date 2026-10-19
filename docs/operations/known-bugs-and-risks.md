@@ -659,22 +659,23 @@ our own. And select-all takes only what has been built: a list built as it
 scrolls, the fuel log or the timeline, copies the rows built so far, not the
 whole log (27 of 200 rows on a 1440 × 900 page, measured once with a throwaway test).
 
-### A page with nothing under it grows a back arrow while a dialog is open
+### A tab whose switch ends after a push is not written to the address
 
-**Low; open, found 19 October 2026.** At a desk, a pushed page opened by its
-address, or gone to from a crumb, has nothing under it and so no back arrow.
-A click on a fill-up in the fuel log opened that way opened its form, and
-under the dialog's barrier the top bar showed a back arrow, the title moved
-right to make room, until the form closed. The bar offers the arrow when
-`Navigator.of(context).canPop()` (`lib/core/widgets/page_scaffold.dart:135`),
-which counts the dialog, a route on the same navigator. The scaffold builds
-again as the dialog opens because it reads its address through
-`GoRouterState.of`, which depends on the page's route and so hears it stop
-being the top. The barrier covers the arrow, so nothing can press it; what
-shows is the bar changing shape under the dialog. A menu or a popover is a
-route over the page too and does the same: on 19 October the arrow came under
-Statistics' Pick dates and under a tyre set's right-click menu, both on pages
-opened by their address.
+**Low; open, found 19 October 2026 by reading.** A tab is written once the
+tabs stop moving and only while its page is the router's top
+(`lib/core/widgets/routed_tabs.dart:176`), so a tab whose switch is still
+moving when a row pushes a page over it is never written, and Back to its
+page shows the chosen tab at the old address until the next switch.
+
+### Add's own press throws when a refresh of the cars failed
+
+**Low; open, found 19 October 2026 by reading.** `showQuickAdd` awaits
+`ref.read(vehiclesProvider.future)` unguarded
+(`lib/features/dashboard/quick_add.dart:35`), so after a refresh that failed
+with an error other than no signal, while the cars read before are still
+held and Add still shows, Add's own press throws the read's error. `n` is
+gated on the read having no error
+(`lib/core/widgets/desktop_shortcuts.dart:165`); Add is not.
 
 ### Vehicle page loose ends from its first critique
 
@@ -1108,6 +1109,26 @@ several releases later.
 ---
 
 ## Recently fixed, worth remembering
+
+### A page with nothing under it grew a back arrow while a dialog was open
+
+**Low, fixed 19 October 2026; found the same day.** At a desk, a pushed page
+opened by its address, or gone to from a crumb, has nothing under it and so no
+back arrow. A click on a fill-up in the fuel log opened that way opened its
+form, and under the dialog's barrier the top bar showed a back arrow, the
+title moved right to make room, until the form closed. A popover and a menu
+did the same: the arrow came under Statistics' Pick dates and under a tyre
+set's right-click menu, both on pages opened by their address. The bar
+offered the arrow when `Navigator.of(context).canPop()`, which counts every
+route on the navigator, the dialog over the page included; the scaffold built
+again as one opened because it reads its address through `GoRouterState.of`,
+which hears its route stop being the top. It now asks the page's own route,
+as Material's app bar does: `impliesAppBarDismissal`
+(`lib/core/widgets/page_scaffold.dart:136`), true with a page under it and
+blind to what is over it. `test/core/widgets/page_scaffold_test.dart:348`
+opens a popover and a dialog over a page at its own address and finds no
+arrow and the title where it was; the test after it pushes the page over
+another and finds the arrow, under a popover too, and its press going back.
 
 ### The date's card ran off the smallest sideways tablet at large text
 

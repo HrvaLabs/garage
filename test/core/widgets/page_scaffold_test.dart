@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:garage/core/widgets/anchored_popover.dart';
+import 'package:garage/core/widgets/confirm_delete.dart';
 import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/domain/account/account_identity.dart';
@@ -13,6 +16,7 @@ import 'package:garage/features/household/providers/household_providers.dart';
 import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 import 'package:garage/l10n/app_localizations.dart';
 import 'package:garage/core/widgets/page_scaffold.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../support/pump_screen.dart';
 
@@ -304,5 +308,82 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('crumb-/vehicles')), findsNothing);
+  });
+
+  group('a desk\'s back arrow is the page\'s own', () {
+    // A popover or a dialog is a route over the page on the same navigator.
+    // Counted as somewhere to go back to, it grew an arrow under itself on a
+    // page with nothing under it, and the title moved right to make room
+    // until it closed.
+    Widget page() => GaragePageScaffold(
+      title: 'Fuel',
+      body: Builder(
+        builder: (context) => Column(
+          children: [
+            TextButton(
+              onPressed: () => showAnchoredPopover<void>(
+                context,
+                builder: (context) => const Text('A popover'),
+              ),
+              child: const Text('Popover'),
+            ),
+            TextButton(
+              onPressed: () =>
+                  showNotice(context, content: const Text('A dialog')),
+              child: const Text('Dialog'),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    Offset title(WidgetTester tester) => tester.getTopLeft(
+      find.descendant(of: find.byType(PageHeader), matching: find.text('Fuel')),
+    );
+
+    for (final (over, shown) in const [
+      ('Popover', 'A popover'),
+      ('Dialog', 'A dialog'),
+    ]) {
+      testWidgets('none at the page\'s own address, under a '
+          '${over.toLowerCase()} too', (tester) async {
+        await pumpDesktop(tester, page(), initialLocation: '/vehicles/v1/fuel');
+        await tester.pumpAndSettle();
+        expect(find.byTooltip('Back'), findsNothing);
+        final before = title(tester);
+
+        await tester.tap(find.text(over));
+        await tester.pumpAndSettle();
+
+        expect(find.text(shown), findsOneWidget);
+        expect(find.byTooltip('Back'), findsNothing);
+        expect(title(tester), before);
+      });
+    }
+
+    testWidgets('on a page pushed over another, under a popover too, and it '
+        'goes back', (tester) async {
+      await pumpDesktop(tester, page(), initialLocation: '/vehicles/v1/fuel');
+      await tester.pumpAndSettle();
+      final router = GoRouter.of(tester.element(find.byType(PageHeader)));
+      router.go('/stats');
+      await tester.pumpAndSettle();
+      router.push('/vehicles/v1/fuel');
+      await tester.pumpAndSettle();
+      expect(find.byTooltip('Back'), findsOneWidget);
+
+      await tester.tap(find.text('Popover'));
+      await tester.pumpAndSettle();
+      expect(find.text('A popover'), findsOneWidget);
+      expect(find.byTooltip('Back'), findsOneWidget);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      await tester.pumpAndSettle();
+      expect(find.text('A popover'), findsNothing);
+
+      await tester.tap(find.byTooltip('Back'));
+      await tester.pumpAndSettle();
+      expect(find.byType(PageHeader), findsNothing);
+      expect(find.text('stub:/stats'), findsOneWidget);
+    });
   });
 }

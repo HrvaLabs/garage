@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/widgets/adaptive.dart';
 import 'package:garage/core/widgets/anchored_popover.dart';
 import 'package:garage/core/widgets/confirm_delete.dart';
+import 'package:garage/core/widgets/date_pickers.dart';
 import 'package:garage/core/widgets/desktop_shortcuts.dart';
 import 'package:garage/core/widgets/garage_bottom_nav.dart';
 import 'package:garage/core/widgets/garage_sidebar.dart';
@@ -581,6 +582,67 @@ void main() {
         expect(find.text('Keyboard shortcuts'), findsNothing);
       });
     }
+  });
+
+  group('a popover over the page has none of them', () {
+    testWidgets('n in an open quick-add does not open a second', (
+      tester,
+    ) async {
+      await pumpDesktop(
+        tester,
+        _page(),
+        initialLocation: '/stats',
+        vehicles: [testVehicle('v1')],
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.byKey(const Key('top-bar-quick-add')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('anchored-popover')), findsOneWidget);
+
+      await pressN(tester);
+
+      expect(find.byKey(const Key('anchored-popover')), findsOneWidget);
+      expect(find.text('Fill-up'), findsOneWidget);
+    });
+
+    testWidgets('? under the date\'s popover opens no list', (tester) async {
+      await pumpDesktop(
+        tester,
+        GaragePageScaffold(
+          title: 'Fuel',
+          body: Builder(
+            builder: (context) => TextButton(
+              onPressed: () => showGarageDatePicker(
+                context: context,
+                initialDate: DateTime(2026, 10, 19),
+                firstDate: DateTime(2000),
+                lastDate: DateTime(2030),
+              ),
+              child: const Text('Date'),
+            ),
+          ),
+        ),
+        initialLocation: '/stats',
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Date'));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('anchored-popover')), findsOneWidget);
+      // Off the web the date's field waits for a click, so what holds the
+      // key back is the popover over the page, not a field taking it.
+      expect(
+        tester
+            .widget<EditableText>(find.byType(EditableText))
+            .focusNode
+            .hasFocus,
+        isFalse,
+      );
+
+      await pressQuestion(tester);
+
+      expect(find.text('Keyboard shortcuts'), findsNothing);
+      expect(find.byKey(const Key('anchored-popover')), findsOneWidget);
+    });
   });
 
   testWidgets('two sets of keys under one route act once on a key', (

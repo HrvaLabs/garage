@@ -85,6 +85,12 @@ class FakeBrowser {
 /// click or with Ctrl or ⌘ held, and the browser's own right-click menu goes
 /// off at a wide window. Off in a test as on Android, so a test about the
 /// web asks for it, before it pumps the app.
+///
+/// One web flag it leaves off, `PointerAnchor.web`. A widget test runs with
+/// the semantics on, and on the web the anchor counts no press while they
+/// are (`PointerAnchor.point` is null), so in every test as the web a
+/// popover would hang as one opened from a key does. A test that needs it
+/// sets it by hand.
 FakeBrowser asTheWeb(WidgetTester tester) {
   final browser = FakeBrowser._(tester);
   final titled = PageTitle.enabled;

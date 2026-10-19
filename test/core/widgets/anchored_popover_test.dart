@@ -599,7 +599,14 @@ void main() {
       await pumpScreen(tester, const SizedBox(), surface: desktopSurface);
       await tester.tapAt(const Offset(10, 20));
 
-      expect(SemanticsBinding.instance.semanticsEnabled, isFalse);
+      expect(
+        SemanticsBinding.instance.semanticsEnabled,
+        isFalse,
+        reason:
+            'a premise, and a cascade when it fails: a test before this '
+            'one failed, and a failed test never disposes of its '
+            'semantics handle. Run this test alone.',
+      );
       expect(PointerAnchor.point, const Offset(10, 20));
     }, semanticsEnabled: false);
 

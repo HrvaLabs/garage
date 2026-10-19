@@ -2713,11 +2713,13 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(PageHeader), findsOneWidget);
-    for (final (tab, act) in const [
-      ('Fuel', 'log-fuel'),
-      ('Upkeep', 'log-service'),
-      ('Car', null),
-      ('Costs', null),
+    // Each act with the tab's first row: the odometer over the fuel tab's
+    // gauge, and the upkeep tab's heading for what is due.
+    for (final (tab, act, firstRow) in const [
+      ('Fuel', 'log-fuel', 'CURRENT ODOMETER'),
+      ('Upkeep', 'log-service', 'DUE'),
+      ('Car', null, null),
+      ('Costs', null, null),
     ]) {
       await tester.tap(
         find.descendant(
@@ -2736,6 +2738,11 @@ void main() {
         expect(
           find.descendant(of: find.byType(PageHeader), matching: button),
           findsNothing,
+          reason: tab,
+        );
+        expect(
+          tester.getBottomLeft(button).dy,
+          lessThan(tester.getTopLeft(find.text(firstRow!)).dy),
           reason: tab,
         );
       }

@@ -237,8 +237,10 @@ behind it out.
   when the signing certificate's SHA-1 is registered for the OAuth client.
 - **The web build is a real product, not a demo.** It is deployed on every push to
   `main`, ahead of the Play release, so a backend mistake shows up there first.
-- **`lib/domain/` purity is a convention with no automated guard.** Nothing fails
-  the build if someone imports Flutter into it. Grep before assuming.
+- **`lib/domain/` purity is held by a test.** `test/ci/domain_purity_test.dart:16`
+  fails the build on an `import` or `export` of `package:flutter/…` or
+  `package:flutter_…` under `lib/domain/`. It looks for those two prefixes
+  alone, so a `dart:ui` import would pass it.
 
 ## Public discovery pages
 

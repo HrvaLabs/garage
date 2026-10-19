@@ -129,10 +129,12 @@ class GaragePageScaffold extends ConsumerWidget {
                         // Keyed, so it stays itself as an act joins it.
                         const QuickAddButton(key: ValueKey(QuickAddButton)),
                       ],
-                      // Only offered when there is something to go back to; a
-                      // page opened directly by URL on the web has an empty
-                      // stack.
-                      onBack: Navigator.of(context).canPop()
+                      // Only with a page under this one, as the app bar
+                      // asks: a page opened by its address has none, and a
+                      // popover or a dialog over it is not one.
+                      onBack:
+                          ModalRoute.of(context)?.impliesAppBarDismissal ??
+                              false
                           ? () => Navigator.of(context).maybePop()
                           : null,
                     ),

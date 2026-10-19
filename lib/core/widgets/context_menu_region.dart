@@ -17,8 +17,10 @@ import 'adaptive.dart';
 /// text is a selection, whose own right-click shows Copy and Select all, and
 /// held past the moment a tap becomes a press it showed them over the row's
 /// menu. The row claims the press as the button goes down, so the selection
-/// is told it lost the press and shows nothing. The menu is a route, as the
-/// ⋮'s is, so the page's keys go quiet under it.
+/// is told it lost the press and shows nothing. A region [enabled] with no
+/// items claims it too and shows nothing, so a row with nothing to offer
+/// passes `enabled: false`. The menu is a route, as the ⋮'s is, so the
+/// page's keys go quiet under it.
 class ContextMenuRegion<T> extends StatelessWidget {
   const ContextMenuRegion({
     required this.itemBuilder,

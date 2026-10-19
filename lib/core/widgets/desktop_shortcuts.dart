@@ -141,7 +141,7 @@ class _DesktopShortcutsState extends ConsumerState<DesktopShortcuts> {
         _inAField()) {
       return KeyEventResult.ignored;
     }
-    // Lower case, as the list names them: with Caps Lock on, `n` types N.
+    // Lower case, so an N typed with Caps Lock on is `n`; the list shows N.
     final act = switch (event.character?.toLowerCase()) {
       '/' => pageSearchFocus?.requestFocus,
       'n' => _quickAdd(),
