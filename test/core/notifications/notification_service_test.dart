@@ -10,9 +10,11 @@ import 'package:timezone/timezone.dart' as tz;
 class _Plugin implements FlutterLocalNotificationsPlugin {
   final scheduled = <tz.TZDateTime>[];
   final shown = <int>[];
+  final calls = <Symbol>[];
 
   @override
   dynamic noSuchMethod(Invocation invocation) {
+    calls.add(invocation.memberName);
     switch (invocation.memberName) {
       case #zonedSchedule:
         final date = invocation.namedArguments[#scheduledDate] as tz.TZDateTime;
@@ -76,5 +78,15 @@ void main() {
 
     expect(plugin.scheduled, hasLength(1));
     expect(plugin.shown, isEmpty);
+  });
+
+  test('clearing what is scheduled leaves what is on screen', () async {
+    // A push is shown through the same plugin, so cancelling everything would
+    // take the garage's reminders off the shade each time the app opened.
+    final plugin = _Plugin();
+
+    await NotificationService(plugin).cancelScheduled();
+
+    expect(plugin.calls, [#cancelAllPendingNotifications]);
   });
 }

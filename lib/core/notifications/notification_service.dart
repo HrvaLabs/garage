@@ -100,4 +100,8 @@ class NotificationService {
   }
 
   Future<void> cancelAll() => _plugin.cancelAll();
+
+  /// Cancels what is scheduled and leaves what is on screen: a push is shown
+  /// through this plugin too, and [cancelAll] would take it off the shade.
+  Future<void> cancelScheduled() => _plugin.cancelAllPendingNotifications();
 }

@@ -343,6 +343,18 @@ is saved, and the whole pack fails with the generic sentence. Not seen in
 the wild; the fix is a full decode before the page is added, at the cost of
 decoding every receipt twice.
 
+### Without push, a reboot drops the phone's scheduled reminders
+
+**Low, for a build without push only.** The dated reminders a build without
+push schedules are alarms, and Android clears alarms on a reboot.
+`flutter_local_notifications` reschedules them from a
+`ScheduledNotificationBootReceiver` the app has to declare, and
+`android/app/src/main/AndroidManifest.xml` asks for `RECEIVE_BOOT_COMPLETED`
+and declares no receiver. The next sync plans them again, which happens when
+the dashboard opens, so a reminder due before the app is next opened is lost.
+Every Play build has push, so this is local builds and anything shipped
+without the Firebase defines.
+
 ### A receipt reminder waits for push to be configured
 
 **Low until push is on; then not a bug.** "Remind driver" writes a
@@ -584,7 +596,7 @@ projections resolved, for exactly that reason.
 
 **Attempted again, 4 September 2026, and not reproduced — with a reason worth
 writing down.** The dashboard's own harness cannot produce it: `pumpDashboard`
-(`test/features/dashboard/dashboard_screen_test.dart:99`) overrides
+(`test/features/dashboard/dashboard_screen_test.dart:102`) overrides
 `bundlesProvider`, `householdProjectionsProvider`, `allVehiclesProvider` and
 every provider they derive from, so the listeners fire against futures the test
 supplies and never against the real graph being invalidated mid-build. Any
@@ -1046,6 +1058,27 @@ several releases later.
 
 ## Recently fixed, worth remembering
 
+### Reminders a phone set before push was on still fired
+
+**Medium, fixed 16 October 2026; since push stood the phone down in August.**
+A build without push plans its own dated reminders, both lead times for every
+item and months ahead, and hands them to the system as alarms. A build with
+push schedules none and stands down
+(`lib/core/notifications/notification_providers.dart:138`), but nothing
+cancelled what an earlier build had set, and an alarm survives an update.
+So a phone that ran a build without push — any Play build made before the
+Firebase secrets were set on 16 August, or a local one — kept announcing what
+that old plan said, for a car archived since or a service done since, on the
+same day as the server's push for anything still due. No
+`ScheduledNotificationBootReceiver` is declared, so a reboot clears such
+alarms; a phone that has not rebooted since still has them. A build with push
+now cancels whatever is still scheduled on every sync
+(`lib/core/notifications/notification_providers.dart:198`), and only that:
+`cancelScheduled` leaves what is on the shade
+(`lib/core/notifications/notification_service.dart:106`), since a push is
+shown through the same plugin. `test/core/notifications/sync_notifications_test.dart:221`
+plans as the old build did, then syncs with push on.
+
 ### An address no route matched showed go_router's own page, in English
 
 **Low, fixed 16 October 2026; found 4 October.** `GoRouter` was built with no
@@ -1161,6 +1194,14 @@ same car restored, because a join that matched nothing would pass the first
 alone. The fake only answers as PostgREST would, so the query was also run on
 the local stack: an active rule on a kept car and one on an archived car came
 back as the first alone, where the old query returned both.
+
+**Not the only way that notice could arrive.** A phone that ever ran a build
+without push may also have held an alarm for it, set while the car was still
+in the list, which this fix cannot reach; see "Reminders a phone set before
+push was on still fired", above. A push from the run arrives at about eight
+in the morning in Zagreb, after the 06:00 UTC run; the phone's own at nine
+(`notificationHour`). Which one the owner saw on 16 October is not known, so
+it is not evidence that push reaches a phone.
 
 ### The app-icon shortcuts opened "Page Not Found"
 

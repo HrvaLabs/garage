@@ -127,6 +127,16 @@ per item would undo the bundling the app exists to do. It cannot reproduce the
 app's own bundling window — that needs the measured rate — so it groups by what
 it knows.
 
+**What a build without push scheduled is cancelled** when a build with it
+syncs (`lib/core/notifications/notification_providers.dart:198`). The plan a
+build without push makes runs months ahead, both lead times for every item,
+and an alarm outlives an update, so standing down was not enough: until
+October 2026 those alarms went on firing on the days the old plan said, for a
+car archived since or a service done since. Only what is still scheduled is
+cancelled (`lib/core/notifications/notification_service.dart:106`); a push is
+shown through the same plugin, and cancelling everything would take it off
+the shade each time the dashboard synced.
+
 **The risk this creates, stated plainly:** configure Firebase and leave the
 daily job without its Vault secrets, and nobody gets anything, because the
 local fallback has stood down. The runbook does both in one sitting for that
@@ -271,8 +281,9 @@ decades out.
 Only the rules of cars that are not archived are read
 (`supabase/functions/push-due-reminders/handler.ts:744`). Archiving leaves a
 car's rules active, and until 16 October 2026 the run pushed them anyway,
-which the phone, scheduling from the garage's cars without the archived ones,
-never did.
+which the phone's own plan, made from the garage's cars without the archived
+ones, never did. An alarm a build without push had set before the car was
+archived still could, until such alarms were cancelled (above).
 
 **What the run considers**, rule by rule:
 

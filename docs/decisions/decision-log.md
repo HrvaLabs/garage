@@ -6494,7 +6494,7 @@ rather than scheduled (`lib/core/notifications/notification_service.dart:39`),
 each notice is scheduled on its own so one the plugin refuses costs only
 itself (`notification_providers.dart:157`), and the fake refuses a
 past date as the plugin does
-(`test/core/notifications/notification_service_test.dart:37`).
+(`test/core/notifications/notification_service_test.dart:39`).
 
 **Why a ledger and not the server's fix.** The server counts from the day of
 the reading (decision 168). Doing that on the phone moves every projected date

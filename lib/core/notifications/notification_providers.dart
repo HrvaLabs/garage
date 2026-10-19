@@ -189,6 +189,16 @@ Future<void> syncNotifications(WidgetRef ref, AppLocalizations l10n) async {
         ]),
       );
     }
+  } else {
+    // What a build without push scheduled is still waiting in the system:
+    // it outlives an update, and nothing here cancelled it. Left alone, a car
+    // archived since, or a service done since, is still announced on the day
+    // the old plan said, beside the server's own push.
+    try {
+      await service.cancelScheduled();
+    } on Object catch (error) {
+      reportFailure(AppFailure.from(error));
+    }
   }
 
   for (final reminder in planByDistance(

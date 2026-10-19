@@ -205,6 +205,47 @@ void main() {
       expect(service.shown, hasLength(2));
     });
   });
+
+  group('once push is on', () {
+    setUp(() => SharedPreferences.setMockInitialValues({}));
+
+    final tyres = ReminderProjection(
+      ruleId: 'tyres',
+      vehicleId: 'v1',
+      serviceTypeKey: 'service_seasonal_tyre_swap',
+      projectedDueDate: DateTime(2026, 11, 15),
+      state: ReminderState.upcoming,
+      dateFromTime: DateTime(2026, 11, 15),
+    );
+
+    testWidgets('what the phone scheduled for itself before is cleared', (
+      tester,
+    ) async {
+      // A build without push schedules the dated notices itself, months
+      // ahead; a build with push schedules none and never cancelled those.
+      // They outlive an update, so a car archived since, or a service done
+      // since, was still announced on the day, beside the garage's own push.
+      final service = RecordingService();
+      await syncOn(tester, service, DateTime(2026, 8, 10), [tyres]);
+      expect(service.pending, isNotEmpty, reason: 'the old build scheduled');
+
+      await syncOn(tester, service, DateTime(2026, 8, 20), [tyres], push: true);
+
+      expect(service.pending, isEmpty);
+    });
+
+    testWidgets('and nothing already on the shade is taken off it', (
+      tester,
+    ) async {
+      // A push is shown through the same plugin, so clearing everything would
+      // take the garage's reminders off the shade each time the app opened.
+      final service = RecordingService();
+
+      await syncOn(tester, service, DateTime(2026, 8, 20), [tyres], push: true);
+
+      expect(service.everythingCancelled, 0);
+    });
+  });
 }
 
 /// Syncs as the dashboard does on [day] at ten in the morning, with
@@ -215,6 +256,7 @@ Future<void> syncOn(
   DateTime day,
   List<ReminderProjection> projections, {
   List<MaintenanceBundle> bundles = const [],
+  bool push = false,
 }) async {
   final now = DateTime(day.year, day.month, day.day, 10);
   service.now = () => now;
@@ -227,7 +269,7 @@ Future<void> syncOn(
         allVehiclesProvider.overrideWith((ref) async => const []),
         householdProjectionsProvider.overrideWith((ref) async => projections),
         bundlesProvider.overrideWith((ref) async => bundles),
-        pushRemindersActiveProvider.overrideWithValue(false),
+        pushRemindersActiveProvider.overrideWithValue(push),
         todayProvider.overrideWithValue(day),
         clockProvider.overrideWithValue(() => now),
       ],
@@ -280,8 +322,17 @@ class RecordingService extends NotificationService {
   @override
   Future<bool> requestPermission() async => permitted;
 
+  /// How often everything was cancelled, the shade included.
+  int everythingCancelled = 0;
+
   @override
-  Future<void> cancelAll() async => pending.clear();
+  Future<void> cancelAll() async {
+    everythingCancelled++;
+    pending.clear();
+  }
+
+  @override
+  Future<void> cancelScheduled() async => pending.clear();
 
   @override
   Future<void> schedule({

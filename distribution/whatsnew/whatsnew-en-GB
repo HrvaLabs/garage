@@ -1,7 +1,7 @@
 Fixes from the first days in production:
-• An entry saved with no signal can be edited or deleted before it is sent, instead of saying you are not allowed
 • An archived vehicle no longer gets reminders
 • When a driver logs a service, its one-time reminder now closes too
 • An incident reported with no signal is kept on your phone and sent when there is one
 • For a driver, the vehicles tab is now called Cars
 • An address that leads nowhere says so in your language, with a way back
+• Old reminders the phone set for itself no longer arrive beside the garage's own

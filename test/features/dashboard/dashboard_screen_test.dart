@@ -61,6 +61,9 @@ class SilentNotificationService implements NotificationService {
   Future<void> cancelAll() async {}
 
   @override
+  Future<void> cancelScheduled() async {}
+
+  @override
   Future<void> schedule({
     required int id,
     required String title,

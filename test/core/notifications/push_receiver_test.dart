@@ -34,6 +34,9 @@ class RecordingNotifications implements NotificationService {
 
   @override
   Future<void> cancelAll() async {}
+
+  @override
+  Future<void> cancelScheduled() async {}
 }
 
 Map<String, dynamic> reminderMessage({String keys = 'service_oil_change'}) => {
