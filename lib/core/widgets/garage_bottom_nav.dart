@@ -35,7 +35,12 @@ class _Destination {
   final String label;
 }
 
-List<_Destination> _destinations(AppLocalizations l10n) => [
+/// [driver] names the cars tab for the cars handed to a driver, as the list
+/// it opens is titled "My cars" for them.
+List<_Destination> _destinations(
+  AppLocalizations l10n, {
+  required bool driver,
+}) => [
   _Destination(
     GarageTab.dashboard,
     Icons.dashboard_outlined,
@@ -52,7 +57,7 @@ List<_Destination> _destinations(AppLocalizations l10n) => [
     GarageTab.vehicles,
     Icons.directions_car_outlined,
     Icons.directions_car,
-    l10n.vehiclesTitle,
+    driver ? l10n.companyDriverCarsTab : l10n.vehiclesTitle,
   ),
   _Destination(
     GarageTab.planner,
@@ -178,13 +183,13 @@ class GarageTabScaffold extends StatelessWidget {
 /// still get the sidebar, because a window with room for it losing its
 /// navigation is a phone's model on a desktop screen — the reader's only way
 /// out was the browser's back button.
-class GarageNavigationRail extends StatelessWidget {
+class GarageNavigationRail extends ConsumerWidget {
   const GarageNavigationRail({required this.current, super.key});
 
   final GarageTab? current;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     // A labelled sidebar above the desktop breakpoint, a compact icon rail
     // between that and phone width. An icon strip beside a narrow column was
@@ -195,7 +200,10 @@ class GarageNavigationRail extends StatelessWidget {
     // "More" is not a destination, and what it holds is listed below the
     // primaries instead. The compact rail keeps it, as the phone does.
     final destinations = [
-      for (final destination in _destinations(l10n))
+      for (final destination in _destinations(
+        l10n,
+        driver: ref.watch(isDriverProvider),
+      ))
         if (!desktop || destination.tab != GarageTab.more) destination,
     ];
     final selected = current == null
@@ -231,20 +239,23 @@ class GarageNavigationRail extends StatelessWidget {
   }
 }
 
-class GarageBottomNav extends StatelessWidget {
+class GarageBottomNav extends ConsumerWidget {
   const GarageBottomNav({required this.current, super.key});
 
   final GarageTab current;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
 
     return NavigationBar(
       selectedIndex: GarageTab.values.indexOf(current),
       onDestinationSelected: (index) => _goTo(context, current, index),
       destinations: [
-        for (final destination in _destinations(l10n))
+        for (final destination in _destinations(
+          l10n,
+          driver: ref.watch(isDriverProvider),
+        ))
           NavigationDestination(
             icon: Icon(destination.icon),
             selectedIcon: Icon(destination.selectedIcon),

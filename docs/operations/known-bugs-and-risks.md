@@ -136,16 +136,6 @@ row and the Costs tab's income button hide theirs
 the driver's four tabs as they are: ruling 15 of the plan recorded both as
 gaps rather than built them.
 
-### The bottom tab under "My cars" still says "Vehicles"
-
-**Low, and the owner's to decide.** A driver's list is titled "My cars"
-(`lib/features/vehicles/screens/vehicles_screen.dart:95`) while the tab that
-opens it keeps the everyday label. `GarageBottomNav` and `GarageNavigationRail`
-share one plain label list, and `test/core/widgets/garage_bottom_nav_test.dart`
-holds every tab label to one word in every language, which "My cars", "Moja
-vozila" and "Le mie auto" are not. A one-word label for a driver's list in
-three languages is a product choice, handed to the owner.
-
 ### A refused role read writes an empty membership list over a good cache
 
 **Low.** `_memberships()` swallows a failure and answers no rows
@@ -249,8 +239,8 @@ rather than built.
 **Low.** `myRoleProvider` answers `member` until the startup fetch, or its
 cache, has arrived (`lib/features/company/providers/company_providers.dart:67`),
 so a cold open draws the member's presentation for a moment: "Vehicles"
-before "My cars" in the title, the Company entry at the top of More for an
-admin, and on a `/vehicles/:id` typed in by URL the add-reminder row and the
+before "My cars" in the title and before "Cars" on the tab, the Company entry
+at the top of More for an admin, and on a `/vehicles/:id` typed in by URL the add-reminder row and the
 income button until the bootstrap lands. Nothing is written in that moment
 without a tap, and every write the moment offers is refused by the
 policies; a loading state for the role, rather than a default, would remove
@@ -1066,6 +1056,20 @@ several releases later.
 ---
 
 ## Recently fixed, worth remembering
+
+### The bottom tab under "My cars" said "Vehicles"
+
+**Low, fixed 16 October 2026; since drivers arrived in 0080.** A driver's list
+is titled "My cars" (`lib/features/vehicles/screens/vehicles_screen.dart:95`)
+while the tab that opened it kept the everyday label: both navigation widgets
+take one-word labels by test, which "My cars", "Moja vozila" and "Le mie
+auto" are not, so the word was the owner's to choose. On 20 September the
+owner chose "Cars", "Auti" and "Auto", for a driver only. The bottom bar and
+the sidebar read the role and take that label for the cars tab
+(`lib/core/widgets/garage_bottom_nav.dart:60`); everybody else keeps
+"Vehicles". `test/core/widgets/garage_bottom_nav_test.dart` holds the new
+label to one word in every language with the others, and asks for both
+roles at phone and desktop width. Decision 194.
 
 ### An incident logged with no signal was lost
 

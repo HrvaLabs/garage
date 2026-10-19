@@ -8241,6 +8241,12 @@ abstract class AppLocalizations {
   /// **'My cars'**
   String get companyMyCars;
 
+  /// The bottom tab and sidebar label of the cars list for a driver, where everybody else sees vehiclesTitle. One word: a tab slot fits one.
+  ///
+  /// In en, this message translates to:
+  /// **'Cars'**
+  String get companyDriverCarsTab;
+
   /// No description provided for @companyMyCarsEmpty.
   ///
   /// In en, this message translates to:

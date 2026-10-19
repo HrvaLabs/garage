@@ -4933,6 +4933,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get companyMyCars => 'Moja vozila';
 
   @override
+  String get companyDriverCarsTab => 'Auti';
+
+  @override
   String get companyMyCarsEmpty =>
       'Danas ti nije dodijeljeno nijedno vozilo. Administrator ga predaje.';
 

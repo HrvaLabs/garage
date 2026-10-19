@@ -2266,6 +2266,7 @@
   "companyNoDriverOnDate": "Na taj datum nema dodijeljenog vozača",
   "companyFormerDriverOnDate": "Vozač na taj datum: bivši član garaže",
   "companyMyCars": "Moja vozila",
+  "companyDriverCarsTab": "Auti",
   "companyMyCarsEmpty": "Danas ti nije dodijeljeno nijedno vozilo. Administrator ga predaje.",
   "companyDriverNoticeTitle": "Što vidi tvoj administrator",
   "companyDriverNoticeBody": "Sve što uneseš za službeno vozilo (točenja, vožnje, troškove, nezgode) vide administratori garaže, zajedno s time koje je vozilo bilo tvoje kojeg dana. Aplikacija bilježi mjesta koja upišeš, nikad gdje je telefon.",

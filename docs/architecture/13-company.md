@@ -120,7 +120,8 @@ last case leaves a garage of drivers with no admin; it is recorded in
 rather than refused.
 
 **"My cars"** is the vehicles screen wearing a driver's presentation
-(`lib/features/vehicles/screens/vehicles_screen.dart:77`): the title, no Add
+(`lib/features/vehicles/screens/vehicles_screen.dart:77`), under a tab that
+reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:60`): the title, no Add
 button, no archived section, an empty state that names the administrator as
 the one who hands a car over, and two cards above the grid. The dashboard
 says the same to a driver with no car yet
@@ -571,7 +572,8 @@ resolve against.
   lands. The Reimbursements tab waits for the list instead.
 - **The role flips from member to driver when the first bootstrap fetch
   lands.** `myRoleProvider` answers `member` until then, so on a cold open the
-  title reads "Vehicles" before "My cars", the Company entry can show at the
+  title reads "Vehicles" before "My cars" and the tab before "Cars", the
+  Company entry can show at the
   top of More, and the add-reminder and income rows can show on a car page
   for a moment.
 - **A borrower on a pass sees "Report an incident"** on the car's Car tab
@@ -619,6 +621,3 @@ resolve against.
 - **`paid_with` is not in the public API.** The read-only API selects its
   columns by name (`supabase/functions/public-api/handler.ts:138`) and was not
   taught the new one.
-- **The bottom tab under "My cars" still says "Vehicles".** Both navigation
-  widgets take one-word labels by test, and "My cars" is two in every
-  language; an open question for the owner.

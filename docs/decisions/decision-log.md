@@ -7433,3 +7433,18 @@ borrower on a pass who reported with no signal (online, their save is refused
 at once, since a refusal is never queued). Only the retry screen says how
 many were dropped; a replay at launch or on resume drops them without a word,
 which is the queue's behaviour for every kind and is not changed here.
+
+## 194. A driver's cars tab reads "Cars"
+
+**16 October 2026, the owner's choice of 20 September.** A driver's list is
+titled "My cars", because the cars on it are the ones handed to them and none
+is theirs to add. The tab that opens it said "Vehicles", the everyday word
+for a garage's own, and a tab slot fits one word, which every language's
+"My cars" is not. The owner chose "Cars", "Auti" and "Auto", one key, for
+the driver role only; members and admins keep "Vehicles". The bottom bar and
+the sidebar read the role the way the vehicles screen does.
+
+**Cost.** The tab has two names, and a cold open on a driver's phone shows
+"Vehicles" until the startup fetch says who they are, as the title already
+did ("The role flips from member to driver when the first bootstrap fetch
+lands" in known-bugs).

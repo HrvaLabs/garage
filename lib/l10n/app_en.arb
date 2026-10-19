@@ -2820,6 +2820,10 @@
   "companyNoDriverOnDate": "No driver assigned on this date",
   "companyFormerDriverOnDate": "Driver on this date: a former member",
   "companyMyCars": "My cars",
+  "companyDriverCarsTab": "Cars",
+  "@companyDriverCarsTab": {
+    "description": "The bottom tab and sidebar label of the cars list for a driver, where everybody else sees vehiclesTitle. One word: a tab slot fits one."
+  },
   "companyMyCarsEmpty": "No car is assigned to you today. The administrator hands one over.",
   "companyDriverNoticeTitle": "What your administrator sees",
   "companyDriverNoticeBody": "Everything you log on a company car — fill-ups, drives, costs, incidents — is visible to the garage's administrators, together with which car was yours on which day. The app records the places you type, never where the phone is.",

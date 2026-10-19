@@ -98,9 +98,10 @@ an admin of a fleet opens the app for it more often than for the garage's own
 screen. The console is a pushed page with its own tab strip, not a sixth tab:
 Material caps the bar at five, and the fleet is one thing, however many views
 it has. A driver's Vehicles tab is titled "My cars" on its own page
-(`lib/features/vehicles/screens/vehicles_screen.dart:95`) while the tab label
-itself still reads "Vehicles": both navigation widgets take one-word labels by
-test, and a one-word label for a driver's list is a product choice still open.
+(`lib/features/vehicles/screens/vehicles_screen.dart:95`) and labelled "Cars"
+in the bar and the sidebar (`lib/core/widgets/garage_bottom_nav.dart:60`):
+both navigation widgets take one-word labels by test, so the tab could not
+carry the title's two words, and the owner chose the word (decision 194).
 See [13](13-company.md#the-console).
 
 **The tour.** `/features` (`lib/features/settings/screens/features_screen.dart`)

@@ -29,6 +29,7 @@ List<String> tabLabels(AppLocalizations l10n) => [
   l10n.dashboardTitle,
   l10n.timelineTitle,
   l10n.vehiclesTitle,
+  l10n.companyDriverCarsTab,
   l10n.plannerTitle,
   l10n.settingsTitle,
 ];
@@ -86,6 +87,51 @@ void main() {
 
     expect(find.byType(NavigationRail), findsOneWidget);
     expect(find.text('More'), findsOneWidget);
+  });
+
+  group('a driver\'s cars tab', () {
+    // A driver's list is titled "My cars": the cars handed to them, none of
+    // them theirs to add. The tab that opens it said "Vehicles", the
+    // everyday word for a garage's own, and two words do not fit a tab.
+    Future<void> pumpAs(
+      WidgetTester tester,
+      String role, {
+      Size surface = const Size(360, 800),
+    }) async {
+      await pumpScreen(
+        tester,
+        GarageTabScaffold(
+          current: GarageTab.vehicles,
+          appBar: AppBar(title: const Text('Screen')),
+          body: const SizedBox(),
+        ),
+        surface: surface,
+        household: const Household(id: 'h1', name: 'Prijevoz', plan: 'company'),
+        role: role,
+      );
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('says Cars to a driver', (tester) async {
+      await pumpAs(tester, 'driver');
+
+      expect(find.text('Cars'), findsOneWidget);
+      expect(find.text('Vehicles'), findsNothing);
+    });
+
+    testWidgets('and still says Vehicles to everybody else', (tester) async {
+      await pumpAs(tester, 'member');
+
+      expect(find.text('Vehicles'), findsOneWidget);
+      expect(find.text('Cars'), findsNothing);
+    });
+
+    testWidgets('in the sidebar too', (tester) async {
+      await pumpAs(tester, 'driver', surface: const Size(1400, 900));
+
+      expect(find.text('Cars'), findsOneWidget);
+      expect(find.text('Vehicles'), findsNothing);
+    });
   });
 
   testWidgets('tapping a tab navigates to it', (tester) async {

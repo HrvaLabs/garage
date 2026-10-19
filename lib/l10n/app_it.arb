@@ -1490,6 +1490,7 @@
   "companyNoDriverOnDate": "Nessun autista assegnato in quella data",
   "companyFormerDriverOnDate": "Autista in quella data: un ex membro del garage",
   "companyMyCars": "Le mie auto",
+  "companyDriverCarsTab": "Auto",
   "companyMyCarsEmpty": "Oggi non ti è assegnato nessun veicolo. Lo consegna l'amministratore.",
   "companyDriverNoticeTitle": "Cosa vede il tuo amministratore",
   "companyDriverNoticeBody": "Tutto ciò che registri su un veicolo aziendale (rifornimenti, viaggi, spese, incidenti) è visibile agli amministratori del garage, insieme a quale veicolo era tuo in quale giorno. L'app registra i luoghi che scrivi, mai dove si trova il telefono.",
