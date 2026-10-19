@@ -116,14 +116,16 @@ among the ones returned is one reached through a pass —
 
 Since migration 0080 the same `Future.wait` carries a fourth request, the
 caller's own `household_members` rows
-(`lib/features/household/data/supabase_garage_bootstrap_repository.dart:99`),
+(`lib/features/household/data/supabase_garage_bootstrap_repository.dart:132`),
 which say whether each garage is one they belong to or one they *drive* for.
 The answer is kept as `GarageBootstrap.rolesByHousehold`, cached with the
 rest, and read by `myRoleProvider` before the first frame, so a driver's phone
 opens on "My cars" rather than on the garage and then flips
 (`lib/features/company/providers/company_providers.dart:67`). A role that could
-not be read costs the garage nothing and reads as `member`, which is what every
-garage was before roles existed; see [13](13-company.md#drivers).
+not be read costs the garage nothing: the one the last full fetch read stands,
+from the device's copy, which the fetch that missed it does not rewrite. With
+no copy it reads as `member`, which is what every garage was before roles
+existed; see [13](13-company.md#drivers).
 
 ### And before that fetch, a garage from last time
 

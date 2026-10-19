@@ -146,8 +146,9 @@ returns the columns a borrower's app needs, as an allowlist, so a column added
 later is withheld until somebody decides otherwise;
 `test/ci/guest_vehicle_columns_test.dart` fails the build until they do. The
 app fetches it beside its own two selects at startup
-(`lib/features/household/data/supabase_garage_bootstrap_repository.dart:83`),
-and a failure there costs the account its borrowed cars, never its own garage.
+(`lib/features/household/data/supabase_garage_bootstrap_repository.dart:115`),
+and a failure there never costs the account its own garage, nor the borrowed
+cars the last full fetch saw.
 
 **What a borrower always sees comes from a function, not a grant.**
 `guest_vehicle_briefing` (0066) returns the real odometer, the expiry dates of

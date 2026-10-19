@@ -124,18 +124,6 @@ their own window with a `confirmed_at` of their choosing. The sign-off is
 still the right person's, which is what the guard is for; the date is not
 evidence when the driver is also the one who keeps the log.
 
-### A refused role read writes an empty membership list over a good cache
-
-**Low.** `_memberships()` swallows a failure and answers no rows
-(`lib/features/household/data/supabase_garage_bootstrap_repository.dart:99`),
-and `load()` writes whatever it got into the cache
-(`lib/features/household/data/supabase_garage_bootstrap_repository.dart:39`),
-so one refused read replaces a cache that knew the caller was a driver with
-one that says member. The next cold start draws the member layout — the
-garage list, an Add button the policy will refuse — until the refresh lands,
-which is the same shape `_lentVehicles` has for borrowed cars. Writing the
-previous rows back when the read fails would fix both.
-
 ### The entry sheets seed a UTC date as a local one, and name the previous day's driver west of UTC
 
 **Low, pre-existing.** Every entry sheet seeds its date field from
@@ -217,13 +205,18 @@ tab already waits for the list. Ruled acceptable for this release.
 
 **Low.** `myRoleProvider` answers `member` until the startup fetch, or its
 cache, has arrived (`lib/features/company/providers/company_providers.dart:67`),
-so a cold open draws the member's presentation for a moment: "Vehicles"
-before "My cars" in the title and before "Cars" on the tab, the Company entry
-at the top of More for an admin, and on a `/vehicles/:id` typed in by URL the add-reminder row and the
-income button until the bootstrap lands. Nothing is written in that moment
-without a tap, and every write the moment offers is refused by the
-policies; a loading state for the role, rather than a default, would remove
-it.
+so a cold open with no usable copy draws the member's presentation for a
+moment: "Vehicles" before "My cars" in the title and before "Cars" on the
+tab, the Company entry at the top of More for an admin, and on a
+`/vehicles/:id` typed in by URL the add-reminder row and the income button
+until the bootstrap lands. The copy carries the role, and since 17 October a
+fetch that could not read it no longer rewrites it, so the moment is the
+first open after a sign-in, which clears the copy, or after thirty days away
+(`lib/features/household/data/garage_bootstrap_cache.dart:46`). Nothing is
+written in that moment without a tap, and every write the moment offers is
+refused by the policies; a loading state for the role, rather than a
+default, would remove it, at the price of deciding what each of the screens
+that ask shows while it loads.
 
 ### The failure sentence repeats on every driver row of the members screen
 
@@ -1011,6 +1004,24 @@ several releases later.
 
 ## Recently fixed, worth remembering
 
+### A refused role read wrote "member" over a cache that knew better
+
+**Low, fixed 17 October 2026; since the company plan.** The startup fetch's
+role read and its lent-car read each swallow a failure, so the garage never
+goes dark over them, and each answered "none" when it failed. That answer
+was then written over the device's copy, so one refused role read replaced a
+cache that knew the caller drove with one that said member, and the next
+cold start drew the member's layout until the refresh landed; a failed lent
+car read did the same to a borrowed car. A failed read is now null, not
+empty (`lib/features/household/data/supabase_garage_bootstrap_repository.dart:132`),
+and when either is, the fetch keeps what the last full one said, from the
+copy, and does not rewrite it
+(`lib/features/household/data/supabase_garage_bootstrap_repository.dart:78`).
+With no copy, the role is `member` as before.
+`test/features/household/supabase_garage_bootstrap_repository_test.dart:190`
+reads the role twice, refused the second time, and checks the screen's
+answer and the disk's.
+
 ### The tyres, documents and parts screens offered a driver what they could not do
 
 **Low, fixed 17 October 2026; since the company plan.** A driver holds
@@ -1678,7 +1689,7 @@ token could ask PostgREST for both. Proven with a fuel-only pass reading the own
 Fixed in `supabase/migrations/0072_guest_vehicle_columns.sql:31`: borrowers have
 no read on the table, and `guest_vehicles` hands them an allowlist of columns,
 which the app fetches at startup
-(`lib/features/household/data/supabase_garage_bootstrap_repository.dart:83`).
+(`lib/features/household/data/supabase_garage_bootstrap_repository.dart:115`).
 `test/ci/guest_vehicle_columns_test.dart` fails the build for the next vehicle
 column nobody has decided about (decision 164). A borrower on an older build
 sees no borrowed car until they update.

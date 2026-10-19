@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/errors/failure_log.dart';
+import 'package:garage/features/household/data/garage_bootstrap_cache.dart';
 import 'package:garage/features/household/data/supabase_garage_bootstrap_repository.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -130,12 +131,15 @@ void main() {
   group("the caller's role", () {
     /// The same server as [serverAnswering], with sign-in: the role is read
     /// off the caller's own membership rows, which needs a caller.
-    FakeSupabaseServer server({(int, Object)? memberships}) {
+    FakeSupabaseServer server({
+      (int, Object)? memberships,
+      (int, Object)? lent,
+    }) {
       return FakeSupabaseServer((request) {
         return switch (request.url.path) {
           '/rest/v1/households' => (200, [householdRow(id: 'h1')]),
           '/rest/v1/vehicles' => (200, const []),
-          '/rest/v1/rpc/guest_vehicles' => (200, const []),
+          '/rest/v1/rpc/guest_vehicles' => lent ?? (200, const []),
           '/rest/v1/household_members' =>
             memberships ??
                 (
@@ -178,6 +182,66 @@ void main() {
       expect(bootstrap.households.single.id, 'h1');
       expect(bootstrap.roleIn('h1'), 'member');
       expect(recordedFailures, isNotEmpty);
+    });
+
+    // One refused read wrote "member" over a cache that knew the caller
+    // drove, and the next cold start drew the member's layout — the garage
+    // list, an Add button the policy refuses — until the refresh landed.
+    test(
+      'that cannot be read is what the last fetch said, here and on disk',
+      () async {
+        final cache = PrefsGarageBootstrapCache();
+        final first = server();
+        await first.signIn();
+        await SupabaseGarageBootstrapRepository(
+          first.client,
+          cache: cache,
+        ).load();
+        await Future<void>.delayed(Duration.zero);
+
+        final refused = server(
+          memberships: (401, {'code': '42501', 'message': 'permission denied'}),
+        );
+        await refused.signIn();
+        final bootstrap = await SupabaseGarageBootstrapRepository(
+          refused.client,
+          cache: cache,
+        ).load();
+        await Future<void>.delayed(Duration.zero);
+
+        expect(bootstrap.roleIn('h1'), 'driver');
+        expect((await cache.read('u1'))!.roleIn('h1'), 'driver');
+        expect(recordedFailures, isNotEmpty);
+      },
+    );
+
+    test('nor does a failed lending function forget a borrowed car', () async {
+      final cache = PrefsGarageBootstrapCache();
+      final first = server(
+        lent: (
+          200,
+          [vehicleRow(id: 'v9', nickname: 'Sister Clio', householdId: 'hers')],
+        ),
+      );
+      await first.signIn();
+      await SupabaseGarageBootstrapRepository(
+        first.client,
+        cache: cache,
+      ).load();
+      await Future<void>.delayed(Duration.zero);
+
+      final failing = server(lent: (503, {'message': 'upstream unavailable'}));
+      await failing.signIn();
+      final bootstrap = await SupabaseGarageBootstrapRepository(
+        failing.client,
+        cache: cache,
+      ).load();
+      await Future<void>.delayed(Duration.zero);
+
+      expect(bootstrap.borrowedVehicles.map((it) => it.id), ['v9']);
+      expect((await cache.read('u1'))!.borrowedVehicles.map((it) => it.id), [
+        'v9',
+      ]);
     });
 
     test('is not asked for when nobody is signed in', () async {

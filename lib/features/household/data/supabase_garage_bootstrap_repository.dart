@@ -17,8 +17,9 @@ class SupabaseGarageBootstrapRepository implements GarageBootstrapRepository {
   final SupabaseClient _client;
 
   /// Written to on every successful fetch, so the *next* cold start has
-  /// something to draw. Never read here: what to do with a cached garage is
-  /// the provider's decision, not a repository's.
+  /// something to draw. Read here only when the role or the lent cars could
+  /// not be fetched, for what the last full fetch said about them; what to do
+  /// with a cached garage otherwise is the provider's decision.
   final GarageBootstrapCache _cache;
 
   /// Four requests, issued together: the garages, their cars, the cars a
@@ -44,26 +45,56 @@ class SupabaseGarageBootstrapRepository implements GarageBootstrapRepository {
         _lentVehicles(),
         _memberships(),
       ]);
-      final households = results[0];
-      final vehicles = [...results[1], ...results[2]];
+      final households = results[0]!;
+      final lent = results[2];
       final memberships = results[3];
-      if (_client.auth.currentUser?.id case final userId?) {
-        // Not awaited: a disk write must not stand between the app and the
-        // frame this fetch was for. A failure inside is swallowed by the
-        // cache itself.
-        unawaited(
-          _cache.write(
-            userId,
-            households: households,
-            vehicles: vehicles,
-            memberships: memberships,
-          ),
-        );
-      }
-      return garageBootstrapFromRows(
+      final vehicles = [...results[1]!, ...?lent];
+      final userId = _client.auth.currentUser?.id;
+      final fresh = garageBootstrapFromRows(
         households: households,
         vehicles: vehicles,
-        memberships: memberships,
+        memberships: memberships ?? const [],
+      );
+      if (lent != null && memberships != null) {
+        if (userId != null) {
+          // Not awaited: a disk write must not stand between the app and the
+          // frame this fetch was for. A failure inside is swallowed by the
+          // cache itself.
+          unawaited(
+            _cache.write(
+              userId,
+              households: households,
+              vehicles: vehicles,
+              memberships: memberships,
+            ),
+          );
+        }
+        return fresh;
+      }
+      // A read that failed says nothing about the role or the borrowed cars,
+      // so what the last full fetch said stands, on screen and on disk: the
+      // cache is not rewritten, or one refused read would draw a driver the
+      // member's layout on every cold start until the next full one.
+      final previous = userId == null ? null : await _cache.read(userId);
+      if (previous == null) {
+        return fresh;
+      }
+      final own = {
+        for (final cars in fresh.vehiclesByHousehold.values)
+          for (final car in cars) car.id,
+      };
+      return GarageBootstrap(
+        households: fresh.households,
+        vehiclesByHousehold: fresh.vehiclesByHousehold,
+        borrowedVehicles: lent != null
+            ? fresh.borrowedVehicles
+            : [
+                for (final car in previous.borrowedVehicles)
+                  if (!own.contains(car.id)) car,
+              ],
+        rolesByHousehold: memberships != null
+            ? fresh.rolesByHousehold
+            : previous.rolesByHousehold,
       );
     } catch (error) {
       throw AppFailure.from(error);
@@ -79,14 +110,15 @@ class SupabaseGarageBootstrapRepository implements GarageBootstrapRepository {
   /// A failure here is recorded and costs nothing else. The web app and the
   /// migration ship on the same push in no fixed order, so for a few minutes
   /// the function may not exist, and an account's own garage must not go dark
-  /// because a borrowed car could not be fetched.
-  Future<List<Map<String, dynamic>>> _lentVehicles() async {
+  /// because a borrowed car could not be fetched. Null then, which is not
+  /// "none": [load] keeps the last fetch's.
+  Future<List<Map<String, dynamic>>?> _lentVehicles() async {
     try {
       final rows = await _client.rpc('guest_vehicles') as List<dynamic>;
       return rows.cast<Map<String, dynamic>>();
     } catch (error) {
       reportFailure(AppFailure.from(error));
-      return const [];
+      return null;
     }
   }
 
@@ -94,9 +126,10 @@ class SupabaseGarageBootstrapRepository implements GarageBootstrapRepository {
   ///
   /// Recorded and swallowed like the lent cars, and for the same reason: a
   /// build that predates the role-carrying policy must not lose its garage
-  /// over a request that only decides which list a driver sees. A role that
-  /// could not be read is `member`, which is what every garage was.
-  Future<List<Map<String, dynamic>>> _memberships() async {
+  /// over a request that only decides which list a driver sees. Null when it
+  /// failed: [load] keeps the role the last fetch read, and with none, a role
+  /// that could not be read is `member`, which is what every garage was.
+  Future<List<Map<String, dynamic>>?> _memberships() async {
     try {
       final userId = _client.auth.currentUser?.id;
       if (userId == null) {
@@ -108,7 +141,7 @@ class SupabaseGarageBootstrapRepository implements GarageBootstrapRepository {
           .eq('user_id', userId);
     } catch (error) {
       reportFailure(AppFailure.from(error));
-      return const [];
+      return null;
     }
   }
 }

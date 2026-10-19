@@ -79,12 +79,13 @@ like is below.
 
 **The role travels with the startup fetch.** The bootstrap's fourth request is
 the caller's own `household_members` rows
-(`lib/features/household/data/supabase_garage_bootstrap_repository.dart:99`),
+(`lib/features/household/data/supabase_garage_bootstrap_repository.dart:132`),
 kept in `GarageBootstrap.rolesByHousehold` and in the on-device cache, so a
 driver's phone opens on the right presentation from the copy it kept
 (`lib/features/household/data/garage_bootstrap.dart:48`). A role that could not
-be read, or a cache from before roles were kept, reads as `member`, which is
-what every garage was. `myRoleProvider` and `isDriverProvider`
+be read is the one the last full fetch read, and the fetch that missed it
+does not rewrite the copy; with no copy, or one from before roles were kept,
+it reads as `member`, which is what every garage was. `myRoleProvider` and `isDriverProvider`
 (`lib/features/company/providers/company_providers.dart:67`) are what every
 screen asks about the garage on screen. The car page asks about the car's
 own garage instead, `roleForVehicleProvider` and `isDriverForVehicleProvider`
