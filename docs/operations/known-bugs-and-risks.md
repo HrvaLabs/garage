@@ -132,7 +132,7 @@ and the same line in the cost, service and trip sheets). An entry's date is
 UTC midnight, which west of Greenwich is the evening before, so an edit
 opened in Lisbon or New York shows the previous day, keeps it on save, and —
 new with the company plan — resolves the driver line under the date for that
-previous day (`lib/features/company/widgets/driver_on_date.dart:39`). East of
+previous day (`lib/features/company/widgets/driver_on_date.dart:51`). East of
 UTC, where every tester is, the day is right. The fix is to seed the field
 from the UTC components rather than convert, in all four sheets at once.
 
@@ -189,17 +189,6 @@ driver is not choosable in the export's driver chooser either
 by exporting everyone and filtering the `driver` column on "Former member".
 A snapshot of the display name on the window, taken at the handover, is the
 fix, and is a column the log does not have yet.
-
-### "A former member" flashes on a sheet while the names load
-
-**Low.** `driverNameOnProvider` answers `''` while `memberNamesProvider` has
-no value yet (`lib/features/company/providers/company_providers.dart:171`),
-and `''` is the word for a departed member, so the driver line under a
-sheet's date and on the incidents card reads "a former member" for the
-frames between the log landing and the member list landing. One `hasValue`
-gate on the names would hold the line back the way the log's own gate does
-(`lib/features/company/widgets/driver_on_date.dart:35`); the Reimbursements
-tab already waits for the list. Ruled acceptable for this release.
 
 ### The role flips from member to driver when the first bootstrap fetch lands
 
@@ -1003,6 +992,22 @@ several releases later.
 ---
 
 ## Recently fixed, worth remembering
+
+### "A former member" flashed while the names loaded
+
+**Low, fixed 17 October 2026; since the company plan.** `driverNameOnProvider`
+answers `''` while the member list has no value
+(`lib/features/company/providers/company_providers.dart:171`), and `''` is the
+word for a departed member, so the driver line under a sheet's date, on the
+incidents card and in the console's incidents list read "a former member" for
+the frames between the log landing and the names landing. The entry named the
+sheets and the card; the console's list did it too. Both now wait for the
+names once the log names somebody, as they already waited for the log
+(`lib/features/company/widgets/driver_on_date.dart:47`,
+`lib/features/company/widgets/incidents_tab.dart:104`).
+`test/features/company/driver_on_date_test.dart:103` and
+`test/features/company/incidents_tab_test.dart:182` hold the names back and
+then let them land.
 
 ### A refused role read wrote "member" over a cache that knew better
 

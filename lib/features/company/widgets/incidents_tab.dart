@@ -11,6 +11,7 @@ import '../../incidents/providers/incident_providers.dart';
 import '../../incidents/widgets/incident_sheet.dart';
 import '../../settings/providers/unit_providers.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
+import '../../household/providers/member_providers.dart';
 import '../providers/company_providers.dart';
 import 'driver_on_date.dart';
 
@@ -95,8 +96,12 @@ class _IncidentsTabState extends ConsumerState<IncidentsTab> {
               }
               // Nothing about the driver until the log is known: "no
               // driver" is a claim about the log, and the first list after
-              // launch, or one whose fetch failed, must not make it.
-              final logKnown = ref.watch(fleetAssignmentsProvider).hasValue;
+              // launch, or one whose fetch failed, must not make it. Nor
+              // until the names are: an empty one is the word for a
+              // departed member.
+              final logKnown =
+                  ref.watch(fleetAssignmentsProvider).hasValue &&
+                  ref.watch(memberNamesProvider).hasValue;
               return ListView(
                 padding: const EdgeInsets.only(bottom: GarageTokens.space6),
                 children: [

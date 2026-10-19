@@ -21,6 +21,9 @@ List<Override> driverLog({
   /// The fetch itself, for a log that has not arrived or one whose fetch
   /// failed. Wins over [assignments].
   Future<List<VehicleAssignment>> Function()? fetch,
+
+  /// The member list's, for names that have not arrived. Wins over [names].
+  Future<Map<String, String>> Function()? namesFetch,
 }) {
   final log =
       assignments ??
@@ -36,6 +39,8 @@ List<Override> driverLog({
     fleetAssignmentsProvider.overrideWith(
       (ref) => fetch?.call() ?? Future.value(log),
     ),
-    memberNamesProvider.overrideWith((ref) async => names),
+    memberNamesProvider.overrideWith(
+      (ref) => namesFetch?.call() ?? Future.value(names),
+    ),
   ];
 }

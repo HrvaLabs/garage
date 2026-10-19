@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/errors/app_failure.dart';
@@ -54,10 +56,25 @@ Future<void> pumpIncidents(
 
   /// A second car, sold: its reports are still the fleet's.
   bool withArchivedCar = false,
+
+  /// The names, for a list that has not arrived. The members themselves
+  /// still answer, or the screens waiting on them would never settle.
+  Future<Map<String, String>> Function()? names,
   Size surface = const Size(1400, 900),
   Locale? locale,
   double textScale = 1,
 }) async {
+  // A list still loading draws a spinner, which never settles.
+  Future<void> settle() async {
+    if (names == null) {
+      await tester.pumpAndSettle();
+      return;
+    }
+    for (var frame = 0; frame < 10; frame++) {
+      await tester.pump(const Duration(milliseconds: 100));
+    }
+  }
+
   await pumpScreen(
     tester,
     const CompanyScreen(),
@@ -88,12 +105,13 @@ Future<void> pumpIncidents(
         ),
       ),
       membersProvider.overrideWith((ref) async => people),
+      if (names != null) memberNamesProvider.overrideWith((ref) => names()),
       incidentRepositoryProvider.overrideWithValue(
         repository ?? RecordingIncidents(stored: incidents),
       ),
     ],
   );
-  await tester.pumpAndSettle();
+  await settle();
   // The tab, and not a sidebar link of the same name; on a narrow phone at
   // a large font the strip scrolls, so the tab is brought on screen first.
   final tab = find.descendant(
@@ -103,9 +121,9 @@ Future<void> pumpIncidents(
     ),
   );
   await tester.ensureVisible(tab);
-  await tester.pumpAndSettle();
+  await settle();
   await tester.tap(tab);
-  await tester.pumpAndSettle();
+  await settle();
 }
 
 void main() {
@@ -159,6 +177,29 @@ void main() {
     expect(find.byKey(const Key('incident-row-i1')), findsOneWidget);
     expect(find.textContaining('No driver assigned'), findsNothing);
     expect(find.textContaining('Driver on this date'), findsNothing);
+  });
+
+  testWidgets('names nobody while the names load, not "a former member"', (
+    tester,
+  ) async {
+    // An empty name is the word for a departed member; until the member
+    // list lands, Ana read as somebody who had left.
+    final names = Completer<Map<String, String>>();
+    await pumpIncidents(
+      tester,
+      incidents: [reported()],
+      names: () => names.future,
+    );
+
+    expect(find.byKey(const Key('incident-row-i1')), findsOneWidget);
+    expect(find.textContaining('a former member'), findsNothing);
+
+    names.complete({
+      for (final member in people) member.userId: member.displayName,
+    });
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('Ana'), findsOneWidget);
   });
 
   testWidgets('a quiet fleet says so', (tester) async {

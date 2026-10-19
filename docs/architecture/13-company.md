@@ -219,11 +219,11 @@ report — go through `AssignmentResolution.driverOf`
 (`lib/domain/company/assignment_resolution.dart:40`) with a names map.
 
 Every entry sheet on the plan says so under its date
-(`lib/features/company/widgets/driver_on_date.dart:21`): "Driver on this
+(`lib/features/company/widgets/driver_on_date.dart:22`): "Driver on this
 date: Ana", or that nobody was assigned, and nothing at all while the log has
 not arrived or its fetch failed with nothing cached — the first sheet after
 launch must not claim nobody had the car. For a driver a day the log gives
-to nobody is also nothing (`lib/features/company/widgets/driver_on_date.dart:50`),
+to nobody is also nothing (`lib/features/company/widgets/driver_on_date.dart:57`),
 since the policy shows them their own windows only: under the previous
 driver's fine the line would say nobody had the car, and be wrong. Driver
 in the car's garage, as the car page asks it, since a car opened by URL can
@@ -264,7 +264,7 @@ unknown on a cold start typed in by URL
 |---|---|---|
 | Drivers and cars | `lib/features/company/widgets/drivers_and_cars_tab.dart:30` | A card per car: who has it today, since when, signed or not, a Hand over button, the earlier windows, and a menu that strikes the newest open window from the log |
 | Deadlines | `lib/features/company/widgets/deadlines_tab.dart:30` | This month, or everything ahead, grouped by month; a row opens the car |
-| Incidents | `lib/features/company/widgets/incidents_tab.dart:19` | Open, or all, across the fleet, archived cars included; a row opens the sheet |
+| Incidents | `lib/features/company/widgets/incidents_tab.dart:20` | Open, or all, across the fleet, archived cars included; a row opens the sheet |
 | Reimbursements | `lib/features/company/widgets/reimbursements_tab.dart:26` | Who is owed what, per month, with Mark as paid |
 | Accountant pack | `lib/features/company/widgets/accountant_pack_tab.dart:35` | The month's missing receipts with Remind driver, the month picker, and Build the pack with its progress line |
 | Settings | `lib/features/company/widgets/company_settings_tab.dart:19` | The letterhead: name, OIB (eleven digits, digits only), address. The plan is read-only and named in the banner |
@@ -566,11 +566,6 @@ resolve against.
 - **A departed driver's name cannot be read back.** The profiles policy hides
   a profile once its owner is no longer a co-member, so every reader prints a
   former member as such, through `memberNameOf`.
-- **"A former member" flashes while the names load.** `driverNameOnProvider`
-  answers `''` until the member list arrives
-  (`lib/features/company/providers/company_providers.dart:171`), so a sheet
-  or the incidents card reads "a former member" for the frames before it
-  lands. The Reimbursements tab waits for the list instead.
 - **The role flips from member to driver when the first bootstrap fetch
   lands.** `myRoleProvider` answers `member` until then, so on a cold open the
   title reads "Vehicles" before "My cars" and the tab before "Cars", the

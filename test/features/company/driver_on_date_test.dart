@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/domain/entities/household.dart';
@@ -21,6 +23,7 @@ Future<void> pumpLine(
   /// The startup fetch itself, for a test whose car is in another garage
   /// than the one on screen. Wins over [role].
   GarageBootstrapRepository? bootstrap,
+  Future<Map<String, String>> Function()? namesFetch,
 }) async {
   await pumpScreen(
     tester,
@@ -34,6 +37,7 @@ Future<void> pumpLine(
     overrides: driverLog(
       assignments: assignments,
       names: const {'u1': 'Karlo', 'u3': 'Ivo'},
+      namesFetch: namesFetch,
     ),
   );
   await tester.pumpAndSettle();
@@ -94,6 +98,35 @@ void main() {
     );
 
     expect(find.byKey(const Key('driver-on-date')), findsNothing);
+  });
+
+  testWidgets('says nothing while the names load, not "a former member"', (
+    tester,
+  ) async {
+    // An empty name is the word for a departed member, so for the frames
+    // between the log landing and the member list landing the driver of the
+    // day read as somebody who had left.
+    final names = Completer<Map<String, String>>();
+    await pumpLine(
+      tester,
+      role: 'admin',
+      assignments: [
+        VehicleAssignment(
+          id: 'ivo',
+          vehicleId: 'v1',
+          userId: 'u3',
+          fromDate: DateTime.utc(2026, 9, 1),
+        ),
+      ],
+      namesFetch: () => names.future,
+    );
+
+    expect(find.byKey(const Key('driver-on-date')), findsNothing);
+
+    names.complete(const {'u3': 'Ivo'});
+    await tester.pumpAndSettle();
+
+    expect(find.text('Driver on this date: Ivo'), findsOneWidget);
   });
 
   testWidgets('a driver is still named on their own day', (tester) async {

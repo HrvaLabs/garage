@@ -4,6 +4,7 @@ import 'package:garage/l10n/app_localizations.dart';
 
 import '../../../core/theme/garage_theme.dart';
 import '../../../core/theme/garage_tokens.dart';
+import '../../household/providers/member_providers.dart';
 import '../providers/company_providers.dart';
 
 /// Who had the car on the entry's date, under the date on every sheet a
@@ -36,12 +37,18 @@ class DriverOnDate extends ConsumerWidget {
       return const SizedBox.shrink();
     }
     final l10n = AppLocalizations.of(context)!;
-    final name = ref.watch(
-      driverNameOnProvider((
-        vehicleId: vehicleId,
-        date: DateTime.utc(date.year, date.month, date.day),
-      )),
+    final day = (
+      vehicleId: vehicleId,
+      date: DateTime.utc(date.year, date.month, date.day),
     );
+    // Nor, once the log names somebody, until the names are known: an empty
+    // name is the word for a departed member, and before the member list
+    // lands the driver of the day would read as one.
+    if (ref.watch(driverOnProvider(day)) != null &&
+        !ref.watch(memberNamesProvider).hasValue) {
+      return const SizedBox.shrink();
+    }
+    final name = ref.watch(driverNameOnProvider(day));
     // The policy shows a driver their own windows and nothing else, so the
     // log they hold cannot say a day was nobody's: under the previous
     // driver's fine it would, and be wrong. Their own days are still named.
