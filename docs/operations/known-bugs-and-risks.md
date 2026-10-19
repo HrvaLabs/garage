@@ -537,7 +537,7 @@ projections resolved, for exactly that reason.
 
 **Attempted again, 4 September 2026, and not reproduced — with a reason worth
 writing down.** The dashboard's own harness cannot produce it: `pumpDashboard`
-(`test/features/dashboard/dashboard_screen_test.dart:102`) overrides
+(`test/features/dashboard/dashboard_screen_test.dart:103`) overrides
 `bundlesProvider`, `householdProjectionsProvider`, `allVehiclesProvider` and
 every provider they derive from, so the listeners fire against futures the test
 supplies and never against the real graph being invalidated mid-build. Any
@@ -977,7 +977,8 @@ report is in `docs/superpowers/critiques/` (outside git). The first pass is
 decision 156; what it did not take on, ranked:
 
 - **Low, still open.** Each vehicle tab adds entries a different way: Costs has
-  a pinned row, the rest a floating button.
+  a pinned row, the rest a floating button (on a desk, a button above the
+  tab).
 
 **Fixed in decisions 173 and 177:** the vehicle tabs say what they hold (Fuel,
 Upkeep, Car, Costs); a car out on loan says so on the dashboard and in the car
@@ -998,6 +999,21 @@ several releases later.
 ---
 
 ## Recently fixed, worth remembering
+
+### A page's own act joining the top bar built its Add again
+
+**Low, caught before shipping, 18 October 2026.** The top bar wrapped each
+widget in its far-end slot in the same `Padding`, so when a page's own act
+joined the slot ahead of Add, as a car's documents or parts finished loading,
+Flutter paired the two wrappers by position and built Add again from nothing.
+A choice made in the quick-add dialog meanwhile then found its button gone and
+did nothing. Each widget now has a gap beside it instead
+(`lib/core/widgets/page_header.dart:178`), and Add carries a key of its own,
+so it is matched with itself whatever joins it.
+`test/core/widgets/page_header_test.dart:152` adds a widget ahead of another
+and takes it away, and the second stays the same element throughout;
+`test/core/widgets/page_header_test.dart:180` does it with two of a kind,
+told apart by their keys.
 
 ### An edit made with no signal was lost when the save it changed had landed
 
@@ -1082,11 +1098,11 @@ add buttons. The screens are now read-only to a driver: no add button, rows
 that open nothing, a set card with its readings and none of its actions, and
 an empty list that says nothing has been recorded rather than asking for the
 first (`lib/features/tyres/screens/tyres_screen.dart:543`,
-`lib/features/documents/screens/documents_screen.dart:40`,
-`lib/features/parts/screens/vehicle_parts_screen.dart:38`); the Car tab's row
+`lib/features/documents/screens/documents_screen.dart:41`,
+`lib/features/parts/screens/vehicle_parts_screen.dart:39`); the Car tab's row
 for what the car takes says the same. `test/features/tyres/tyres_screen_test.dart:253`,
-`test/features/documents/documents_screen_test.dart:111` and
-`test/features/parts/vehicle_parts_screen_test.dart:80` pump each as a driver.
+`test/features/documents/documents_screen_test.dart:113` and
+`test/features/parts/vehicle_parts_screen_test.dart:82` pump each as a driver.
 
 ### A backup made with no signal was made from copies
 
@@ -1173,13 +1189,13 @@ the page and the path it was given.
 ### The bottom tab under "My cars" said "Vehicles"
 
 **Low, fixed 16 October 2026; since drivers arrived in 0080.** A driver's list
-is titled "My cars" (`lib/features/vehicles/screens/vehicles_screen.dart:95`)
+is titled "My cars" (`lib/features/vehicles/screens/vehicles_screen.dart:96`)
 while the tab that opened it kept the everyday label: both navigation widgets
 take one-word labels by test, which "My cars", "Moja vozila" and "Le mie
 auto" are not, so the word was the owner's to choose. On 20 September the
 owner chose "Cars", "Auti" and "Auto", for a driver only. The bottom bar and
 the sidebar read the role and take that label for the cars tab
-(`lib/core/widgets/garage_bottom_nav.dart:59`,
+(`lib/core/widgets/garage_bottom_nav.dart:60`,
 `lib/core/widgets/garage_sidebar.dart:84`); everybody else keeps
 "Vehicles". `test/core/widgets/garage_bottom_nav_test.dart` holds the new
 label to one word in every language with the others, and asks for both
@@ -1940,7 +1956,7 @@ each was a promise that had stopped describing it.
   `supabase/migrations/0066_guest_briefing.sql:16`: the odometer, when the
   insurance, green card and roadworthiness run out, the text of every open
   problem, and the tyres. A sensible decision that three sentences predated.
-  `guestLendIntro` (`lib/l10n/app_en.arb:2067`), `PRIVACY.md`,
+  `guestLendIntro` (`lib/l10n/app_en.arb:2071`), `PRIVACY.md`,
   `web/privacy.html` and `web/features.html` now say so.
 - **The About screen and the features page said deleting an account takes
   every record with it** (`lib/l10n/app_en.arb:1284`). In a garage other people
@@ -4544,8 +4560,8 @@ incidents card keeps its add button for whoever sees it, and there is no
 guest policy on `incidents`. But the card is on the Car tab, and a borrowed
 car's page has no tabs: since 8 September, before incidents existed, a car
 that is not in one of your garages opens the borrower's page, the briefing
-and what the pass allows (`lib/features/vehicles/screens/vehicle_detail_screen.dart:602`).
-`test/features/vehicles/vehicle_detail_screen_test.dart:594` looks for the
+and what the pass allows (`lib/features/vehicles/screens/vehicle_detail_screen.dart:603`).
+`test/features/vehicles/vehicle_detail_screen_test.dart:620` looks for the
 button on a borrowed car, and the test after it finds it on the owner's.
 
 ### Moving to Flutter 3.47.7: five files rewritten, two first runs failed

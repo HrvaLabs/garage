@@ -3641,6 +3641,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get maintenanceAddRuleHint => 'Qualcosa che tornerà a scadere';
 
   @override
+  String get maintenanceAddChoice => 'Intervento o promemoria';
+
+  @override
   String get quickAddInterval => 'Aggiungi un promemoria';
 
   @override

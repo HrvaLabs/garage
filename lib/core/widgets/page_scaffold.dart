@@ -10,6 +10,7 @@ import 'adaptive.dart';
 import 'garage_bottom_nav.dart';
 import 'garage_sidebar.dart';
 import 'page_header.dart';
+import 'primary_action.dart';
 import 'stale_reads_banner.dart';
 
 /// Scaffold for a screen that was pushed onto another, the counterpart to
@@ -25,7 +26,7 @@ class GaragePageScaffold extends ConsumerWidget {
     required this.title,
     required this.body,
     this.actions = const [],
-    this.floatingActionButton,
+    this.primaryAction,
     this.bottom,
     this.contentWidth = ContentWidth.reading,
     this.showNavigation = true,
@@ -35,7 +36,11 @@ class GaragePageScaffold extends ConsumerWidget {
   final String title;
   final Widget body;
   final List<Widget> actions;
-  final Widget? floatingActionButton;
+
+  /// The page's main act: floating on a phone, in the top bar on a desk
+  /// (decision 198). A page without navigation keeps the phone's
+  /// presentation at every width, its floating button included.
+  final PrimaryAction? primaryAction;
 
   /// A tab bar or similar, shown under the title in both presentations.
   final PreferredSizeWidget? bottom;
@@ -70,7 +75,7 @@ class GaragePageScaffold extends ConsumerWidget {
       return Scaffold(
         appBar: AppBar(title: Text(title), actions: actions, bottom: bottom),
         body: content,
-        floatingActionButton: floatingActionButton,
+        floatingActionButton: primaryAction?.floating(),
       );
     }
 
@@ -86,51 +91,51 @@ class GaragePageScaffold extends ConsumerWidget {
           const GarageSidebar(),
           const VerticalDivider(width: 1),
           Expanded(
-            // A scaffold of its own, so the floating button stays within the
-            // content pane. Snackbars are sized at the root (WindowSnackBars).
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              floatingActionButton: floatingActionButton,
-              body: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  // The pane's whole width: a top bar, not a heading held to
-                  // the text column.
-                  PageHeader(
-                    title: title,
-                    crumbs:
-                        crumbs ??
-                        sectionCrumbs(
-                          AppLocalizations.of(context)!,
-                          location,
-                          carName: car == null
-                              ? null
-                              : ref.watch(vehicleProvider(car)).value?.nickname,
-                          driver: ref.watch(isDriverProvider),
-                        ),
-                    actions: actions,
-                    trailing: const [QuickAddButton()],
-                    // Only offered when there is something to go back to; a
-                    // page opened directly by URL on the web has an empty
-                    // stack.
-                    onBack: Navigator.of(context).canPop()
-                        ? () => Navigator.of(context).maybePop()
-                        : null,
-                  ),
-                  // A tab strip under the bar draws its own rule.
-                  if (bottom == null) const Divider(height: 1),
-                  // Outside the column on purpose. A tab strip belongs to the
-                  // surface it switches, so it runs the width of the pane along
-                  // with its divider — the same edge-to-edge strip a phone gets
-                  // from the app bar. Held to the text column it read as a
-                  // control floating mid-page, above a rule that stopped short
-                  // of both sides.
-                  ?bottom,
-                  Expanded(
-                    child: AdaptiveContent(width: contentWidth, child: content),
-                  ),
-                ],
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // The pane's whole width: a top bar, not a heading held to
+                // the text column.
+                PageHeader(
+                  title: title,
+                  crumbs:
+                      crumbs ??
+                      sectionCrumbs(
+                        AppLocalizations.of(context)!,
+                        location,
+                        carName: car == null
+                            ? null
+                            : ref.watch(vehicleProvider(car)).value?.nickname,
+                        driver: ref.watch(isDriverProvider),
+                      ),
+                  actions: actions,
+                  // The page's own act, then what every page offers.
+                  trailing: [
+                    if (primaryAction case final action? when action.showOnWide)
+                      action.toolbar(),
+                    // Keyed, so it stays itself as an act joins it.
+                    const QuickAddButton(key: ValueKey(QuickAddButton)),
+                  ],
+                  // Only offered when there is something to go back to; a
+                  // page opened directly by URL on the web has an empty
+                  // stack.
+                  onBack: Navigator.of(context).canPop()
+                      ? () => Navigator.of(context).maybePop()
+                      : null,
+                ),
+                // A tab strip under the bar draws its own rule.
+                if (bottom == null) const Divider(height: 1),
+                // Outside the column on purpose. A tab strip belongs to the
+                // surface it switches, so it runs the width of the pane along
+                // with its divider — the same edge-to-edge strip a phone gets
+                // from the app bar. Held to the text column it read as a
+                // control floating mid-page, above a rule that stopped short
+                // of both sides.
+                ?bottom,
+                Expanded(
+                  child: AdaptiveContent(width: contentWidth, child: content),
+                ),
+              ],
             ),
           ),
         ],

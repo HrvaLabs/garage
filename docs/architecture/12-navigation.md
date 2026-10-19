@@ -21,7 +21,7 @@ On a wide window the tabs lead a sidebar instead, `GarageSidebar` (see
 [The desktop sidebar](#the-desktop-sidebar)); a pushed screen keeps the sidebar
 rather than swapping it for a back button, because a browser window that loses
 its navigation on every push leaves the back button as the only way out
-(`lib/core/widgets/page_scaffold.dart:80`). The page's title moves from an app
+(`lib/core/widgets/page_scaffold.dart:85`). The page's title moves from an app
 bar into a top bar across the content pane, with a breadcrumb (see
 [The top bar](#the-top-bar)).
 
@@ -101,8 +101,8 @@ an admin of a fleet opens the app for it more often than for the garage's own
 screen. The console is a pushed page with its own tab strip, not a sixth tab:
 Material caps the bar at five, and the fleet is one thing, however many views
 it has. A driver's Vehicles tab is titled "My cars" on its own page
-(`lib/features/vehicles/screens/vehicles_screen.dart:95`) and labelled "Cars"
-in the bar (`lib/core/widgets/garage_bottom_nav.dart:59`) and the sidebar
+(`lib/features/vehicles/screens/vehicles_screen.dart:96`) and labelled "Cars"
+in the bar (`lib/core/widgets/garage_bottom_nav.dart:60`) and the sidebar
 (`lib/core/widgets/garage_sidebar.dart:84`): the bar takes one-word labels by
 test, so the tab could not carry the title's two words, and the owner chose the
 word (decision 194).
@@ -214,16 +214,18 @@ The shape that works, and what the vehicle tabs do now:
 
 - **Anything that is content scrolls with the content.** The recalls card is
   the last row of the Car tab's list
-  (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1237`), reached by
+  (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1236`), reached by
   scrolling rather than by taking room. Upkeep is one lazily built list whose
   leading rows are the schedule and whose months are the history
   (`vehicle_detail_screen.dart:1062`); the schedule is the Maintenance screen's
   own list, told that something else scrolls it
-  (`lib/features/maintenance/screens/maintenance_screen.dart:189`).
-- **The everyday action is a FAB**, on a `Scaffold` belonging to the tab rather
-  than to the screen. The vehicle screen holds four tabs and one app bar, and
-  hanging a tab-specific action off it would mean threading the tab index
-  through a widget with no other reason to know it.
+  (`lib/features/maintenance/screens/maintenance_screen.dart:193`).
+- **The everyday action is the tab's own**, an `ActionPane`
+  (`lib/core/widgets/primary_action.dart:64`) belonging to the tab rather than
+  to the screen: a FAB on a `Scaffold` of the tab's on a phone, a button above
+  the tab's content on a desk. The vehicle screen holds four tabs and one app
+  bar, and hanging a tab-specific action off it would mean threading the tab
+  index through a widget with no other reason to know it.
 - **The once-in-a-while actions go in the menu.** The calendar and tyre sets
   moved into the vehicle's `PopupMenuButton` beside edit, transfer and report.
 
@@ -341,11 +343,12 @@ only on the screen behind it.
 
 The rule that came out of it: **an act done standing at the car is on the
 car's page, without a menu.** Logging a reading and starting a drive are the
-app-bar icons (`lib/features/vehicles/screens/vehicle_detail_screen.dart:396`);
+app-bar icons (`lib/features/vehicles/screens/vehicle_detail_screen.dart:397`);
 while a drive is out the icon gives way to the in-progress card above the
-tabs, which carries "Finish drive". Logging a fill-up is the Fuel tab's
-floating button (`vehicle_detail_screen.dart:736`), as logging a service is
-Upkeep's (`vehicle_detail_screen.dart:1101`). The five newest fill-ups sit
+tabs, which carries "Finish drive". Logging a fill-up is the Fuel tab's own
+button (`vehicle_detail_screen.dart:736`), floating on a phone and above the
+tab on a desk, as logging a service is Upkeep's
+(`vehicle_detail_screen.dart:1100`). The five newest fill-ups sit
 under the gauge as the fuel log's own rows
 (`lib/features/fuel/widgets/fuel_entry_row.dart:20`), and "All fill-ups (N)"
 (`vehicle_detail_screen.dart:897`) is the way to the rest.
@@ -520,7 +523,7 @@ into each other.
 On a wide window a page names itself in a top bar, `PageHeader`
 (`lib/core/widgets/page_header.dart:114`), where a phone has its app bar. Both
 scaffolds draw it (`lib/core/widgets/page_scaffold.dart:99`,
-`lib/core/widgets/garage_bottom_nav.dart:165`) across the content pane beside
+`lib/core/widgets/garage_bottom_nav.dart:166`) across the content pane beside
 the sidebar, above a rule; the content keeps its own column under it. The
 title used to be a heading held to that column, with the page's actions at the
 column's end. The bar belongs to the page, not to its text, as a tab strip
@@ -532,7 +535,7 @@ stack. Left to right: the back arrow, the crumbs over the title, the page's
 own actions, and a slot (`trailing`) for what a page offers beyond them.
 
 On every page that slot holds the quick-add, `QuickAddButton`
-(`lib/features/dashboard/widgets/quick_add_button.dart:13`): a button labelled
+(`lib/features/dashboard/widgets/quick_add_button.dart:15`): a button labelled
 Add that opens what the dashboard's + opens (`showQuickAdd`,
 `lib/features/dashboard/quick_add.dart:26`), so a fill-up, a service or a cost
 is logged from Statistics or the console without going back to the dashboard.
@@ -541,6 +544,23 @@ log against. A phone keeps it on the dashboard only. On a desk the dialog's
 three tiles keep the outline a card has on a phone
 (`lib/features/dashboard/quick_add.dart:209`), which the desk's theme takes
 from every other card (decision 198).
+
+A page's main act goes in the same slot, before Add. A screen names it as a
+`PrimaryAction` (`lib/core/widgets/primary_action.dart:14`) and the scaffold
+presents it for the window: on a phone the floating button the screen used to
+build itself, unchanged, and on a desk the page's one filled button in the top
+bar, where a button floating over a list would be a phone's. Add is outlined
+beside it, so the two never read as one offer twice. The dashboard's + is the
+quick-add itself, which a desk's bar already has, so there it is not drawn
+(`showOnWide`) and the bar holds one Add. The maintenance screen's + opens a
+choice of a service or a reminder, and on a desk its label names both,
+"Service or reminder", where "Add" read the same as the quick-add beside it;
+on documents and parts a driver is offered no add button there either. The
+slot puts its gap beside each widget rather than around it
+(`lib/core/widgets/page_header.dart:178`), and the quick-add carries a key of
+its own: wrapped alike, the quick-add was paired with a page's own act joining
+before it as a list loaded, and built again, losing a choice made in its
+dialog meanwhile.
 
 The crumbs say where a pushed page sits, read from its address by
 `pageLocation`, as the sidebar reads which link to light. `sectionCrumbs`

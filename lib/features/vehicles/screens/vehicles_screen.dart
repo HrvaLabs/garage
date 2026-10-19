@@ -12,6 +12,7 @@ import '../../../core/widgets/empty_state_art.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/confirm_delete.dart';
 import '../../../core/widgets/garage_bottom_nav.dart';
+import '../../../core/widgets/primary_action.dart';
 import '../../../core/widgets/vehicle_photo.dart';
 import '../../../domain/entities/vehicle.dart';
 import '../../company/providers/company_providers.dart';
@@ -108,12 +109,12 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
       ],
       // The empty state has its own Add vehicle; two of the same button on
       // one screen is one too many.
-      floatingActionButton: driver || (vehicles.value?.isEmpty ?? true)
+      primaryAction: driver || (vehicles.value?.isEmpty ?? true)
           ? null
-          : FloatingActionButton.extended(
+          : PrimaryAction(
+              label: l10n.vehiclesAdd,
+              icon: Icons.add,
               onPressed: () => _addVehicle(canAdd: canAdd),
-              icon: const Icon(Icons.add),
-              label: Text(l10n.vehiclesAdd),
             ),
       body: Column(
         children: [

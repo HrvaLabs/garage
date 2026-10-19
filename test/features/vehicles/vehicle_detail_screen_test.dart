@@ -33,6 +33,7 @@ import 'package:garage/domain/costs/running_cost.dart';
 import 'package:garage/features/costs/providers/running_cost_providers.dart';
 
 import '../../support/fake_attachments.dart';
+import '../../support/floating_button.dart';
 import '../../support/pump_screen.dart';
 import 'package:garage/features/vehicles/data/vehicle_repository.dart';
 import 'package:garage/domain/entities/household.dart';
@@ -428,6 +429,31 @@ void main() {
           matching: find.text('Log a service'),
         ),
         findsOneWidget,
+      );
+      expectFloatingButton(
+        tester,
+        key: const Key('log-service'),
+        label: 'Log a service',
+        icon: Icons.add,
+      );
+    });
+
+    testWidgets('a desk has it above the tab instead', (tester) async {
+      await pumpDetail(
+        tester,
+        projections: [projection()],
+        surface: desktopSurface,
+      );
+      await tester.pumpAndSettle();
+      await openTab(tester, 'Upkeep');
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FloatingActionButton), findsNothing);
+      final button = find.byKey(const Key('log-service'));
+      expect(tester.widget(button), isA<FilledButton>());
+      expect(
+        tester.getBottomLeft(button).dy,
+        lessThan(tester.getTopLeft(find.text('DUE')).dy),
       );
     });
 
@@ -1058,6 +1084,36 @@ void main() {
       await tester.tap(
         find.widgetWithText(FloatingActionButton, 'Log a fill-up'),
       );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Filled to full'), findsOneWidget);
+    });
+
+    testWidgets('a phone\'s button is the one it always was', (tester) async {
+      await pumpDetail(tester);
+      await tester.pumpAndSettle();
+
+      expectFloatingButton(
+        tester,
+        key: const Key('log-fuel'),
+        label: 'Log a fill-up',
+        icon: Icons.local_gas_station_outlined,
+      );
+    });
+
+    testWidgets('a desk logs it from above the tab instead', (tester) async {
+      await pumpDetail(tester, surface: desktopSurface);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FloatingActionButton), findsNothing);
+      final button = find.byKey(const Key('log-fuel'));
+      expect(tester.widget(button), isA<FilledButton>());
+      expect(
+        tester.getBottomLeft(button).dy,
+        lessThan(tester.getTopLeft(find.text('CURRENT ODOMETER')).dy),
+      );
+
+      await tester.tap(button);
       await tester.pumpAndSettle();
 
       expect(find.text('Filled to full'), findsOneWidget);

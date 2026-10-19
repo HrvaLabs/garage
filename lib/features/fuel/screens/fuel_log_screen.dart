@@ -6,6 +6,7 @@ import '../../../core/format/unit_format.dart';
 import '../../../core/theme/garage_theme.dart';
 import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/page_scaffold.dart';
+import '../../../core/widgets/primary_action.dart';
 import '../../../core/widgets/empty_state_art.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/confirm_delete.dart';
@@ -55,10 +56,10 @@ class FuelLogScreen extends ConsumerWidget {
     return GaragePageScaffold(
       // With two cars a log headed "Fuel" was anybody's.
       title: carTitle(carName, l10n.fuelTitle),
-      floatingActionButton: FloatingActionButton.extended(
+      primaryAction: PrimaryAction(
+        label: l10n.fuelAdd,
+        icon: Icons.local_gas_station,
         onPressed: () => showFuelEntrySheet(context, vehicleId),
-        icon: const Icon(Icons.local_gas_station),
-        label: Text(l10n.fuelAdd),
       ),
       body: Column(
         children: [

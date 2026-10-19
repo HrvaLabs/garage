@@ -4,6 +4,7 @@ import 'package:garage/core/theme/garage_theme.dart';
 import 'package:garage/core/widgets/garage_bottom_nav.dart';
 import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/core/widgets/page_scaffold.dart';
+import 'package:garage/features/dashboard/widgets/quick_add_button.dart';
 import 'package:garage/features/fuel/providers/fuel_providers.dart';
 import 'package:garage/features/fuel/providers/pump_providers.dart';
 import 'package:garage/features/odometer/providers/odometer_providers.dart';
@@ -29,6 +30,63 @@ void main() {
 
     expect(find.text('Fill-up'), findsOneWidget);
     expect(find.text('Service'), findsOneWidget);
+  });
+
+  testWidgets('it is the bar\'s outlined button, not a page\'s filled one', (
+    tester,
+  ) async {
+    // A page's own act is the filled button beside it. In the same fill they
+    // read as one offer made twice.
+    await pumpDesktop(
+      tester,
+      const GaragePageScaffold(title: 'Statistics', body: SizedBox()),
+      initialLocation: '/stats',
+      vehicles: [testVehicle('v1')],
+    );
+    await tester.pumpAndSettle();
+
+    final button = tester.widget(find.byKey(const Key('top-bar-quick-add')));
+    expect(button, isA<OutlinedButton>());
+    expect((button as OutlinedButton).style, GarageTheme.toolbarButton);
+  });
+
+  testWidgets('both top bars key it, to keep it itself beside a page\'s act', (
+    tester,
+  ) async {
+    // Matched by its key, it does not depend on what joins the bar beside it.
+    await pumpDesktop(
+      tester,
+      const GaragePageScaffold(title: 'Statistics', body: SizedBox()),
+      initialLocation: '/stats',
+      vehicles: [testVehicle('v1')],
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: find.byType(PageHeader),
+        matching: find.byKey(const ValueKey(QuickAddButton)),
+      ),
+      findsOneWidget,
+    );
+
+    await pumpDesktop(
+      tester,
+      const GarageTabScaffold(
+        current: GarageTab.timeline,
+        title: 'Timeline',
+        body: SizedBox(),
+      ),
+      initialLocation: '/timeline',
+      vehicles: [testVehicle('v1')],
+    );
+    await tester.pumpAndSettle();
+    expect(
+      find.descendant(
+        of: find.byType(PageHeader),
+        matching: find.byKey(const ValueKey(QuickAddButton)),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('a garage with no car is not offered it', (tester) async {

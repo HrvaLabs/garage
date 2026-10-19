@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/clock.dart';
 import 'package:garage/core/widgets/adaptive.dart';
+import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/core/format/unit_format.dart';
 import 'package:garage/domain/account/account_identity.dart';
 import 'package:garage/domain/entities/vehicle_document.dart';
@@ -15,7 +16,8 @@ import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 import 'package:garage/l10n/app_localizations.dart';
 
 import '../../support/fake_documents.dart';
-import '../../support/pump_screen.dart' show testVehicle;
+import '../../support/floating_button.dart';
+import '../../support/pump_screen.dart' show desktopSurface, testVehicle;
 
 final _today = DateTime.utc(2026, 9, 4);
 
@@ -141,6 +143,29 @@ void main() {
       expect(find.text('Nothing recorded for this car yet.'), findsOneWidget);
       expect(find.text('Add document'), findsNothing);
     });
+
+    // A desk puts the button in the top bar, where it must not come back.
+    testWidgets('and is offered nothing to add on a desk either', (
+      tester,
+    ) async {
+      await pumpScreen(tester, held(), driver: true, surface: desktopSurface);
+
+      expect(find.byKey(const Key('document-add')), findsNothing);
+      expect(find.text('Add document'), findsNothing);
+    });
+
+    testWidgets('where the admin finds it in the top bar', (tester) async {
+      await pumpScreen(tester, held(), surface: desktopSurface);
+
+      expect(find.byType(FloatingActionButton), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(PageHeader),
+          matching: find.byKey(const Key('document-add')),
+        ),
+        findsOneWidget,
+      );
+    });
   });
 
   testWidgets('a car with no paperwork says what to record', (tester) async {
@@ -186,6 +211,12 @@ void main() {
     );
 
     expect(find.byKey(const Key('document-add')), findsOneWidget);
+    expectFloatingButton(
+      tester,
+      key: const Key('document-add'),
+      label: 'Add document',
+      icon: Icons.add,
+    );
   });
 
   testWidgets('an expired certificate says so, and leads the list', (

@@ -18,6 +18,7 @@ import '../../../core/widgets/adaptive.dart';
 import '../../../core/widgets/cluster_readout.dart';
 import '../../../core/widgets/garage_tab_bar.dart';
 import '../../../core/widgets/pick_one.dart';
+import '../../../core/widgets/primary_action.dart';
 import '../../../domain/fuel/energy_type.dart';
 import '../../../domain/fuel/fuel_economy.dart';
 import '../../company/providers/company_providers.dart';
@@ -730,13 +731,12 @@ class _FuelTab extends ConsumerWidget {
     final withAttachments =
         ref.watch(entriesWithAttachmentsProvider).value ?? const <String>{};
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      floatingActionButton: FloatingActionButton.extended(
+    return ActionPane(
+      action: PrimaryAction(
         key: const Key('log-fuel'),
+        label: l10n.fuelAdd,
+        icon: Icons.local_gas_station_outlined,
         onPressed: () => showFuelEntrySheet(context, vehicleId),
-        icon: const Icon(Icons.local_gas_station_outlined),
-        label: Text(l10n.fuelAdd),
       ),
       body: AsyncValueView(
         value: points,
@@ -1091,17 +1091,16 @@ class _UpkeepTab extends ConsumerWidget {
       context,
     ).textTheme.bodyMedium?.copyWith(color: context.tokens.muted);
 
-    // A Scaffold of its own so the button belongs to this tab rather than to
-    // the whole vehicle screen: the parent holds four tabs and one app bar,
+    // An action pane of its own so the button belongs to this tab rather than
+    // to the whole vehicle screen: the parent holds four tabs and one app bar,
     // and hanging a tab-specific action off it would mean tracking the tab
     // index through a screen that has no other reason to know it.
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      floatingActionButton: FloatingActionButton.extended(
+    return ActionPane(
+      action: PrimaryAction(
         key: const Key('log-service'),
+        label: l10n.maintenanceLogService,
+        icon: Icons.add,
         onPressed: () => showServiceEntrySheet(context, vehicleId),
-        icon: const Icon(Icons.add),
-        label: Text(l10n.maintenanceLogService),
       ),
       body: AsyncValueView<List<ReminderProjection>>(
         value: projections,

@@ -35,6 +35,7 @@ import 'package:garage/features/observations/providers/observation_providers.dar
 import '../../support/fake_documents.dart';
 
 import '../../support/fake_repositories.dart';
+import '../../support/floating_button.dart';
 import '../../support/pump_screen.dart';
 import '../settings/backup_restore_test.dart'
     show
@@ -927,6 +928,35 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(FloatingActionButton), findsNothing);
+    });
+
+    testWidgets('a phone\'s + is the bare one it always was', (tester) async {
+      await pumpDashboard(tester, vehicles: [testVehicle('v1')]);
+      await tester.pumpAndSettle();
+
+      expectFloatingButton(
+        tester,
+        key: const Key('dashboard-add'),
+        label: 'Add',
+        icon: Icons.add,
+        extended: false,
+      );
+    });
+
+    // The + is the quick-add, which a desk's top bar has on every page: both
+    // on one page is the same offer twice.
+    testWidgets('a desk offers it once, as the top bar\'s Add', (tester) async {
+      await pumpDashboard(
+        tester,
+        vehicles: [testVehicle('v1')],
+        surface: desktopSurface,
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byType(FloatingActionButton), findsNothing);
+      expect(find.byKey(const Key('dashboard-add')), findsNothing);
+      expect(find.byKey(const Key('top-bar-quick-add')), findsOneWidget);
+      expect(find.text('Add'), findsOneWidget);
     });
 
     // A floating button floats over the content, so the list has to end above

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/domain/entities/code_description.dart';
 import 'package:garage/domain/entities/guest_pass.dart';
 import 'package:garage/domain/entities/service_entry.dart';
@@ -12,6 +13,7 @@ import 'package:garage/features/vehicles/screens/vehicles_screen.dart';
 import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../support/floating_button.dart';
 import '../../support/pump_screen.dart';
 
 class RecordingGuestPassRepository implements GuestPassRepository {
@@ -216,6 +218,34 @@ void main() {
 
       expect(find.text('This car has never been lent out.'), findsOneWidget);
       expect(find.byKey(const Key('lend-car')), findsOneWidget);
+    });
+
+    testWidgets('a phone lends it from the floating button', (tester) async {
+      await pumpPasses(tester, RecordingGuestPassRepository());
+
+      expectFloatingButton(
+        tester,
+        key: const Key('lend-car'),
+        label: 'Lend this car',
+        icon: Icons.key_outlined,
+      );
+    });
+
+    testWidgets('a desk lends it from the top bar', (tester) async {
+      await pumpPasses(
+        tester,
+        RecordingGuestPassRepository(),
+        surface: desktopSurface,
+      );
+
+      expect(find.byType(FloatingActionButton), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(PageHeader),
+          matching: find.byKey(const Key('lend-car')),
+        ),
+        findsOneWidget,
+      );
     });
 
     testWidgets('a live pass shows its code, who it is for, and its days', (

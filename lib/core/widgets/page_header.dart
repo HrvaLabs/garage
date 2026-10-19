@@ -172,11 +172,13 @@ class PageHeader extends StatelessWidget {
             ),
           ),
           ...actions,
-          for (final widget in trailing)
-            Padding(
-              padding: const EdgeInsets.only(left: GarageTokens.space2),
-              child: widget,
-            ),
+          // A gap beside each rather than a padding around it: wrapped alike,
+          // the quick-add was paired with a page's own act joining before it
+          // and built again, losing a choice made in its dialog meanwhile.
+          for (final widget in trailing) ...[
+            const SizedBox(width: GarageTokens.space2),
+            widget,
+          ],
         ],
       ),
     );

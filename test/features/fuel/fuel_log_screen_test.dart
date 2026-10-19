@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/format/unit_format.dart';
 import 'package:garage/core/theme/garage_tokens.dart';
 import 'package:garage/core/widgets/adaptive.dart';
+import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/domain/account/account_identity.dart';
 import 'package:garage/domain/entities/fuel_entry.dart';
 import 'package:garage/features/fuel/data/fuel_repository.dart';
@@ -15,6 +16,9 @@ import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 import 'package:garage/features/fuel/screens/fuel_log_screen.dart';
 import 'package:garage/features/settings/providers/unit_providers.dart';
 import 'package:garage/l10n/app_localizations.dart';
+
+import '../../support/floating_button.dart';
+import '../../support/pump_screen.dart' show desktopSurface;
 
 FuelEntry fill({
   required String id,
@@ -177,6 +181,35 @@ void main() {
       findsOneWidget,
     );
     expect(find.byKey(const ValueKey('f1')), findsOneWidget);
+  });
+
+  testWidgets('a phone logs a fill-up from the floating button', (
+    tester,
+  ) async {
+    await pumpFuelLog(tester, [fill(id: 'f1', odometerKm: 50310)]);
+    await tester.pumpAndSettle();
+
+    expectFloatingButton(
+      tester,
+      label: 'Log a fill-up',
+      icon: Icons.local_gas_station,
+    );
+  });
+
+  testWidgets('a desk logs it from the top bar', (tester) async {
+    await pumpFuelLog(tester, [
+      fill(id: 'f1', odometerKm: 50310),
+    ], surface: desktopSurface);
+    await tester.pumpAndSettle();
+
+    expect(find.byType(FloatingActionButton), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(PageHeader),
+        matching: find.widgetWithText(FilledButton, 'Log a fill-up'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('a desktop window keeps the log in a reading column', (

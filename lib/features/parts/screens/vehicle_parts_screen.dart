@@ -6,6 +6,7 @@ import '../../../core/theme/garage_theme.dart';
 import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/page_scaffold.dart';
+import '../../../core/widgets/primary_action.dart';
 import '../../../domain/entities/vehicle_part.dart';
 import '../../maintenance/service_type_labels.dart';
 import '../providers/vehicle_part_providers.dart';
@@ -44,12 +45,12 @@ class VehiclePartsScreen extends ConsumerWidget {
       ),
       // The empty state carries its own button, like the documents screen:
       // this list is empty for every household until the first lookup.
-      floatingActionButton: any && !driver
-          ? FloatingActionButton.extended(
+      primaryAction: any && !driver
+          ? PrimaryAction(
               key: const Key('part-add'),
+              label: l10n.partsAdd,
+              icon: Icons.add,
               onPressed: () => showVehiclePartSheet(context, vehicleId),
-              icon: const Icon(Icons.add),
-              label: Text(l10n.partsAdd),
             )
           : null,
       body: AsyncValueView<List<VehiclePart>>(

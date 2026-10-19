@@ -6298,6 +6298,12 @@ abstract class AppLocalizations {
   /// **'Something that should come round again'**
   String get maintenanceAddRuleHint;
 
+  /// The maintenance screen's add button on a wide window, where it carries a label. It opens a choice of logging a service or adding a reminder, so it names both. Plain "Add" read the same as the quick-add beside it in the top bar. A phone's button is a bare + with no label.
+  ///
+  /// In en, this message translates to:
+  /// **'Service or reminder'**
+  String get maintenanceAddChoice;
+
   /// No description provided for @quickAddInterval.
   ///
   /// In en, this message translates to:

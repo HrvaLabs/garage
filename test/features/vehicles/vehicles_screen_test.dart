@@ -9,6 +9,7 @@ import 'package:garage/domain/entities/guest_pass.dart';
 import 'package:garage/domain/entities/household.dart';
 import 'package:garage/domain/entities/vehicle_assignment.dart';
 import 'package:garage/core/widgets/adaptive.dart';
+import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/domain/entities/vehicle.dart';
 import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 import 'package:garage/features/vehicles/screens/vehicles_screen.dart';
@@ -16,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'vehicle_photo_repository_test.dart' show FakeVehiclePhotoRepository;
 
+import '../../support/floating_button.dart';
 import '../../support/pump_screen.dart';
 import '../company/company_providers_test.dart' show RecordingCompanyRepository;
 
@@ -202,6 +204,34 @@ void main() {
     await tester.pumpAndSettle();
 
     await tester.tap(find.byType(FloatingActionButton));
+    await tester.pumpAndSettle();
+
+    expect(log.visited, contains('/vehicles/new'));
+  });
+
+  testWidgets('a phone adds one from the floating button', (tester) async {
+    await pumpVehicles(tester, vehicles: [testVehicle('v1', nickname: 'Golf')]);
+    await tester.pumpAndSettle();
+
+    expectFloatingButton(tester, label: 'Add vehicle', icon: Icons.add);
+  });
+
+  testWidgets('a desk adds one from the top bar', (tester) async {
+    final log = await pumpVehicles(
+      tester,
+      vehicles: [testVehicle('v1', nickname: 'Golf')],
+      surface: desktopSurface,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(FloatingActionButton), findsNothing);
+    final add = find.descendant(
+      of: find.byType(PageHeader),
+      matching: find.widgetWithText(FilledButton, 'Add vehicle'),
+    );
+    expect(add, findsOneWidget);
+
+    await tester.tap(add);
     await tester.pumpAndSettle();
 
     expect(log.visited, contains('/vehicles/new'));

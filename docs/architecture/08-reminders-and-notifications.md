@@ -328,7 +328,7 @@ plausible date for a country nobody checked would look authoritative and be
 wrong, which is the same rule the statutory service types already follow.
 
 The maintenance row says **which** of the three kinds of rule applies
-(`maintenance_screen.dart:490`), because a driver told "15 Nov" has no way to
+(`maintenance_screen.dart:494`), because a driver told "15 Nov" has no way to
 know whether that is the law, a habit, or something the app made up. The
 wording deliberately stops short of legal advice: Croatia's rule binds on
 winter *sections*, not every road, and summer tyres with 4 mm plus chains

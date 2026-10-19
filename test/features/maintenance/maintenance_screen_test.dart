@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/widgets/adaptive.dart';
+import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/domain/entities/service_entry.dart';
+import 'package:garage/domain/entities/vehicle.dart';
 import 'package:garage/features/maintenance/data/maintenance_repository.dart';
 import 'package:garage/domain/maintenance/reminder_projection.dart';
 import 'package:garage/features/maintenance/providers/maintenance_providers.dart';
@@ -10,6 +12,7 @@ import 'package:garage/features/maintenance/widgets/maintenance_calendar.dart';
 
 import 'package:garage/domain/entities/household.dart';
 
+import '../../support/floating_button.dart';
 import '../../support/pump_screen.dart';
 
 final _today = DateTime(2026, 8, 15);
@@ -38,12 +41,19 @@ Future<NavigationLog> pumpMaintenance(
   double? drivingRate,
   Size surface = const Size(400, 1200),
   String countryCode = 'HR',
+  Locale? locale,
+
+  /// The garage's cars, for a test that wants the top bar's quick-add, which
+  /// a garage with none does not show.
+  List<Vehicle> vehicles = const [],
 }) {
   return pumpScreen(
     tester,
     const MaintenanceScreen(vehicleId: 'v1'),
     initialLocation: '/vehicles/v1/maintenance',
     surface: surface,
+    locale: locale,
+    vehicles: vehicles,
     household: Household(id: 'h1', name: 'Test', countryCode: countryCode),
     overrides: [
       vehicleProjectionsProvider('v1').overrideWith((ref) async => projections),
@@ -162,6 +172,86 @@ void main() {
     expect(find.text('Log a service'), findsOneWidget);
     expect(find.text('Add reminder'), findsOneWidget);
   });
+
+  testWidgets('a phone\'s + is the bare one it always was', (tester) async {
+    await pumpMaintenance(tester, projections: [projection()]);
+    await tester.pumpAndSettle();
+
+    expectFloatingButton(
+      tester,
+      key: const Key('maintenance-add'),
+      label: 'Service or reminder',
+      icon: Icons.add,
+      extended: false,
+    );
+  });
+
+  // Labelled "Add", it sat beside the quick-add's Add: two buttons reading
+  // the same in one bar, offering different things.
+  testWidgets('a desk names both of the two it offers', (tester) async {
+    await pumpMaintenance(
+      tester,
+      projections: [projection()],
+      surface: desktopSurface,
+      vehicles: [testVehicle('v1', nickname: 'Golf')],
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(FloatingActionButton), findsNothing);
+    final own = find.descendant(
+      of: find.byType(PageHeader),
+      matching: find.byKey(const Key('maintenance-add')),
+    );
+    expect(tester.widget(own), isA<FilledButton>());
+    expect(
+      find.descendant(of: own, matching: find.text('Service or reminder')),
+      findsOneWidget,
+    );
+    expect(find.byKey(const Key('top-bar-quick-add')), findsOneWidget);
+    expect(
+      find.descendant(of: find.byType(PageHeader), matching: find.text('Add')),
+      findsOneWidget,
+      reason: 'the quick-add is the bar\'s one Add',
+    );
+    expect(find.text('Log a service'), findsNothing);
+
+    await tester.tap(own);
+    await tester.pumpAndSettle();
+
+    expect(find.text('Log a service'), findsOneWidget);
+    expect(find.text('Add reminder'), findsOneWidget);
+  });
+
+  // The narrowest desk, with the quick-add beside it. The test font is wider
+  // than Inter, so a label that fits here fits in the app.
+  for (final (language, label) in [
+    ('en', 'Service or reminder'),
+    ('hr', 'Servis ili podsjetnik'),
+    ('it', 'Intervento o promemoria'),
+  ]) {
+    testWidgets('the narrowest desk\'s bar holds it in $language', (
+      tester,
+    ) async {
+      await pumpMaintenance(
+        tester,
+        projections: [projection()],
+        surface: const Size(900, 700),
+        locale: Locale(language),
+        vehicles: [testVehicle('v1', nickname: 'Golf')],
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('maintenance-add')),
+          matching: find.text(label),
+        ),
+        findsOneWidget,
+      );
+      expect(find.byKey(const Key('top-bar-quick-add')), findsOneWidget);
+    });
+  }
 
   testWidgets('and says which is which, since the words are close', (
     tester,

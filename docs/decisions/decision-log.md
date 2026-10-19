@@ -2892,17 +2892,18 @@ sidebar repeated the More list under a More that led to it again, three
 stats stretched across the window like a table with no rows, and a form of
 800-pixel inputs. The phone layout was being served wide, not a desktop one.
 
-**Second look, same day.** The floating button belongs to the content
-pane, which is a scaffold of its own. Snackbars could not be scoped that
-way: a sheet or dialog is a modal route under the root navigator, so its
-messenger is the root one whatever the page below does. Instead
-`WindowSnackBars` at the root sizes every snackbar to the window: floating,
-at most 560 px, centred, so on a desktop it clears the sidebar and on a
-phone it is what it was (on a wide window, superseded by decision 198, which
-puts a notice in the bottom right corner). The dashboard's garage row keeps
-its chevron beside the name on desktop rather than at any fixed width. About
-renders inside the shell like every other pushed page. An empty state's
-button is capped at 360 px, and the vehicles list shows no floating
+**Second look, same day.** The floating button belongs to the content pane,
+which is a scaffold of its own (until decision 198 put a desk's main act in
+the top bar, and the pane's scaffold went with the button). Snackbars could
+not be scoped that way: a sheet or dialog is a modal route under the root
+navigator, so its messenger is the root one whatever the page below does.
+Instead `WindowSnackBars` at the root sizes every snackbar to the window:
+floating, at most 560 px, centred, so on a desktop it clears the sidebar and
+on a phone it is what it was (on a wide window, superseded by decision 198,
+which puts a notice in the bottom right corner). The dashboard's garage row
+keeps its chevron beside the name on desktop rather than at any fixed width.
+About renders inside the shell like every other pushed page. An empty
+state's button is capped at 360 px, and the vehicles list shows no floating
 "Add vehicle" while its empty state offers the same button. The vehicle
 form's calculator dock sits inside the Optional section with its one field
 and reserves no space until the field is used, rather than as a blank band
@@ -2974,7 +2975,8 @@ fails on one.
 **Known cost of the split.** FABs live in the per-tab and per-pane
 scaffolds while snackbars are rendered by the root one, so a floating
 snackbar does not lift a FAB out of its way; "Service logged." can land on
-the Log service button for its four seconds.
+the Log service button for its four seconds. (Still so on a phone's vehicle
+tabs; a desk has had no floating button since decision 198.)
 
 **Verified on screen, and four fixes that had not landed.** A walk of the
 built app found that the "since you added it" figure still spread the
@@ -4940,7 +4942,7 @@ appeared only when it had bad news would answer nobody.
 ## 138. Lending is in the vehicle menu, and every route must have a caller
 
 **September 2026.** `Lending` sits between Documents and Transfer in the
-vehicle menu (`lib/features/vehicles/screens/vehicle_detail_screen.dart:460`),
+vehicle menu (`lib/features/vehicles/screens/vehicle_detail_screen.dart:461`),
 and `test/ci/every_route_has_a_way_in_test.dart` fails the build for any route
 in `app_router.dart` that nothing in `lib/` opens.
 
@@ -5660,7 +5662,7 @@ decision, because it moves where everything on the car lives.
 - **A drive starts from the car.** "Start a drive" was More › Trips › the
   vehicle dropdown › the car › the button, five taps, and absent from the
   owner's page while a borrower's had it. It is an app-bar action beside "Log
-  a reading" (`lib/features/vehicles/screens/vehicle_detail_screen.dart:396`),
+  a reading" (`lib/features/vehicles/screens/vehicle_detail_screen.dart:397`),
   hidden while a drive is out, when the in-progress card with "Finish drive"
   takes its place above the tabs; and the "+" sheet offers "Start a drive"
   before "Log a trip" (`lib/features/dashboard/quick_add.dart:102`).
@@ -5671,7 +5673,7 @@ decision, because it moves where everything on the car lives.
   now do too. The rows on Reminders about the car itself, tyres, documents,
   what it takes, the trip check, sit under a "This car" heading, so the tab
   reads as two things rather than seven. *Since decision 173 they have a tab
-  of their own* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1211`).
+  of their own* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1210`).
 - **One list, one name.** The due list is "Reminders" on the car and now
   "{car} · Reminders" when the dashboard or the planner opens it; a service is
   "Services" in the Timeline's filter as it is on every button; the settings
@@ -6421,11 +6423,11 @@ alone, as before.
 
 **18 September 2026.** The vehicle page's four tabs are what the car burns,
 what it is due for and has had done, the car itself, and what it costs
-(`lib/features/vehicles/screens/vehicle_detail_screen.dart:530`). Upkeep puts
+(`lib/features/vehicles/screens/vehicle_detail_screen.dart:531`). Upkeep puts
 the schedule above the services and readings logged, in one scroll
 (`vehicle_detail_screen.dart:1062`); Car holds the tyres, the papers, the parts,
 the check before a long drive, open problems and the recall check
-(`vehicle_detail_screen.dart:1211`). The strip shares the width out when every
+(`vehicle_detail_screen.dart:1210`). The strip shares the width out when every
 label fits and scrolls when one does not
 (`lib/core/widgets/garage_tab_bar.dart:10`).
 
@@ -6617,7 +6619,7 @@ delete.
 
 - A row under "Recent activity" opens its entry as the Timeline does
   (`lib/features/timeline/open_timeline_entry.dart:22`,
-  `lib/features/dashboard/screens/dashboard_screen.dart:610`), and the heading
+  `lib/features/dashboard/screens/dashboard_screen.dart:615`), and the heading
   opens the Timeline.
 - The three figures open where each is explained: the cars, statistics on its
   costs tab, and statistics
@@ -7596,9 +7598,9 @@ corner rather than under the middle of the page, where they covered the row
 they were about. A width only ever centres a snackbar, so what puts it in the
 corner is a margin as wide as the rest of the window, and that margin lets a
 click through to the page beside the notice
-(`lib/core/widgets/window_snackbars.dart`). *Trade-off:* the corner is where
-a page's floating button sits, so on a desk page that still has one, a notice
-covers it while it shows.
+(`lib/core/widgets/window_snackbars.dart`). The corner is where a page's
+floating button sat, and a notice covered it while it showed; a desk has none
+now, its main act being in the top bar (below).
 
 **A sidebar, not a rail.** `GarageSidebar` replaced `NavigationRail` in both
 scaffolds: five primaries (the four tabs and the garage's people), the tools
@@ -7650,3 +7652,23 @@ one was hovered, and a choice to press has to look like one
 (`lib/features/dashboard/quick_add.dart`). *Cost:* one kind of card the
 desk's theme does not reach, outlined by the tile itself rather than by the
 theme.
+
+**No floating button on a desk.** A page names its main act as a
+`PrimaryAction` (`lib/core/widgets/primary_action.dart`), and the scaffold
+presents it for the window: on a phone the floating button the screen used to
+build itself, unchanged, with no tooltip or spoken name it did not have; on a
+desk the page's one filled button in its top bar, before Add. A button
+floating over a list is a phone's idiom. A tab with an act of its own, the
+car's Fuel and Upkeep, is an `ActionPane`: its own floating button on a
+phone, a button above the tab's content on a desk. The dashboard's + is the
+quick-add, which every top bar already has, so a desk's dashboard has one Add
+and no +. The maintenance screen's + opens a choice of a service or a
+reminder, so on a desk its button names both, "Service or reminder". Labelled
+"Add" at first, for neither, it sat beside the quick-add's Add: two buttons
+reading the same in one bar, offering different things. A driver is offered
+no add button on a car's documents or parts on a desk, as on a phone. Add
+itself becomes the outlined button, the app's secondary one: the theme fills
+every `FilledButton` with the accent, the tonal one too, so beside a page's
+own act Add read as the same offer twice. *Cost:* a list still ends in the
+room it keeps clear for a floating button (`GarageTokens.fabClearance`), 88
+pixels a desk no longer needs.

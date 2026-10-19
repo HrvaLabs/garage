@@ -10,6 +10,7 @@ import '../../../core/widgets/adaptive.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/confirm_delete.dart';
 import '../../../core/widgets/page_scaffold.dart';
+import '../../../core/widgets/primary_action.dart';
 import '../../../domain/entities/trip_entry.dart';
 import '../../../domain/trips/trip_log.dart';
 import '../../settings/providers/unit_providers.dart';
@@ -90,13 +91,13 @@ class _TripLogScreenState extends ConsumerState<TripLogScreen> {
         ),
         const SizedBox(width: GarageTokens.space2),
       ],
-      floatingActionButton: vehicles.isEmpty
+      primaryAction: vehicles.isEmpty
           ? null
-          : FloatingActionButton.extended(
+          : PrimaryAction(
+              label: l10n.tripAdd,
+              icon: Icons.add,
               onPressed: () =>
                   showTripEntrySheet(context, chosen ?? vehicles.first.id),
-              icon: const Icon(Icons.add),
-              label: Text(l10n.tripAdd),
             ),
       body: AsyncValueView<List<TripEntry>>(
         value: trips,

@@ -8,6 +8,7 @@ import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/date_pickers.dart';
 import '../../../core/widgets/page_scaffold.dart';
+import '../../../core/widgets/primary_action.dart';
 import '../../../domain/entities/guest_pass.dart';
 import '../../settings/providers/unit_providers.dart';
 import '../providers/guest_pass_providers.dart';
@@ -35,11 +36,11 @@ class GuestPassesScreen extends ConsumerWidget {
 
     return GaragePageScaffold(
       title: vehicle?.nickname ?? l10n.guestPassesTitle,
-      floatingActionButton: FloatingActionButton.extended(
+      primaryAction: PrimaryAction(
         key: const Key('lend-car'),
+        label: l10n.guestLendTitle,
+        icon: Icons.key_outlined,
         onPressed: () => showLendCarSheet(context, ref, vehicleId),
-        icon: const Icon(Icons.key_outlined),
-        label: Text(l10n.guestLendTitle),
       ),
       body: AsyncValueView<List<GuestPass>>(
         value: passes,

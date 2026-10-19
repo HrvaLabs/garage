@@ -9,6 +9,7 @@ import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/empty_state_art.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/page_scaffold.dart';
+import '../../../core/widgets/primary_action.dart';
 import '../../../domain/documents/document_expiry.dart';
 import '../../../domain/entities/vehicle_document.dart';
 import '../../settings/providers/unit_providers.dart';
@@ -66,12 +67,12 @@ class DocumentsScreen extends ConsumerWidget {
         ref.watch(vehicleProvider(vehicleId)).value?.nickname,
         l10n.documentsTitle,
       ),
-      floatingActionButton: anyDocuments && !driver
-          ? FloatingActionButton.extended(
+      primaryAction: anyDocuments && !driver
+          ? PrimaryAction(
               key: const Key('document-add'),
+              label: l10n.documentAdd,
+              icon: Icons.add,
               onPressed: open,
-              icon: const Icon(Icons.add),
-              label: Text(l10n.documentAdd),
             )
           : null,
       body: AsyncValueView<List<VehicleDocument>>(

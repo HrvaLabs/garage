@@ -8,6 +8,7 @@ import '../../features/dashboard/widgets/quick_add_button.dart';
 import 'adaptive.dart';
 import 'garage_sidebar.dart';
 import 'page_header.dart';
+import 'primary_action.dart';
 import 'stale_reads_banner.dart';
 
 /// The app's primary sections. Shared so every top-level screen presents the
@@ -94,9 +95,13 @@ class GarageTabScaffold extends StatelessWidget {
     this.appBar,
     this.title,
     this.actions = const [],
-    this.floatingActionButton,
+    this.primaryAction,
     this.contentWidth = ContentWidth.reading,
-  });
+  }) : assert(
+         primaryAction == null || title != null,
+         'A desk puts the primary action in the top bar, which only a tab '
+         'with a title has.',
+       );
 
   final GarageTab current;
   final Widget body;
@@ -115,7 +120,10 @@ class GarageTabScaffold extends StatelessWidget {
   /// Shown beside the title, in the app bar or the page header as appropriate.
   final List<Widget> actions;
   final PreferredSizeWidget? appBar;
-  final Widget? floatingActionButton;
+
+  /// The page's main act: floating on a phone, in the top bar on a desk
+  /// (decision 198), which only a page with a [title] has.
+  final PrimaryAction? primaryAction;
 
   PreferredSizeWidget? _titleBar() =>
       title == null ? null : AppBar(title: Text(title!), actions: actions);
@@ -137,7 +145,7 @@ class GarageTabScaffold extends StatelessWidget {
         appBar: appBar ?? _titleBar(),
         body: content,
         bottomNavigationBar: GarageBottomNav(current: current),
-        floatingActionButton: floatingActionButton,
+        floatingActionButton: primaryAction?.floating(),
       );
     }
 
@@ -148,35 +156,34 @@ class GarageTabScaffold extends StatelessWidget {
           const GarageSidebar(),
           const VerticalDivider(width: 1),
           Expanded(
-            // The content pane is a scaffold of its own, so the floating
-            // button belongs to it rather than to the window. Snackbars are
-            // sized by WindowSnackBars at the root: a messenger here would
-            // never see one raised from a sheet.
-            child: Scaffold(
-              backgroundColor: Colors.transparent,
-              floatingActionButton: floatingActionButton,
-              // The page names itself in a bar across the pane, rather than
-              // in one above the sidebar. A tab is a section: no crumbs.
-              body: title == null
-                  ? AdaptiveContent(width: contentWidth, child: content)
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        PageHeader(
-                          title: title!,
-                          actions: actions,
-                          trailing: const [QuickAddButton()],
+            // The page names itself in a bar across the pane, rather than in
+            // one above the sidebar. A tab is a section: no crumbs.
+            child: title == null
+                ? AdaptiveContent(width: contentWidth, child: content)
+                : Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      PageHeader(
+                        title: title!,
+                        actions: actions,
+                        // The page's own act, then what every page offers.
+                        trailing: [
+                          if (primaryAction case final action?
+                              when action.showOnWide)
+                            action.toolbar(),
+                          // Keyed, so it stays itself as an act joins it.
+                          const QuickAddButton(key: ValueKey(QuickAddButton)),
+                        ],
+                      ),
+                      const Divider(height: 1),
+                      Expanded(
+                        child: AdaptiveContent(
+                          width: contentWidth,
+                          child: content,
                         ),
-                        const Divider(height: 1),
-                        Expanded(
-                          child: AdaptiveContent(
-                            width: contentWidth,
-                            child: content,
-                          ),
-                        ),
-                      ],
-                    ),
-            ),
+                      ),
+                    ],
+                  ),
           ),
         ],
       ),

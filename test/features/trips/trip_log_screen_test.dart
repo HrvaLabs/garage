@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/domain/entities/trip_entry.dart';
 import 'package:garage/domain/entities/vehicle.dart';
 import 'package:garage/features/trips/providers/fleet_trip_providers.dart';
@@ -8,6 +9,7 @@ import 'package:garage/features/trips/providers/trip_providers.dart';
 import 'package:garage/features/trips/screens/trip_log_screen.dart';
 import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 
+import '../../support/floating_button.dart';
 import '../../support/pump_screen.dart';
 
 /// The fleet as the test can change it mid-session: a car can be transferred
@@ -44,12 +46,16 @@ TripEntry trip(
   );
 }
 
-Future<void> pumpTrips(WidgetTester tester, List<TripEntry> trips) async {
+Future<void> pumpTrips(
+  WidgetTester tester,
+  List<TripEntry> trips, {
+  Size surface = const Size(500, 1400),
+}) async {
   await pumpScreen(
     tester,
     const TripLogScreen(),
     initialLocation: '/trips',
-    surface: const Size(500, 1400),
+    surface: surface,
     overrides: [
       vehiclesProvider.overrideWith((ref) async => ref.watch(_fleet)),
       allVehiclesProvider.overrideWith((ref) async => ref.watch(_fleet)),
@@ -84,6 +90,25 @@ void main() {
     expect(find.text('30 km'), findsWidgets);
     // 120 km in 90 minutes, over the timed trip alone.
     expect(find.text('80 km/h'), findsOneWidget);
+  });
+
+  testWidgets('a phone logs a trip from the floating button', (tester) async {
+    await pumpTrips(tester, [trip('t1')]);
+
+    expectFloatingButton(tester, label: 'Log a trip', icon: Icons.add);
+  });
+
+  testWidgets('a desk logs it from the top bar', (tester) async {
+    await pumpTrips(tester, [trip('t1')], surface: desktopSurface);
+
+    expect(find.byType(FloatingActionButton), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(PageHeader),
+        matching: find.widgetWithText(FilledButton, 'Log a trip'),
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets('an untimed trip leaves the speed unsaid rather than wrong', (

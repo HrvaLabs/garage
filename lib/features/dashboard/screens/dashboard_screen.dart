@@ -12,6 +12,7 @@ import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/adaptive.dart';
 import '../../../core/widgets/pick_one.dart';
 import '../../../core/widgets/garage_bottom_nav.dart';
+import '../../../core/widgets/primary_action.dart';
 import '../../../core/widgets/empty_state_art.dart';
 import '../../../core/widgets/gauge_arc.dart';
 import '../../company/providers/company_providers.dart';
@@ -168,13 +169,17 @@ class DashboardScreen extends ConsumerWidget {
       // button: four taps for the thing done most often, and an unscheduled
       // service was buried deeper still. This is one tap from the app's
       // landing screen. Hidden when there is no car, since there would be
-      // nothing to log it against.
-      floatingActionButton: ref.watch(vehiclesProvider).value?.isEmpty ?? true
+      // nothing to log it against. Not on a desk, whose top bar has this same
+      // quick-add on every page: both would be the one offer twice.
+      primaryAction: ref.watch(vehiclesProvider).value?.isEmpty ?? true
           ? null
-          : FloatingActionButton(
+          : PrimaryAction(
               key: const Key('dashboard-add'),
+              label: l10n.quickAddNew,
+              icon: Icons.add,
+              extended: false,
+              showOnWide: false,
               onPressed: () => showQuickAdd(context, ref),
-              child: const Icon(Icons.add),
             ),
       body: AsyncValueView<List<Vehicle>>(
         value: ref.watch(vehiclesProvider),

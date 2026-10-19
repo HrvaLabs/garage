@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/widgets/garage_bottom_nav.dart';
 import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/page_header.dart';
+import 'package:garage/core/widgets/primary_action.dart';
 import 'package:garage/domain/entities/household.dart';
 import 'package:garage/l10n/app_localizations.dart';
 
@@ -160,6 +161,24 @@ void main() {
         }
       });
     }
+  });
+
+  // A desk puts a tab's main act in its top bar, which only a titled tab
+  // has: given an app bar instead, the act would vanish on a desk unsaid.
+  test('a tab titled through its app bar is refused a primary action', () {
+    expect(
+      () => GarageTabScaffold(
+        current: GarageTab.dashboard,
+        appBar: AppBar(),
+        primaryAction: PrimaryAction(
+          label: 'Add',
+          icon: Icons.add,
+          onPressed: () {},
+        ),
+        body: const SizedBox(),
+      ),
+      throwsAssertionError,
+    );
   });
 
   group('page chrome', () {

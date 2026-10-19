@@ -3582,6 +3582,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get maintenanceAddRuleHint => 'Something that should come round again';
 
   @override
+  String get maintenanceAddChoice => 'Service or reminder';
+
+  @override
   String get quickAddInterval => 'Add reminder';
 
   @override

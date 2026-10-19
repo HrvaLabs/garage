@@ -1033,6 +1033,7 @@
   "householdDeleteBody": "Questo chiude il garage per tutti i suoi membri, non solo per te. Ogni veicolo, voce e promemoria se ne va con lui.",
   "maintenanceLogServiceHint": "Qualcosa che è stato fatto",
   "maintenanceAddRuleHint": "Qualcosa che tornerà a scadere",
+  "maintenanceAddChoice": "Intervento o promemoria",
   "quickAddInterval": "Aggiungi un promemoria",
   "settingsMore": "Altro",
   "settingsPreferencesHint": "Unità di misura, valuta, tema e lingua",

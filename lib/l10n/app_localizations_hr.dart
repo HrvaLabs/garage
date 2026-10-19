@@ -3639,6 +3639,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get maintenanceAddRuleHint => 'Nešto što se ponavlja';
 
   @override
+  String get maintenanceAddChoice => 'Servis ili podsjetnik';
+
+  @override
   String get quickAddInterval => 'Dodaj podsjetnik';
 
   @override

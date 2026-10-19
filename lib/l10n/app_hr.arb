@@ -1552,6 +1552,7 @@
   "householdDeleteBody": "Ovime garaža nestaje za sve u njoj, ne samo za tebe. S njom odlaze sva vozila, svi unosi i svi podsjetnici.",
   "maintenanceLogServiceHint": "Nešto što je obavljeno",
   "maintenanceAddRuleHint": "Nešto što se ponavlja",
+  "maintenanceAddChoice": "Servis ili podsjetnik",
   "quickAddInterval": "Dodaj podsjetnik",
   "settingsMore": "Više",
   "settingsPreferencesHint": "Jedinice, valuta, tema i jezik",

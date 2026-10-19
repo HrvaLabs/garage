@@ -8,6 +8,7 @@ import '../../../core/theme/garage_tokens.dart';
 import '../../../domain/entities/reminder_rule.dart';
 import '../../../domain/entities/service_entry.dart';
 import '../../../core/widgets/page_scaffold.dart';
+import '../../../core/widgets/primary_action.dart';
 import '../../../core/widgets/empty_state_art.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/confirm_delete.dart';
@@ -125,11 +126,14 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
         // icon and a FAB, which put "log what I just had done" and "set up
         // what should happen again" in different corners of the same screen
         // with nothing to say why. The dashboard already answers this shape
-        // with a menu, and this is the same menu.
-        floatingActionButton: FloatingActionButton(
+        // with a menu, and this is the same menu. Labelled on a desk, it names
+        // both: "Add" read the same as the quick-add beside it.
+        primaryAction: PrimaryAction(
           key: const Key('maintenance-add'),
+          label: l10n.maintenanceAddChoice,
+          icon: Icons.add,
+          extended: false,
           onPressed: () => _showAddMenu(context),
-          child: const Icon(Icons.add),
         ),
         body: AsyncValueView<List<ReminderProjection>>(
           value: projections,

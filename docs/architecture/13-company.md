@@ -46,7 +46,7 @@ screen asks first: `canAddVehicleProvider`
 through `Household.canAddVehicleAt` (`lib/domain/entities/household.dart:88`),
 and the Add button shows the cap sentence, or the "plan ended on" sentence for
 a lapsed company garage, instead of a form the database would refuse
-(`lib/features/vehicles/screens/vehicles_screen.dart:41`).
+(`lib/features/vehicles/screens/vehicles_screen.dart:42`).
 
 **Nobody puts their own garage on the plan.** `authenticated` holds `update`
 on every household column but `plan` and `plan_until`
@@ -132,14 +132,14 @@ last case leaves a garage of drivers with no admin; it is recorded in
 rather than refused.
 
 **"My cars"** is the vehicles screen wearing a driver's presentation
-(`lib/features/vehicles/screens/vehicles_screen.dart:77`), under a tab that
-reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:59`, and in the sidebar
+(`lib/features/vehicles/screens/vehicles_screen.dart:78`), under a tab that
+reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:60`, and in the sidebar
 `lib/core/widgets/garage_sidebar.dart:84` and a desk page's crumbs
-`lib/core/widgets/page_header.dart:49`): the title, no Add button, no
-archived section, an empty state that names the administrator as the one who
-hands a car over, and two cards above the grid. The dashboard
+`lib/core/widgets/page_header.dart:49`): the title, no Add vehicle button,
+no archived section, an empty state that names the administrator as the one
+who hands a car over, and two cards above the grid. The dashboard
 says the same to a driver with no car yet
-(`lib/features/dashboard/screens/dashboard_screen.dart:207`) in place of the
+(`lib/features/dashboard/screens/dashboard_screen.dart:212`) in place of the
 "add your first vehicle" card, whose every way in is refused for a driver,
 and its quick-add sheet and "What next" card offer no reminder and no income
 (`lib/features/dashboard/quick_add.dart:41`). The first is a
@@ -162,13 +162,13 @@ sign-off keeps the card and says why.
 **The driver's car page** keeps the four tabs and the everyday buttons, and
 loses the owner's once-in-a-while acts, every one of which the policies
 refuse: a driver gets a menu of their own with *Report an incident* and
-*Create report* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:508`),
-no add-reminder row (`lib/features/vehicles/screens/vehicle_detail_screen.dart:2338`)
-and no *Add income* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1637`).
+*Create report* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:509`),
+no add-reminder row (`lib/features/vehicles/screens/vehicle_detail_screen.dart:2337`)
+and no *Add income* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1636`).
 The menu is theirs only for a car handed to them: a driver holding somebody
 else's car on a pass gets the borrower's page like anyone. The report reads
 what they can read and asks no "which driver" of them
-(`lib/features/vehicles/screens/vehicle_detail_screen.dart:197`): the log a
+(`lib/features/vehicles/screens/vehicle_detail_screen.dart:198`): the log a
 driver holds is their own windows, so any other pick would file an empty
 logbook. A report whose read fails says so in a snackbar rather than ending
 the tap in silence. The tyres,
@@ -535,7 +535,7 @@ tables. A departed driver is not choosable:
 their rows are reached by exporting everyone and filtering the `driver`
 column on "Former member". The mileage logbook asks which driver after the
 period, on the plan and never of a driver
-(`lib/features/vehicles/screens/vehicle_detail_screen.dart:197`), through the
+(`lib/features/vehicles/screens/vehicle_detail_screen.dart:198`), through the
 resolution rather than the typed name: the log says whose car it was, the
 free text says who was at the wheel that day.
 

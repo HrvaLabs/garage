@@ -1940,6 +1940,10 @@
   "householdDeleteBody": "This ends the garage for everyone in it, not just for you. Every vehicle, entry and reminder goes with it.",
   "maintenanceLogServiceHint": "Something that has been done",
   "maintenanceAddRuleHint": "Something that should come round again",
+  "maintenanceAddChoice": "Service or reminder",
+  "@maintenanceAddChoice": {
+    "description": "The maintenance screen's add button on a wide window, where it carries a label. It opens a choice of logging a service or adding a reminder, so it names both. Plain \"Add\" read the same as the quick-add beside it in the top bar. A phone's button is a bare + with no label."
+  },
   "quickAddInterval": "Add reminder",
   "settingsMore": "More",
   "settingsPreferencesHint": "Units, currency, theme and language",

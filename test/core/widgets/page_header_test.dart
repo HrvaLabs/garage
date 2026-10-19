@@ -149,6 +149,59 @@ void main() {
     );
   });
 
+  testWidgets('what every page offers stays itself as a page\'s own comes and '
+      'goes', (tester) async {
+    // A page's own act joins the bar once its list has loaded. Paired with it
+    // by position, the quick-add was built again from scratch, and a choice
+    // made in its dialog meanwhile went nowhere.
+    final own = FilledButton(
+      key: const Key('own'),
+      onPressed: () {},
+      child: const Text('Own'),
+    );
+    final every = OutlinedButton(
+      key: const Key('every'),
+      onPressed: () {},
+      child: const Text('Add'),
+    );
+
+    await pumpHeader(tester, const Size(1500, 1000), trailing: [every]);
+    final before = tester.element(find.byKey(const Key('every')));
+
+    await pumpHeader(tester, const Size(1500, 1000), trailing: [own, every]);
+    expect(find.byKey(const Key('own')), findsOneWidget);
+    expect(tester.element(find.byKey(const Key('every'))), same(before));
+
+    await pumpHeader(tester, const Size(1500, 1000), trailing: [every]);
+    expect(find.byKey(const Key('own')), findsNothing);
+    expect(tester.element(find.byKey(const Key('every'))), same(before));
+  });
+
+  testWidgets('and a keyed one, whatever kind of widget joins it', (
+    tester,
+  ) async {
+    // Two of a kind side by side are told apart by their keys alone.
+    final own = OutlinedButton(
+      key: const Key('own'),
+      onPressed: () {},
+      child: const Text('Own'),
+    );
+    final every = OutlinedButton(
+      key: const Key('every'),
+      onPressed: () {},
+      child: const Text('Add'),
+    );
+
+    await pumpHeader(tester, const Size(1500, 1000), trailing: [every]);
+    final before = tester.element(find.byKey(const Key('every')));
+
+    await pumpHeader(tester, const Size(1500, 1000), trailing: [own, every]);
+    expect(tester.element(find.byKey(const Key('every'))), same(before));
+
+    await pumpHeader(tester, const Size(1500, 1000), trailing: [every]);
+    expect(tester.element(find.byKey(const Key('every'))), same(before));
+  });
+
   group('the crumbs a page is given from its address', () {
     late AppLocalizations l10n;
     setUpAll(() async {

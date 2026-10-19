@@ -9,7 +9,9 @@ import '../quick_add.dart';
 /// The dashboard's +, in the top bar of every page on a desk.
 ///
 /// Hidden while the garage has no car: there is nothing to log against, and
-/// the dashboard's empty state is where adding one is explained.
+/// the dashboard's empty state is where adding one is explained. Outlined, the
+/// app's secondary button: a page's own act beside it is the filled one, and
+/// in the same fill the two would read as one offer made twice.
 class QuickAddButton extends ConsumerWidget {
   const QuickAddButton({super.key});
 
@@ -18,7 +20,7 @@ class QuickAddButton extends ConsumerWidget {
     if (ref.watch(vehiclesProvider).value?.isEmpty ?? true) {
       return const SizedBox.shrink();
     }
-    return FilledButton.tonalIcon(
+    return OutlinedButton.icon(
       key: const Key('top-bar-quick-add'),
       style: GarageTheme.toolbarButton,
       onPressed: () => showQuickAdd(context, ref),

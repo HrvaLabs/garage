@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/errors/app_failure.dart';
+import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/domain/entities/vehicle_part.dart';
 import 'package:garage/features/maintenance/data/maintenance_repository.dart';
 import 'package:garage/features/maintenance/providers/maintenance_providers.dart';
@@ -8,6 +9,7 @@ import 'package:garage/features/parts/data/vehicle_part_repository.dart';
 import 'package:garage/features/parts/providers/vehicle_part_providers.dart';
 import 'package:garage/features/parts/screens/vehicle_parts_screen.dart';
 
+import '../../support/floating_button.dart';
 import '../../support/pump_screen.dart';
 
 class FakeVehiclePartRepository implements VehiclePartRepository {
@@ -99,6 +101,38 @@ void main() {
       expect(find.text('Nothing recorded for this car yet.'), findsOneWidget);
       expect(find.byKey(const Key('part-add-first')), findsNothing);
     });
+
+    // A desk puts the button in the top bar, where it must not come back.
+    testWidgets('and is offered nothing to add on a desk either', (
+      tester,
+    ) async {
+      await pumpParts(
+        tester,
+        FakeVehiclePartRepository(parts: [oil()]),
+        role: 'driver',
+        surface: desktopSurface,
+      );
+
+      expect(find.byKey(const Key('part-add')), findsNothing);
+      expect(find.text('Add what it takes'), findsNothing);
+    });
+
+    testWidgets('where the admin finds it in the top bar', (tester) async {
+      await pumpParts(
+        tester,
+        FakeVehiclePartRepository(parts: [oil()]),
+        surface: desktopSurface,
+      );
+
+      expect(find.byType(FloatingActionButton), findsNothing);
+      expect(
+        find.descendant(
+          of: find.byType(PageHeader),
+          matching: find.byKey(const Key('part-add')),
+        ),
+        findsOneWidget,
+      );
+    });
   });
 
   testWidgets('the title names the car', (tester) async {
@@ -126,6 +160,17 @@ void main() {
     expect(find.text('Oil change'), findsOneWidget);
     expect(find.text('5W-30 ACEA C3'), findsOneWidget);
     expect(find.text('4.3 l with filter'), findsOneWidget);
+  });
+
+  testWidgets('and the next is added from the floating button', (tester) async {
+    await pumpParts(tester, FakeVehiclePartRepository(parts: [oil()]));
+
+    expectFloatingButton(
+      tester,
+      key: const Key('part-add'),
+      label: 'Add what it takes',
+      icon: Icons.add,
+    );
   });
 
   testWidgets('deleting asks first, then goes through the repository', (
