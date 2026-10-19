@@ -21,7 +21,7 @@ On a wide window the tabs lead a sidebar instead, `GarageSidebar` (see
 [The desktop sidebar](#the-desktop-sidebar)); a pushed screen keeps the sidebar
 rather than swapping it for a back button, because a browser window that loses
 its navigation on every push leaves the back button as the only way out
-(`lib/core/widgets/page_scaffold.dart:89`). The page's title moves from an app
+(`lib/core/widgets/page_scaffold.dart:90`). The page's title moves from an app
 bar into a top bar across the content pane, with a breadcrumb (see
 [The top bar](#the-top-bar)).
 
@@ -102,7 +102,7 @@ screen. The console is a pushed page with its own tab strip, not a sixth tab:
 Material caps the bar at five, and the fleet is one thing, however many views
 it has. A driver's Vehicles tab is titled "My cars" on its own page
 (`lib/features/vehicles/screens/vehicles_screen.dart:96`) and labelled "Cars"
-in the bar (`lib/core/widgets/garage_bottom_nav.dart:61`) and the sidebar
+in the bar (`lib/core/widgets/garage_bottom_nav.dart:62`) and the sidebar
 (`lib/core/widgets/garage_sidebar.dart:85`): the bar takes one-word labels by
 test, so the tab could not carry the title's two words, and the owner chose the
 word (decision 194).
@@ -318,7 +318,7 @@ watches the garage, and:
 The choice when there is more than one car is a question, not a guess: the fuel
 sheet does not name the vehicle it writes to, so a wrong guess is one the
 driver finds out about weeks later in the timeline. `showVehiclePicker`
-(`lib/features/vehicles/widgets/vehicle_picker.dart:15`) is the dashboard's own
+(`lib/features/vehicles/widgets/vehicle_picker.dart:16`) is the dashboard's own
 list, extracted so both surfaces ask the same way.
 
 It renders an empty `Scaffold`, not a spinner. The dashboard replaces it within
@@ -405,14 +405,15 @@ its card wherever it is listed
 Three ways to be modal, and no fourth (decision 175):
 
 - **A form is an adaptive entry sheet**, `showAdaptiveEntrySheet`
-  (`lib/core/widgets/adaptive.dart:127`): a bottom sheet on a phone, a dialog
+  (`lib/core/widgets/adaptive.dart:129`): a bottom sheet on a phone, a dialog
   no wider than a form on a wide window, and no drag to close, because a flick
   skipped the discard guard. Every entry sheet with a text field has a
   `DiscardGuard` (decision 79).
 - **A choice is an adaptive choice**, `showAdaptiveChoice` or, for a list of
-  rows, `showPickOne` (`adaptive.dart:172`,
-  `lib/core/widgets/pick_one.dart:32`): the same split, and a drag closes it,
-  since a list has nothing to lose.
+  rows, `showPickOne` (`adaptive.dart:183`,
+  `lib/core/widgets/pick_one.dart:35`): a bottom sheet on a phone, as a form
+  is, and on a wide window a popover by what asked for it rather than a
+  dialog (below); a drag closes the sheet, since a list has nothing to lose.
 - **A confirmation, a notice or a one-line prompt is a dialog**:
   `confirmDestructive` for what the person cannot undo, in red (decision 85),
   `confirmAction` for the rest, `showNotice` for something to read
@@ -428,6 +429,77 @@ lands before any screen exists, and the spinner over a running import.
 Three surfaces are known not to fit and are left for their own decisions:
 lending is a two-step flow in a sheet, the code box pops itself to push a
 route, and merging garages is a screen that holds a picker and a confirmation.
+
+## A choice on a desk
+
+On a wide window `showAdaptiveChoice` opens a popover, `showAnchoredPopover`
+(`lib/core/widgets/anchored_popover.dart:28`): a card pushed on the root
+navigator, as a menu is, below and to the right of where it was asked for,
+above that when there is no room below, and ending where that does when there
+is no room to its right (`lib/core/widgets/anchored_popover.dart:295`),
+always a margin inside the window
+(`lib/core/widgets/anchored_popover.dart:306`). A click outside it or Escape
+puts it away with nothing picked. A screen reader is taken into it and told
+it opened by the name Material's own menus give, "Popup menu", except on
+Apple's systems, where those give none either
+(`lib/core/widgets/anchored_popover.dart:250`). The page under it stops being
+the top while it is open and keeps its shape for that (`PageTitle`, below),
+so the choice reaches the control that asked (decision 199). `showPickOne`
+caps it at a menu's width, 360 pixels; the quick-add and the timeline's
+filter keep a form's 480. The service types pass `centred: true` and stay a
+dialog in the middle
+(`lib/features/maintenance/widgets/service_type_field.dart:109`): thirty rows
+and a search would cover the window from wherever they hung.
+
+Where it hangs from is settled as it opens
+(`lib/core/widgets/anchored_popover.dart:148`), the first of:
+
+1. **The last press**, which `PointerAnchor`
+   (`lib/core/widgets/pointer_anchor.dart:16`) keeps from a pointer route the
+   frame installs, until a key goes down. The helpers are handed a screen's
+   context, not the control's, so the press is the one record of where the
+   control was. A press on the control that stands for the choice (step 2)
+   hangs it from that control instead, below it, as a menu button's menu
+   opens: hung from the press inside it, the card covered the button's lower
+   half (`lib/core/widgets/anchored_popover.dart:155`). A key the web build
+   makes up, for a modifier it finds held on a pointer event, does not count
+   (`lib/core/widgets/pointer_anchor.dart:46`). Nor, on the web with the
+   accessibility layer on, does the press
+   (`lib/core/widgets/pointer_anchor.dart:62`): a click on anything tappable
+   then reaches the app as an accessibility tap, the press kept back, so the
+   last press passed on is some other one.
+2. **The control that stands for what it offers**, a `PopoverStandIn`
+   (`lib/core/widgets/anchored_popover.dart:55`) given the same action as the
+   choice's `standIn`. The top bar's Add stands for `showQuickAdd`
+   (`lib/features/dashboard/widgets/quick_add_button.dart:29`), so the
+   quick-add hangs from Add whether Add was pressed or a key opened it, and
+   from a key so does the car it asks for next
+   (`lib/features/dashboard/quick_add.dart:145`).
+3. **The focused control**, unless what has the focus is the page itself:
+   the route's scope, or a focus around a page that holds its keys, as tall
+   as the page. A control is no taller than half the window
+   (`lib/core/widgets/anchored_popover.dart:174`); hung from a page's corner,
+   a popover would sit in the window's bottom left corner, over the sidebar.
+4. **Nothing**, and then it is centred over the page's content pane, the
+   `PopoverPane` (`lib/core/widgets/anchored_popover.dart:90`) both scaffolds
+   put beside the sidebar (`lib/core/widgets/page_scaffold.dart:99`,
+   `lib/core/widgets/garage_bottom_nav.dart:168`). On a page without one, or
+   from a dialog, which sits in the middle itself, it is centred in the
+   window.
+
+A stand-in and a pane count only on the page on top. Every page under it
+stays built, top bar and all, so each remembers its route
+(`lib/core/widgets/anchored_popover.dart:126`) and is found while that route
+is current (`lib/core/widgets/anchored_popover.dart:130`). The pointer route
+records presses at every width and on Android too; only a popover reads
+them, and a phone has none. The keyboard's handler is put back whenever a
+frame starts (`lib/core/widgets/pointer_anchor.dart:32`): a widget test drops
+every keyboard handler when it ends and keeps the pointer's routes, and one
+added only the first time was gone from the second test on.
+
+A ⋮ is still Material's menu (`showMenu`, through `PopupMenuButton`), rows of
+one line, and a choice is this card, with the rows its phone sheet has: a
+desk has the two.
 
 ## Links from outside: what Android will and will not open
 
@@ -530,8 +602,8 @@ into each other.
 
 On a wide window a page names itself in a top bar, `PageHeader`
 (`lib/core/widgets/page_header.dart:125`), where a phone has its app bar. Both
-scaffolds draw it (`lib/core/widgets/page_scaffold.dart:103`,
-`lib/core/widgets/garage_bottom_nav.dart:172`) across the content pane beside
+scaffolds draw it (`lib/core/widgets/page_scaffold.dart:105`,
+`lib/core/widgets/garage_bottom_nav.dart:174`) across the content pane beside
 the sidebar, above a rule; the content keeps its own column under it. The
 title used to be a heading held to that column, with the page's actions at the
 column's end. The bar belongs to the page, not to its text, as a tab strip
@@ -543,14 +615,14 @@ stack. Left to right: the back arrow, the crumbs over the title, the page's
 own actions, and a slot (`trailing`) for what a page offers beyond them.
 
 On every page that slot holds the quick-add, `QuickAddButton`
-(`lib/features/dashboard/widgets/quick_add_button.dart:15`): a button labelled
+(`lib/features/dashboard/widgets/quick_add_button.dart:20`): a button labelled
 Add that opens what the dashboard's + opens (`showQuickAdd`,
 `lib/features/dashboard/quick_add.dart:26`), so a fill-up, a service or a cost
 is logged from Statistics or the console without going back to the dashboard.
 Like the +, it is hidden while the garage has no car, there being nothing to
-log against. A phone keeps it on the dashboard only. On a desk the dialog's
+log against. A phone keeps it on the dashboard only. On a desk the popover's
 three tiles keep the outline a card has on a phone
-(`lib/features/dashboard/quick_add.dart:209`), which the desk's theme takes
+(`lib/features/dashboard/quick_add.dart:217`), which the desk's theme takes
 from every other card (decision 198).
 
 A page's main act goes in the same slot, before Add. A screen names it as a
@@ -577,7 +649,7 @@ one: Vehicles, Garage (`/household`), Company and API access (`/api-access`). A 
 pages, `/vehicles/<id>/fuel` and the rest, name Vehicles and then the car; the
 car's own page names only Vehicles, its title being the car, and a new car is
 not a car. The car's name is `vehicleProvider`'s, which the scaffold reads
-(`lib/core/widgets/page_scaffold.dart:112`); until there is one, while the car
+(`lib/core/widgets/page_scaffold.dart:114`); until there is one, while the car
 loads or for a car the startup fetch does not know, the crumbs stop at
 Vehicles rather than read "Vehicles › Vehicles". A driver's Vehicles reads
 "Cars", as the sidebar's link does (decision 194). A tab, any other section,
@@ -658,8 +730,8 @@ or under, such an address.
 **The browser's tab** is named after the page on top, "Statistics · Garage",
 by `PageTitle` (`lib/core/widgets/page_title.dart:20`); the garage's own
 screen, called what the app is called, is named once. Both scaffolds wrap
-their page in it (`lib/core/widgets/page_scaffold.dart:66`,
-`lib/core/widgets/garage_bottom_nav.dart:135`), and a screen outside them wraps
+their page in it (`lib/core/widgets/page_scaffold.dart:67`,
+`lib/core/widgets/garage_bottom_nav.dart:136`), and a screen outside them wraps
 itself; `test/ci/page_addresses_test.dart:31` fails one that does neither. A
 page says its name when it comes on top (`lib/core/widgets/page_title.dart:56`),
 so closing Calculator over Statistics names Statistics again, and a page

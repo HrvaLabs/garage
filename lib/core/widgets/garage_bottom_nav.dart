@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/company/providers/company_providers.dart';
 import '../../features/dashboard/widgets/quick_add_button.dart';
 import 'adaptive.dart';
+import 'anchored_popover.dart';
 import 'garage_sidebar.dart';
 import 'page_header.dart';
 import 'page_title.dart';
@@ -164,32 +165,34 @@ class GarageTabScaffold extends StatelessWidget {
           Expanded(
             // The page names itself in a bar across the pane, rather than in
             // one above the sidebar. A tab is a section: no crumbs.
-            child: title == null
-                ? AdaptiveContent(width: contentWidth, child: content)
-                : Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      PageHeader(
-                        title: title!,
-                        actions: actions,
-                        // The page's own act, then what every page offers.
-                        trailing: [
-                          if (primaryAction case final action?
-                              when action.showOnWide)
-                            action.toolbar(),
-                          // Keyed, so it stays itself as an act joins it.
-                          const QuickAddButton(key: ValueKey(QuickAddButton)),
-                        ],
-                      ),
-                      const Divider(height: 1),
-                      Expanded(
-                        child: AdaptiveContent(
-                          width: contentWidth,
-                          child: content,
+            child: PopoverPane(
+              child: title == null
+                  ? AdaptiveContent(width: contentWidth, child: content)
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        PageHeader(
+                          title: title!,
+                          actions: actions,
+                          // The page's own act, then what every page offers.
+                          trailing: [
+                            if (primaryAction case final action?
+                                when action.showOnWide)
+                              action.toolbar(),
+                            // Keyed, so it stays itself as an act joins it.
+                            const QuickAddButton(key: ValueKey(QuickAddButton)),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
+                        const Divider(height: 1),
+                        Expanded(
+                          child: AdaptiveContent(
+                            width: contentWidth,
+                            child: content,
+                          ),
+                        ),
+                      ],
+                    ),
+            ),
           ),
         ],
       ),

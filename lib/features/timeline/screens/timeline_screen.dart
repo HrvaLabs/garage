@@ -49,9 +49,9 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
 
   /// Lets the six kinds be switched on and off, one row each.
   ///
-  /// A sheet rather than chips on the screen: the labels are long in both
-  /// languages, and a list gives each one a full line instead of squeezing six
-  /// of them into the width of a phone.
+  /// A sheet, or on a desk a popover by the button, rather than chips on the
+  /// screen: the labels are long in both languages, and a list gives each one
+  /// a full line instead of squeezing six of them into the width of a phone.
   Future<void> _pickKinds() async {
     final l10n = AppLocalizations.of(context)!;
     final vehicles = ref.read(vehiclesProvider).value ?? const [];

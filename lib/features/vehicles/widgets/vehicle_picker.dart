@@ -11,14 +11,17 @@ import '../../../domain/entities/vehicle.dart';
 /// shown a list with one row. Two callers share this — the dashboard's
 /// quick-add and the launcher's fill-up route — because they were the same
 /// list twice, and the same gesture has to be the same control on every
-/// surface that offers it.
+/// surface that offers it. [standIn] is the action that asks, as
+/// [showPickOne] takes it.
 Future<String?> showVehiclePicker(
   BuildContext context,
-  List<Vehicle> vehicles,
-) {
+  List<Vehicle> vehicles, {
+  Object? standIn,
+}) {
   final l10n = AppLocalizations.of(context)!;
   return showPickOne<String>(
     context,
+    standIn: standIn,
     title: l10n.quickAddPickVehicle,
     options: [
       for (final vehicle in vehicles)

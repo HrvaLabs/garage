@@ -471,6 +471,45 @@ void main() {
     );
   });
 
+  testWidgets('on a desk the filter hangs from the button, and still filters', (
+    tester,
+  ) async {
+    // A dialog in the middle of the monitor, for six ticks the button sits
+    // beside.
+    await pumpTimeline(
+      tester,
+      items: [
+        item(kind: TimelineKind.fuel, entryId: 'f1'),
+        item(kind: TimelineKind.trip, entryId: 't1', amount: null),
+      ],
+      surface: const Size(1500, 1000),
+    );
+    await tester.pumpAndSettle();
+    final click = tester.getCenter(find.byKey(const Key('timeline-filter')));
+
+    await tester.tap(find.byKey(const Key('timeline-filter')));
+    await tester.pumpAndSettle();
+
+    expect(find.byType(Dialog), findsNothing);
+    final popover = tester.getRect(find.byKey(const Key('anchored-popover')));
+    expect(popover.top, closeTo(click.dy, 1));
+    // The button is at the pane's right end, with no room to its right: the
+    // card turns back and ends at the press.
+    expect(popover.right, closeTo(click.dx, 1));
+
+    await tester.tap(find.byKey(const Key('timeline-kind-fuel')));
+    await tester.pumpAndSettle();
+    final ticked = tester.widget<CheckboxListTile>(
+      find.byKey(const Key('timeline-kind-fuel')),
+    );
+    expect(ticked.value, isTrue, reason: 'the popover redraws its own tick');
+    expect(
+      find.byKey(const Key('timeline-active-fuel')),
+      findsOneWidget,
+      reason: 'and the screen behind it filters',
+    );
+  });
+
   testWidgets('a desktop window gives the history more than reading width', (
     tester,
   ) async {

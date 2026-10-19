@@ -40,6 +40,9 @@ Future<void> showQuickAdd(BuildContext context, WidgetRef ref) async {
   // inserts are refused, so neither row is offered.
   final driver = ref.read(isDriverProvider);
 
+  // On a desk the choice hangs from the top bar's Add, which stands for this
+  // (decision 199), whether Add was pressed or a key opened it; from a key,
+  // so does the car it asks for next.
   final action = await showAdaptiveChoice<QuickAction>(
     context,
     (context) => SafeArea(
@@ -128,6 +131,7 @@ Future<void> showQuickAdd(BuildContext context, WidgetRef ref) async {
         ),
       ),
     ),
+    standIn: showQuickAdd,
   );
   if (action == null || !context.mounted) {
     return;
@@ -135,7 +139,11 @@ Future<void> showQuickAdd(BuildContext context, WidgetRef ref) async {
 
   var vehicleId = vehicles.first.id;
   if (vehicles.length > 1) {
-    final picked = await showVehiclePicker(context, vehicles);
+    final picked = await showVehiclePicker(
+      context,
+      vehicles,
+      standIn: showQuickAdd,
+    );
     if (picked == null || !context.mounted) {
       return;
     }

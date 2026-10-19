@@ -1000,6 +1000,42 @@ several releases later.
 
 ## Recently fixed, worth remembering
 
+### With the accessibility layer on, a choice hung from an old press
+
+**Low, caught before shipping, 19 October 2026, in a browser look.** On the
+web, with Flutter's accessibility layer switched on, a click on anything
+tappable reaches the app as an accessibility tap, and the web build keeps
+the press itself back (`ClickDebouncer` in the engine's
+`pointer_binding.dart`). `PointerAnchor` therefore never saw the click on
+the top bar's Add, and the quick-add hung from the last press it had seen,
+the sign-in form's password field: the card opened in the middle of the
+page. A press now counts for nothing on the web while the layer is on
+(`lib/core/widgets/pointer_anchor.dart:62`), and the choice hangs as one
+opened from the keyboard does: from Add, which stands for the quick-add, or
+centred over the page. `test/features/dashboard/quick_add_button_test.dart:233`
+presses elsewhere, then taps Add through the accessibility layer, and finds
+the card under Add. Widget tests run with the layer on and pass every press
+on, so the rule asks for the web, and a test sets `PointerAnchor.web`.
+
+### A keyboard handler added once was gone from the second widget test on
+
+**Low, caught before shipping, 19 October 2026.** `PointerAnchor` forgets
+the last press when a key goes down, through a handler on `HardwareKeyboard`,
+so that a choice opened from the keyboard hangs from the focused control
+rather than from an old click. Added once, behind the flag that adds its
+pointer route once, the handler worked in the app and in a file's first
+widget test, and was gone from the second on: the test binding drops every
+keyboard handler when a test ends and keeps the pointer router's routes, so
+a press made earlier in the test was taken for where a keyboard choice should
+hang. `PointerAnchor.install` now puts the handler back each time a frame
+starts, and the route still once (`lib/core/widgets/pointer_anchor.dart:26`).
+`test/core/widgets/anchored_popover_test.dart:484` drops the handlers as the
+binding does and still finds a key forgetting the press; with the handler
+added once, the keyboard test at
+`test/core/widgets/anchored_popover_test.dart:112`, third in its file, fails
+too. Anything else that listens to the keyboard from a static has the same
+edge.
+
 ### A tab moved to on the web could replace the page pushed over it
 
 **Low, caught before shipping, 19 October 2026.** A tab moved to is written to
@@ -1211,7 +1247,7 @@ the last one is given (`lib/features/maintenance/widgets/reminder_rule_sheet.dar
 Each has a test at half past midnight:
 `test/features/observations/observation_sheet_test.dart:82`,
 `test/features/observations/observations_card_test.dart:192` and
-`test/features/maintenance/reminder_rule_sheet_test.dart:551`.
+`test/features/maintenance/reminder_rule_sheet_test.dart:593`.
 
 ### Reminders a phone set before push was on still fired
 
@@ -1260,7 +1296,7 @@ take one-word labels by test, which "My cars", "Moja vozila" and "Le mie
 auto" are not, so the word was the owner's to choose. On 20 September the
 owner chose "Cars", "Auti" and "Auto", for a driver only. The bottom bar and
 the sidebar read the role and take that label for the cars tab
-(`lib/core/widgets/garage_bottom_nav.dart:61`,
+(`lib/core/widgets/garage_bottom_nav.dart:62`,
 `lib/core/widgets/garage_sidebar.dart:85`); everybody else keeps
 "Vehicles". `test/core/widgets/garage_bottom_nav_test.dart` holds the new
 label to one word in every language with the others, and asks for both

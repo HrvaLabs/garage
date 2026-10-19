@@ -133,7 +133,7 @@ rather than refused.
 
 **"My cars"** is the vehicles screen wearing a driver's presentation
 (`lib/features/vehicles/screens/vehicles_screen.dart:78`), under a tab that
-reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:61`, and in the sidebar
+reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:62`, and in the sidebar
 `lib/core/widgets/garage_sidebar.dart:85` and a desk page's crumbs
 `lib/core/widgets/page_header.dart:49`): the title, no Add vehicle button,
 no archived section, an empty state that names the administrator as the one

@@ -5666,7 +5666,7 @@ decision, because it moves where everything on the car lives.
   a reading" (`lib/features/vehicles/screens/vehicle_detail_screen.dart:398`),
   hidden while a drive is out, when the in-progress card with "Finish drive"
   takes its place above the tabs; and the "+" sheet offers "Start a drive"
-  before "Log a trip" (`lib/features/dashboard/quick_add.dart:102`).
+  before "Log a trip" (`lib/features/dashboard/quick_add.dart:105`).
 - **What the vehicle costs sits on Costs.** The running-cost card leads the
   Costs tab, where the question is asked; Economy is about fuel again.
 - **The third tab is "Services".** It holds services and odometer readings,
@@ -6538,8 +6538,8 @@ and a notice a week out is then given again, once.
 
 **18 September 2026.** A form is an adaptive entry sheet, a choice is an
 adaptive choice, and a confirmation, a notice or a one-line prompt is a dialog,
-each through its helper (`lib/core/widgets/adaptive.dart:127`,
-`adaptive.dart:172`, `lib/core/widgets/pick_one.dart:32`,
+each through its helper (`lib/core/widgets/adaptive.dart:129`,
+`adaptive.dart:183`, `lib/core/widgets/pick_one.dart:35`,
 `lib/core/widgets/confirm_delete.dart:40`, `confirm_delete.dart:118`,
 `lib/core/widgets/text_prompt.dart:9`). `test/ci/modal_surfaces_test.dart:58`
 fails anything else that opens a sheet or a dialog, with two exceptions that
@@ -6731,7 +6731,7 @@ a garage of one, where the trigger hands the role straight back.
 
 **18 September 2026.** On a phone, `TextPrompt` and the new-password dialog
 open in the top part of the screen rather than the middle, through
-`keyboardClearDialogPlacement` (`lib/core/widgets/adaptive.dart:58`). A wide
+`keyboardClearDialogPlacement` (`lib/core/widgets/adaptive.dart:60`). A wide
 window keeps them centred. Those two are the only centred dialogs with a field
 that takes focus; every other typed-into surface is a sheet, which rises with
 the keyboard as a sheet should.
@@ -7756,3 +7756,51 @@ from Your data and reloaded would always have ended there. The reference
 keeps `/api`, which `GarageLinks.apiDocs` and the sitemap name, and
 `test/core/router/router_urls_test.dart:51` fails a route that sits at, or
 under, a page the host serves itself.
+
+**A choice opens where it was asked for.** On a desk a choice is a card that
+hangs from the press that opened it, or from the button itself when the press
+landed on the one that stands for the choice, below and to the right as a
+desktop menu opens, turned back inside the window where it would run off an
+edge, and put away with nothing picked by a click outside it or by Escape
+(`showAnchoredPopover`, `lib/core/widgets/anchored_popover.dart:28`). Hung
+from a press inside the top bar's Add, the quick-add covered the lower half
+of the button that opened it; a desk's menu button opens its menu below it.
+`showAdaptiveChoice` opens it where it opened a dialog a form's width in the
+middle of the window (decision 175), so `showPickOne`'s lists, the quick-add
+and the timeline's filter open beside the chip, the button or the row that
+asked, rather than a third of a monitor away from it. A list of labels is a
+menu's width, 360 pixels; the quick-add, for its three tiles, and the
+timeline's filter keep a form's 480. The service types stay a dialog in the
+middle (`lib/features/maintenance/widgets/service_type_field.dart:109`):
+thirty rows and a search, most of the window tall, would cover the window
+from wherever they hung.
+
+The helpers are handed a screen's context, not the control's, so the press
+itself is the record of where: `PointerAnchor`
+(`lib/core/widgets/pointer_anchor.dart:16`), which the frame starts, keeps
+the last one until a key goes down. On the web with the accessibility layer
+on it counts for nothing: the web build then hands a click on anything
+tappable to the app as an accessibility tap and keeps the press back, so the
+last press it passed on was another one, often nowhere near what was clicked.
+Opened from the keyboard, or with no press that counts, a choice hangs from
+the control that stands for what it offers, when the page on top has one
+(`PopoverStandIn`): the top bar's Add stands for the quick-add, so the
+quick-add hangs from it whether Add was pressed or a key opened it, and from
+a key so does the car it asks for next. Failing that it hangs from the
+focused control, and with nothing to hang from it is centred over the page's
+content pane (`PopoverPane`), or the window where there is none. A focus that
+is the page's own is no control: the route's scope, or a focus around the
+whole page that holds its keys, is as tall as the page, and a popover hung
+from its corner would open in the window's bottom left corner, over the
+sidebar.
+
+A desk has two kinds of menu from here on: a ⋮ is Material's own
+(`showMenu`), rows of one line, and a choice is this card, with the rows its
+phone sheet has. Both tell a screen reader they opened by the same name,
+"Popup menu", but on Apple's systems, where neither gives one. The anchor
+adds nothing to the frame's tree and records presses on a phone too, Android
+included; nothing there reads it, and a phone's choice is the sheet it was.
+*Cost:* the press is the last one anywhere, not always the one that asked, so
+a choice that opens itself as a page loads hangs where the last click landed.
+The quick entry's "Which vehicle?", which the launcher's shortcuts open, is
+the only one.

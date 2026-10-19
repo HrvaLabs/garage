@@ -17,7 +17,8 @@ class PickOption<T> {
   final String label;
 
   /// What the row is for, when the label alone does not say: long labels
-  /// get a line each here, which is why a list is a sheet and not a menu.
+  /// get a line each here, which is why a list is a sheet on a phone and a
+  /// popover on a desk, and never a ⋮ menu, whose rows have one line.
   final String? subtitle;
   final IconData? icon;
   final Key? key;
@@ -28,11 +29,14 @@ class PickOption<T> {
 ///
 /// Six lists were a bare bottom sheet each and two were a `SimpleDialog`, so
 /// the same question slid up on one screen, popped up on another, and on a
-/// wide window stretched across the monitor.
+/// wide window stretched across the monitor. On a wide window it is a
+/// popover a menu wide, beside what was clicked; [standIn] is the action a
+/// key may open it for, as [showAdaptiveChoice] takes it.
 Future<T?> showPickOne<T>(
   BuildContext context, {
   String? title,
   required List<PickOption<T>> options,
+  Object? standIn,
 }) {
   return showAdaptiveChoice<T>(
     context,
@@ -40,7 +44,8 @@ Future<T?> showPickOne<T>(
       child: ListView(
         shrinkWrap: true,
         padding: EdgeInsets.only(
-          // A sheet has its drag handle above the title; a dialog has nothing.
+          // A sheet has its drag handle above the title; a popover has
+          // nothing.
           top: GarageBreakpoints.isWide(context) ? GarageTokens.space4 : 0,
           bottom: GarageTokens.space2,
         ),
@@ -69,5 +74,8 @@ Future<T?> showPickOne<T>(
         ],
       ),
     ),
+    // A list of labels is a menu, not a form.
+    maxWidth: 360,
+    standIn: standIn,
   );
 }

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 
+import 'anchored_popover.dart';
+
 /// Width thresholds shared by every surface that adapts between phone and
 /// desktop presentation.
 abstract final class GarageBreakpoints {
   /// At and above this window width the app drops phone chrome (bottom bar,
   /// edge-to-edge lists, bottom sheets) for desktop chrome (sidebar, capped
-  /// column, dialogs).
+  /// column, dialogs and popovers).
   static const double wide = 900;
 
   /// At and above this width the sidebar carries labels and the shell reads as
@@ -160,7 +162,9 @@ Future<T?> showAdaptiveEntrySheet<T>(
 }
 
 /// A choice to make with nothing typed in it: a bottom sheet on a phone and a
-/// centred dialog on a wide window, the same split as an entry sheet.
+/// popover beside what was clicked on a wide window ([showAnchoredPopover]),
+/// as a desktop menu opens, rather than a dialog in the middle of the monitor
+/// (decision 199).
 ///
 /// Unlike an entry sheet it closes on a drag. [showAdaptiveEntrySheet] turns
 /// dragging off only because a flick skipped its discard guard, and a list of
@@ -169,7 +173,20 @@ Future<T?> showAdaptiveEntrySheet<T>(
 /// Sized to what it holds, up to the height of the screen: a sheet that is
 /// not scroll-controlled stops at nine sixteenths of it, which put the sixth
 /// report kind below the fold with nothing to say it was there.
-Future<T?> showAdaptiveChoice<T>(BuildContext context, WidgetBuilder builder) {
+///
+/// [maxWidth] caps it on a wide window, a form's width unless the caller
+/// asks for a menu's. [standIn] is the action the choice is for, when a key
+/// may open it: it then hangs from the control that stands for that action
+/// ([PopoverStandIn]). A list with a search of its own, most of the window
+/// tall, stays [centred] on a wide window, as a dialog: hung from the field
+/// that opened it, it would cover the window from wherever it hung.
+Future<T?> showAdaptiveChoice<T>(
+  BuildContext context,
+  WidgetBuilder builder, {
+  double maxWidth = GarageBreakpoints.dialogMaxWidth,
+  Object? standIn,
+  bool centred = false,
+}) {
   if (!GarageBreakpoints.isWide(context)) {
     return showModalBottomSheet<T>(
       context: context,
@@ -179,14 +196,20 @@ Future<T?> showAdaptiveChoice<T>(BuildContext context, WidgetBuilder builder) {
       builder: builder,
     );
   }
+  if (!centred) {
+    return showAnchoredPopover<T>(
+      context,
+      builder: builder,
+      maxWidth: maxWidth,
+      standIn: standIn,
+    );
+  }
   return showDialog<T>(
     context: context,
     builder: (dialogContext) => Dialog(
       clipBehavior: Clip.antiAlias,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: GarageBreakpoints.dialogMaxWidth,
-        ),
+        constraints: BoxConstraints(maxWidth: maxWidth),
         child: builder(dialogContext),
       ),
     ),

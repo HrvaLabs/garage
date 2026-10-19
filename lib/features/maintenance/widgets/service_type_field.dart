@@ -68,9 +68,9 @@ List<ServiceType> offeredReminderTypes(
   ];
 }
 
-/// Reads like a dropdown, opens a sheet: a search box, the common items,
-/// then everything else in order. A flat menu had no search and no order
-/// but the alphabet.
+/// Reads like a dropdown, opens a sheet, or a dialog on a desk: a search box,
+/// the common items, then everything else in order. A flat menu had no
+/// search and no order but the alphabet.
 
 class ServiceTypeField extends StatelessWidget {
   const ServiceTypeField({
@@ -103,6 +103,10 @@ class ServiceTypeField extends StatelessWidget {
           context,
           (_) =>
               ServiceTypeSheet(vehicleId: vehicleId, existingKey: existingKey),
+          // Thirty rows and a search, most of the window tall: hung from
+          // this field like a menu, it would cover the window from wherever
+          // it hung, so on a desk it stays a dialog (decision 199).
+          centred: true,
         );
         if (picked != null) {
           onChanged(picked);

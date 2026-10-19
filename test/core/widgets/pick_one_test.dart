@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/theme/garage_theme.dart';
-import 'package:garage/core/widgets/adaptive.dart';
 import 'package:garage/core/widgets/pick_one.dart';
 
 const _options = [
@@ -81,25 +80,25 @@ void main() {
     expect(await answer(), isNull);
   });
 
-  testWidgets('on a wide window it is a dialog no wider than a form', (
-    tester,
-  ) async {
-    // A sheet across a whole monitor reads as phone furniture left behind.
-    await _open(tester, width: 1400);
+  testWidgets('on a wide window it is a popover a menu wide, not a sheet or a '
+      'dialog', (tester) async {
+    // A sheet across a whole monitor reads as phone furniture left behind,
+    // and a dialog in the middle of it as a question asked from nowhere.
+    // Where the popover hangs is anchored_popover_test.dart's to check.
+    final answer = await _open(tester, width: 1400);
     await tester.tap(find.text('open'));
     await tester.pumpAndSettle();
 
     expect(find.byType(BottomSheet), findsNothing);
-    // The dialog's own surface: a Dialog widget spans the window and centres
-    // the Material it draws.
-    final surface = find.descendant(
-      of: find.byType(Dialog),
-      matching: find.byType(Material),
-    );
-    expect(
-      tester.getSize(surface.first).width,
-      lessThanOrEqualTo(GarageBreakpoints.dialogMaxWidth),
-    );
+    expect(find.byType(Dialog), findsNothing);
+    final popover = find.byKey(const Key('anchored-popover'));
+    expect(popover, findsOneWidget);
+    // A list of labels is a menu, not a form.
+    expect(tester.getSize(popover).width, lessThanOrEqualTo(360));
+
+    await tester.tap(find.text('From Fuelio'));
+    await tester.pumpAndSettle();
+    expect(await answer(), 'fuelio');
   });
 
   testWidgets('six rows with a line each are all in view on a phone', (

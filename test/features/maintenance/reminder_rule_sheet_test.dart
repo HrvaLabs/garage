@@ -11,6 +11,7 @@ import 'package:garage/domain/entities/vehicle.dart';
 import 'package:garage/features/maintenance/data/maintenance_repository.dart';
 import 'package:garage/features/maintenance/providers/maintenance_providers.dart';
 import 'package:garage/features/maintenance/widgets/reminder_rule_sheet.dart';
+import 'package:garage/features/maintenance/widgets/service_type_field.dart';
 import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:garage/domain/entities/household.dart';
@@ -249,6 +250,47 @@ void main() {
       await tester.tap(find.text('Timing belt'));
       await tester.pumpAndSettle();
       expect(find.text('Timing belt'), findsOneWidget);
+    });
+
+    testWidgets('on a desk it stays a dialog in the middle of the window', (
+      tester,
+    ) async {
+      // A list most of the window tall, with a search of its own: hung from
+      // the field like a menu, it would cover the window from wherever it
+      // hung.
+      await pumpDesktop(
+        tester,
+        Scaffold(
+          body: Center(
+            child: SizedBox(
+              width: 400,
+              child: ServiceTypeField(
+                fieldKey: const Key('type-field'),
+                selected: null,
+                vehicleId: 'v1',
+                existingKey: null,
+                onChanged: (_) {},
+              ),
+            ),
+          ),
+        ),
+        overrides: [
+          availableServiceTypesProvider('v1').overrideWith(
+            (ref) async => const [ServiceType(key: 'service_oil_change')],
+          ),
+        ],
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.byKey(const Key('type-field')));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('anchored-popover')), findsNothing);
+      expect(find.byType(Dialog), findsOneWidget);
+      final search = tester.getRect(
+        find.byKey(const Key('service-type-search')),
+      );
+      expect(search.center.dx, closeTo(desktopSurface.width / 2, 1));
     });
 
     testWidgets('does not offer what nobody schedules', (tester) async {

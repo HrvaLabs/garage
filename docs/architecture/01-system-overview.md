@@ -100,7 +100,10 @@ Every page then sits inside `GarageAppFrame`
 (`lib/core/widgets/app_frame.dart`), which `MaterialApp.router`'s `builder`
 puts around it: the desk's theme on a wide window (`GarageTheme.desktop`,
 decision 198), snackbars sized to the window and, on a wide one, floated into
-its bottom right corner, and the new-version notice the web build shows.
+its bottom right corner, the new-version notice the web build shows, and the
+record of the last press, which a choice on a desk hangs from
+(`PointerAnchor`, decision 199): kept at every width and on Android too, it
+adds nothing to the tree, and nothing on a phone reads it.
 `test/support/pump_screen.dart` builds the same frame, so a screen test sees
 what the app puts around a page, a phone-sized one included: its snackbars
 float, as a phone's do, and one pumped at a desk's size (`pumpDesktop`) gets

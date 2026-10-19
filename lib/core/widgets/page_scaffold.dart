@@ -7,6 +7,7 @@ import '../../features/dashboard/widgets/quick_add_button.dart';
 import '../../features/vehicles/providers/vehicle_providers.dart';
 import '../router/page_location.dart';
 import 'adaptive.dart';
+import 'anchored_popover.dart';
 import 'garage_bottom_nav.dart';
 import 'garage_sidebar.dart';
 import 'page_header.dart';
@@ -95,51 +96,54 @@ class GaragePageScaffold extends ConsumerWidget {
           const GarageSidebar(),
           const VerticalDivider(width: 1),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // The pane's whole width: a top bar, not a heading held to
-                // the text column.
-                PageHeader(
-                  title: title,
-                  crumbs:
-                      crumbs ??
-                      sectionCrumbs(
-                        AppLocalizations.of(context)!,
-                        location,
-                        carName: car == null
-                            ? null
-                            : ref.watch(vehicleProvider(car)).value?.nickname,
-                        driver: ref.watch(isDriverProvider),
-                      ),
-                  actions: actions,
-                  // The page's own act, then what every page offers.
-                  trailing: [
-                    if (primaryAction case final action? when action.showOnWide)
-                      action.toolbar(),
-                    // Keyed, so it stays itself as an act joins it.
-                    const QuickAddButton(key: ValueKey(QuickAddButton)),
-                  ],
-                  // Only offered when there is something to go back to; a
-                  // page opened directly by URL on the web has an empty
-                  // stack.
-                  onBack: Navigator.of(context).canPop()
-                      ? () => Navigator.of(context).maybePop()
-                      : null,
-                ),
-                // A tab strip under the bar draws its own rule.
-                if (bottom == null) const Divider(height: 1),
-                // Outside the column on purpose. A tab strip belongs to the
-                // surface it switches, so it runs the width of the pane along
-                // with its divider — the same edge-to-edge strip a phone gets
-                // from the app bar. Held to the text column it read as a
-                // control floating mid-page, above a rule that stopped short
-                // of both sides.
-                ?bottom,
-                Expanded(
-                  child: AdaptiveContent(width: contentWidth, child: content),
-                ),
-              ],
+            child: PopoverPane(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // The pane's whole width: a top bar, not a heading held to
+                  // the text column.
+                  PageHeader(
+                    title: title,
+                    crumbs:
+                        crumbs ??
+                        sectionCrumbs(
+                          AppLocalizations.of(context)!,
+                          location,
+                          carName: car == null
+                              ? null
+                              : ref.watch(vehicleProvider(car)).value?.nickname,
+                          driver: ref.watch(isDriverProvider),
+                        ),
+                    actions: actions,
+                    // The page's own act, then what every page offers.
+                    trailing: [
+                      if (primaryAction case final action?
+                          when action.showOnWide)
+                        action.toolbar(),
+                      // Keyed, so it stays itself as an act joins it.
+                      const QuickAddButton(key: ValueKey(QuickAddButton)),
+                    ],
+                    // Only offered when there is something to go back to; a
+                    // page opened directly by URL on the web has an empty
+                    // stack.
+                    onBack: Navigator.of(context).canPop()
+                        ? () => Navigator.of(context).maybePop()
+                        : null,
+                  ),
+                  // A tab strip under the bar draws its own rule.
+                  if (bottom == null) const Divider(height: 1),
+                  // Outside the column on purpose. A tab strip belongs to the
+                  // surface it switches, so it runs the width of the pane
+                  // along with its divider — the same edge-to-edge strip a
+                  // phone gets from the app bar. Held to the text column it
+                  // read as a control floating mid-page, above a rule that
+                  // stopped short of both sides.
+                  ?bottom,
+                  Expanded(
+                    child: AdaptiveContent(width: contentWidth, child: content),
+                  ),
+                ],
+              ),
             ),
           ),
         ],
