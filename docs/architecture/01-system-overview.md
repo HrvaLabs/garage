@@ -99,11 +99,12 @@ Within a feature the split is always the same, for example `lib/features/fuel/`:
 Every page then sits inside `GarageAppFrame`
 (`lib/core/widgets/app_frame.dart`), which `MaterialApp.router`'s `builder`
 puts around it: the desk's theme on a wide window (`GarageTheme.desktop`,
-decision 198), snackbars sized to the window, and the new-version notice the
-web build shows. `test/support/pump_screen.dart` builds the same frame, so a
-screen test sees what the app puts around a page, a phone-sized one included:
-its snackbars float, as a phone's do, and one pumped at a desk's size
-(`pumpDesktop`) gets the desk's theme.
+decision 198), snackbars sized to the window and, on a wide one, floated into
+its bottom right corner, and the new-version notice the web build shows.
+`test/support/pump_screen.dart` builds the same frame, so a screen test sees
+what the app puts around a page, a phone-sized one included: its snackbars
+float, as a phone's do, and one pumped at a desk's size (`pumpDesktop`) gets
+the desk's theme and its notices in the corner.
 
 ### The first fetch
 

@@ -2897,13 +2897,15 @@ way: a sheet or dialog is a modal route under the root navigator, so its
 messenger is the root one whatever the page below does. Instead
 `WindowSnackBars` at the root sizes every snackbar to the window: floating,
 at most 560 px, centred, so on a desktop it clears the sidebar and on a
-phone it is what it was. The dashboard's garage row keeps its chevron beside
-the name on desktop rather than at any fixed width. About renders inside
-the shell like every other pushed page. An empty state's button is capped at
-360 px, and the vehicles list shows no floating "Add vehicle" while its empty
-state offers the same button. The vehicle form's calculator dock sits inside
-the Optional section with its one field and reserves no space until the
-field is used, rather than as a blank band above Save.
+phone it is what it was (on a wide window, superseded by decision 198, which
+puts a notice in the bottom right corner). The dashboard's garage row keeps
+its chevron beside the name on desktop rather than at any fixed width. About
+renders inside the shell like every other pushed page. An empty state's
+button is capped at 360 px, and the vehicles list shows no floating
+"Add vehicle" while its empty state offers the same button. The vehicle
+form's calculator dock sits inside the Optional section with its one field
+and reserves no space until the field is used, rather than as a blank band
+above Save.
 
 **Why not a different dashboard on desktop.** The same sections in two
 columns is what the width buys; a separate layout would be a second product
@@ -7586,3 +7588,13 @@ every panel on Statistics, read as sections with a rule under each, and the
 quick-add dialog's three tiles read as underlined labels until one is
 hovered. Those screens are to become tables and panes, so neither gets a
 special case here.
+
+**Notices in the corner.** `WindowSnackBars` stays the host every notice goes
+through; on a wide window it floats them 400 pixels wide in the bottom right
+corner rather than under the middle of the page, where they covered the row
+they were about. A width only ever centres a snackbar, so what puts it in the
+corner is a margin as wide as the rest of the window, and that margin lets a
+click through to the page beside the notice
+(`lib/core/widgets/window_snackbars.dart`). *Trade-off:* the corner is where
+a page's floating button sits, so on a desk page that still has one, a notice
+covers it while it shows.
