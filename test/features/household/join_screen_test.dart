@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garage/core/errors/app_failure.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:garage/domain/entities/code_description.dart';
@@ -41,7 +42,10 @@ class RecordingHouseholdRepository implements HouseholdRepository {
   }
 
   @override
-  Future<String> createInvite(String householdId) async => 'ABC12345';
+  Future<String> createInvite(
+    String householdId, {
+    String role = 'member',
+  }) async => 'ABC12345';
 
   @override
   Future<List<Invite>> invites(String householdId) async => const [];
@@ -445,6 +449,19 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('a driver\'s code on a lapsed plan says what is wrong', (
+    tester,
+  ) async {
+    final repository = RecordingHouseholdRepository(
+      onJoin: (_) async =>
+          throw const AppFailure(kind: AppFailureKind.driverCodeNeedsPlan),
+    );
+    await pumpJoin(tester, repository: repository, household: null);
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('company plan has ended'), findsOneWidget);
   });
 
   testWidgets('a code the backend refuses is explained, not swallowed', (

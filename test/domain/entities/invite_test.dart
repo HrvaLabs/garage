@@ -14,6 +14,10 @@ Invite invite({DateTime? expiresAt, DateTime? redeemedAt}) {
 }
 
 void main() {
+  test('a code from before roles makes a member', () {
+    expect(invite().role, 'member');
+  });
+
   test('a fresh code is waiting to be used', () {
     final subject = invite(expiresAt: DateTime.utc(2026, 8, 30));
 
@@ -72,6 +76,29 @@ void main() {
         expect(Invites.reusable(invites, now)?.id, 'old');
       },
     );
+
+    test('is one for the role asked about, never another role\'s', () {
+      // A member's code handed to somebody hired to drive would make them a
+      // member, which is what the role on the code is there to stop.
+      final invites = [
+        Invite(
+          id: 'member',
+          code: 'MEMBER12',
+          createdAt: DateTime.utc(2026, 8, 10),
+          expiresAt: DateTime.utc(2026, 8, 24),
+        ),
+        Invite(
+          id: 'driver',
+          code: 'DRIVER12',
+          createdAt: DateTime.utc(2026, 8, 12),
+          expiresAt: DateTime.utc(2026, 8, 26),
+          role: 'driver',
+        ),
+      ];
+
+      expect(Invites.reusable(invites, now, role: 'driver')?.id, 'driver');
+      expect(Invites.reusable(invites, now)?.id, 'member');
+    });
 
     test('is none when every code was used or has expired', () {
       final invites = [

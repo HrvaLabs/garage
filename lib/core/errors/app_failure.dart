@@ -33,6 +33,11 @@ enum AppFailureKind {
   /// one car and cannot inherit the console, so somebody has to be made an
   /// admin first, and the sentence says so.
   driversNeedAdmin,
+
+  /// A driver's invite code redeemed while the garage's company plan has
+  /// lapsed (migration 0082). The code is good and waits for the plan;
+  /// "no access" would send the joiner after the wrong thing.
+  driverCodeNeedsPlan,
   unknown,
 }
 
@@ -140,6 +145,8 @@ class AppFailure implements Exception {
           'P0007' => AppFailureKind.driversNeedAdmin,
           // A free garage at its cap of active cars (0080).
           'P0008' => AppFailureKind.planLimit,
+          // join_household_with_code: a driver's code, the plan lapsed (0082).
+          'P0009' => AppFailureKind.driverCodeNeedsPlan,
           _ => AppFailureKind.unknown,
         },
         debugMessage: '${error.code}: ${error.message}',

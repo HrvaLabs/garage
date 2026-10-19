@@ -41,7 +41,10 @@ class RecordingHouseholdRepository implements HouseholdRepository {
   Future<String> joinWithCode(String code) async => 'h1';
 
   @override
-  Future<String> createInvite(String householdId) async => 'ABCD2345';
+  Future<String> createInvite(
+    String householdId, {
+    String role = 'member',
+  }) async => 'ABCD2345';
 
   @override
   Future<List<HouseholdMember>> members(String householdId) async => const [];

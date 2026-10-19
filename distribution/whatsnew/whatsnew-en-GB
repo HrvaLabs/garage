@@ -1,9 +1,10 @@
-Fixes from the first days in production:
-• An archived vehicle no longer gets reminders
-• A driver's service now closes its one-time reminder
-• An incident reported with no signal is sent once there is one
-• Drivers see a Cars tab, and no buttons they cannot use
+A company garage can now invite someone straight in as a driver.
+Fixes:
+• Archived vehicles no longer get reminders
+• A driver's service closes its one-time reminder
+• An incident reported with no signal is sent later
+• Drivers see a Cars tab, and only buttons they can use
 • A problem noted after midnight is dated that day
-• A backup now waits for a signal rather than saving old copies
-• Edits made offline are no longer lost after a slow save
-• Old reminders the phone set for itself no longer arrive
+• A backup waits for a signal instead of saving old copies
+• Offline edits are no longer lost after a slow save
+• Old reminders the phone set itself no longer arrive

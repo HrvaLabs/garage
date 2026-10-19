@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/errors/app_failure.dart';
 import 'package:garage/core/sync/read_cache.dart';
@@ -120,6 +122,62 @@ void main() {
   // 0080), so their change of a unit preference is filtered to zero rows and
   // answered without an error. The repository reads the id back and treats
   // none as the refusal it is.
+  group('invite codes', () {
+    SupabaseHouseholdRepository over(FakeSupabaseServer server) =>
+        SupabaseHouseholdRepository(
+          server.client,
+          cache: ReadCache(store: InMemoryReadCacheStore(), userId: () => 'u1'),
+        );
+
+    FakeSupabaseServer answering(Object body) =>
+        FakeSupabaseServer((request) => (200, body));
+
+    test('a driver\'s code asks for the role', () async {
+      final server = answering('DRVR2345');
+
+      final code = await over(server).createInvite('h1', role: 'driver');
+
+      expect(code, 'DRVR2345');
+      expect(jsonDecode(server.requests.single.body), {
+        'target_household': 'h1',
+        'invite_role': 'driver',
+      });
+    });
+
+    test('a member\'s code is the call every build already makes', () async {
+      // So it still works in the minutes a deploy can put between the app
+      // and the migration that taught the function the role.
+      final server = answering('MEMB2345');
+
+      await over(server).createInvite('h1');
+
+      expect(jsonDecode(server.requests.single.body), {
+        'target_household': 'h1',
+      });
+    });
+
+    test('the list reads who each code is for', () async {
+      final server = answering([
+        {
+          'id': 'i1',
+          'code': 'DRVR2345',
+          'created_at': '2026-10-16T09:00:00Z',
+          'expires_at': '2026-10-30T09:00:00Z',
+          'redeemed_at': null,
+          'role': 'driver',
+        },
+      ]);
+
+      final invites = await over(server).invites('h1');
+
+      expect(invites.single.role, 'driver');
+      expect(
+        server.requests.single.url.queryParameters['select'],
+        contains('role'),
+      );
+    });
+  });
+
   group('a settings write the policy filtered', () {
     SupabaseHouseholdRepository repositoryOver(FakeSupabaseServer server) =>
         SupabaseHouseholdRepository(

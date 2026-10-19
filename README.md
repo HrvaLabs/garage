@@ -69,7 +69,7 @@ garage, no ads, no tracking. English, Croatian and Italian.
 - **Lending a car** — give somebody a code and the car is theirs for a few days:
   they can log fuel and drives on it without joining your garage, and it
   disappears from their app when the pass runs out.
-- **Company mode** — a garage on the company plan gets drivers who see only
+- **Company mode** — a garage on the company plan invites drivers who see only
   the cars handed to them, a log of who had which car when with the driver's
   sign-off, every deadline across the fleet month by month, how each entry
   was paid and who is owed what back, incidents with photos, and one

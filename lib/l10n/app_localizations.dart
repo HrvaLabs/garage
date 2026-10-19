@@ -256,6 +256,12 @@ abstract class AppLocalizations {
   /// **'A garage of drivers needs an admin. Make somebody an admin before you leave.'**
   String get errorDriversNeedAdmin;
 
+  /// No description provided for @errorDriverCodeNeedsPlan.
+  ///
+  /// In en, this message translates to:
+  /// **'This code is for a driver, and the garage\'s company plan has ended. Ask whoever sent it.'**
+  String get errorDriverCodeNeedsPlan;
+
   /// No description provided for @errorAuth.
   ///
   /// In en, this message translates to:
@@ -4359,6 +4365,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'New code'**
   String get householdInviteNew;
+
+  /// Asked of an admin of a garage on the company plan when they invite somebody: the code makes the joiner a driver or a member.
+  ///
+  /// In en, this message translates to:
+  /// **'Who is the code for?'**
+  String get householdInviteWhoFor;
+
+  /// No description provided for @householdInviteForDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'For a driver'**
+  String get householdInviteForDriver;
+
+  /// No description provided for @householdInviteForDriverHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sees only the car handed to them, and logs what they drive'**
+  String get householdInviteForDriverHint;
+
+  /// No description provided for @householdInviteForMember.
+  ///
+  /// In en, this message translates to:
+  /// **'For a member'**
+  String get householdInviteForMember;
+
+  /// No description provided for @householdInviteForMemberHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Sees the whole garage: every car, cost and member'**
+  String get householdInviteForMemberHint;
 
   /// No description provided for @economyScale.
   ///

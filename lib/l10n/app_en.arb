@@ -32,6 +32,7 @@
   "errorHandoverClash": "The car was already handed over on that day. Remove that handover first, or pick another day.",
   "errorPlanLimit": "The garage already has the free plan's five cars. Archive one first; the company plan lifts the limit.",
   "errorDriversNeedAdmin": "A garage of drivers needs an admin. Make somebody an admin before you leave.",
+  "errorDriverCodeNeedsPlan": "This code is for a driver, and the garage's company plan has ended. Ask whoever sent it.",
   "errorAuth": "Sign-in failed. Check your email and password.",
   "errorEmailNotConfirmed": "Confirm your email address first. Check your inbox for the link we sent when you signed up.",
   "authWhatIsThis": "What Garage does",
@@ -1347,6 +1348,14 @@
   "householdInviteRevokeBody": "Whoever has it can no longer join with it. You can make a new one.",
   "householdInviteRevoked": "Code revoked",
   "householdInviteNew": "New code",
+  "householdInviteWhoFor": "Who is the code for?",
+  "@householdInviteWhoFor": {
+    "description": "Asked of an admin of a garage on the company plan when they invite somebody: the code makes the joiner a driver or a member."
+  },
+  "householdInviteForDriver": "For a driver",
+  "householdInviteForDriverHint": "Sees only the car handed to them, and logs what they drive",
+  "householdInviteForMember": "For a member",
+  "householdInviteForMemberHint": "Sees the whole garage: every car, cost and member",
   "economyScale": "Best {best} · Worst {worst} on this vehicle",
   "economyScaleNone": "Log a few full tanks to compare against",
   "@economyScaleDefault": {

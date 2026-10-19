@@ -39,7 +39,7 @@ by a merge whose survivor would end up over the cap
 (`supabase/migrations/0080_company.sql:410`). Archived cars do not count: a
 family that sold two cars and archived them has three in the garage. The three
 functions refuse with their own code, `P0008`, which the app renders as its
-"free plan's five cars" sentence (`lib/core/errors/app_failure.dart:142`); a
+"free plan's five cars" sentence (`lib/core/errors/app_failure.dart:147`); a
 policy cannot raise, so the insert is a bare `42501`. That is why the vehicles
 screen asks first: `canAddVehicleProvider`
 (`lib/features/company/providers/company_providers.dart:53`) mirrors the rule
@@ -77,6 +77,17 @@ costs, not the people's spending. How that is enforced is
 [06](06-security-and-tenancy.md#drivers-the-third-tenancy-path); what it looks
 like is below.
 
+**A driver can join as one.** An admin of a garage whose plan is current is
+asked, on inviting somebody, who the code is for, a driver first
+(`lib/features/household/screens/household_screen.dart:83`), and a driver's
+code makes the joiner a driver at the join, so they never hold a member's
+view of the garage, not even for the minutes before somebody got to "Make
+driver". A code waiting to be handed out again is only ever one for the same
+role. Members are not asked: their codes make members, as every code did,
+and the database refuses a driver's code from anybody but an admin on the
+plan. The invite list says who each code is for. Decision 197; the database
+side is in [06](06-security-and-tenancy.md#invites).
+
 **The role travels with the startup fetch.** The bootstrap's fourth request is
 the caller's own `household_members` rows
 (`lib/features/household/data/supabase_garage_bootstrap_repository.dart:132`),
@@ -97,10 +108,10 @@ company's van.
 **Making a driver** is on the members screen, for an admin, while the plan is
 current — the update policy refuses the role otherwise
 (`supabase/migrations/0080_company.sql:569`) — and never on your own row
-(`lib/features/household/screens/household_screen.dart:630`). A driver's row
+(`lib/features/household/screens/household_screen.dart:665`). A driver's row
 says which cars they have today, or that they have none. When the viewer is
 a driver, only their own row says so
-(`lib/features/household/screens/household_screen.dart:529`): the policy
+(`lib/features/household/screens/household_screen.dart:564`): the policy
 shows a driver their own windows and nothing else, so the log they hold
 cannot say another driver has no car. The role stays on a lapsed garage: its
 drivers keep their cars, and only a new driver waits for the plan.
@@ -112,7 +123,7 @@ does the same (`lib/features/household/admin_succession.dart:12`), so the
 sentence naming who inherits is right before the trigger decides. When only
 drivers would remain, an admin's own leave is refused with `P0007`
 (`supabase/migrations/0080_company.sql:634`) and the members screen shows
-"a garage of drivers needs an admin" (`lib/core/errors/app_failure.dart:140`).
+"a garage of drivers needs an admin" (`lib/core/errors/app_failure.dart:145`).
 Only a leave, and only an admin's: a driver leaving an adminless garage is
 never refused, and an account deletion cascades through with no `auth.uid()`
 to compare and proceeds, because erasure has to be real (decision 101). That
@@ -184,7 +195,7 @@ recipient the car comes back to nobody, which is allowed on a lapsed plan
 while handing it on is not. A second handover on the same day is refused
 (`P0006`, both for an open window that started that day and for a closed one
 that covers it), and the app's sentence tells the admin to remove the wrong
-handover first (`lib/core/errors/app_failure.dart:137`). The console's row
+handover first (`lib/core/errors/app_failure.dart:142`). The console's row
 menu removes the newest window still open — usually today's, but a handover
 arranged on Friday for Monday is open too, is not today's, and is the
 likelier mistake (`lib/features/company/widgets/drivers_and_cars_tab.dart:166`).
@@ -365,7 +376,7 @@ leaves the line showing what is still owed rather than the full total.
 
 **The household settlement is switched off for a fleet.** The settlement card
 and its setting are hidden on the plan
-(`lib/features/household/screens/household_screen.dart:661`,
+(`lib/features/household/screens/household_screen.dart:696`,
 `lib/features/settings/screens/settings_screen.dart:425`): drivers do not owe
 the company; the company owes whoever paid out of their own pocket, which is
 what the reimbursements are.

@@ -26,6 +26,7 @@ String failureMessage(AppLocalizations l10n, AppFailure failure) {
     AppFailureKind.handoverClash => l10n.errorHandoverClash,
     AppFailureKind.planLimit => l10n.errorPlanLimit,
     AppFailureKind.driversNeedAdmin => l10n.errorDriversNeedAdmin,
+    AppFailureKind.driverCodeNeedsPlan => l10n.errorDriverCodeNeedsPlan,
     AppFailureKind.unknown => l10n.errorGeneric,
   };
 }

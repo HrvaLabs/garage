@@ -211,7 +211,7 @@ that ask shows while it loads.
 
 **Low.** When the log could not be read, `driverRow` prints the failure
 sentence as each driver's detail
-(`lib/features/household/screens/household_screen.dart:529`), so a garage
+(`lib/features/household/screens/household_screen.dart:564`), so a garage
 with five drivers says "you do not have access" five times. Once, above the
 list, would do; left because the rows are where the missing fact belongs and
 the repeat is only ever seen on a refused first load.
@@ -1196,7 +1196,7 @@ closing the old one there would leave the garage with neither. The live suite
 makes the app's update as the driver, on a rule the service missed, one set
 after it, one on the other car, a recurring one, a closed one, with a date
 changed on the way, and as the admin, a driver with no car and a stranger
-(`test_rls/rls_test.dart:7692`). Decision 192.
+(`test_rls/rls_test.dart:7852`). Decision 192.
 
 The rest of what a driver's screens offer on the tables they only read — a
 tyre set's edit, fit, retire and delete, a paper's delete, a part's edit and
@@ -1208,10 +1208,10 @@ reads its row back like the entry tables and refuses on none
 `lib/features/trips/data/supabase_route_repository.dart:59`,
 `lib/features/maintenance/data/supabase_maintenance_repository.dart:85`);
 the RLS suite makes the app's write on three of them
-(`test_rls/rls_test.dart:7213`). A paper's edit and a one-off rule's are
+(`test_rls/rls_test.dart:7373`). A paper's edit and a one-off rule's are
 upserts, which Postgres checks against the insert policy and refuses out
 loud; inserts there were always a loud `42501`
-(`test_rls/rls_test.dart:7136`). Only an insert has a new row for a
+(`test_rls/rls_test.dart:7296`). Only an insert has a new row for a
 `with check` clause to fail on — a table with no policy for the command
 filters every row, checked on the local stack against `vehicle_documents`
 as an assigned driver: `update` and `delete` both `0 rows`, `insert`
@@ -1423,7 +1423,7 @@ handed to them and the row opens the same sheet with the same Save; their
 update and delete policies are per author
 (`supabase/migrations/0080_company.sql:1253`), so the write touched no row,
 was answered 204, and the sheet closed over an entry that did not change.
-The RLS suite proved the row untouched (`test_rls/rls_test.dart:7403`) and
+The RLS suite proved the row untouched (`test_rls/rls_test.dart:7563`) and
 said nothing about what the phone showed; only the incident repository read
 its rows back.
 
@@ -1438,10 +1438,10 @@ covered. So do the two writes outside the entry tables a driver can make on
 a row the policy may filter — a receipt's delete, per uploader
 (`lib/features/attachments/data/supabase_attachment_repository.dart:140`),
 and the garage's settings row, on which a driver holds no update policy at
-all (`lib/features/household/data/supabase_household_repository.dart:193`). Each repository's fake-server test answers the write with `[]` and
+all (`lib/features/household/data/supabase_household_repository.dart:202`). Each repository's fake-server test answers the write with `[]` and
 expects the permission failure, and the RLS suite makes the app's write on a
 row somebody else wrote and on the driver's own
-(`test_rls/rls_test.dart:7426`). Inserts are left alone: a refused insert is
+(`test_rls/rls_test.dart:7586`). Inserts are left alone: a refused insert is
 a real `42501`. The tables a driver cannot write at all were left alone too,
 on the belief that they refuse the same way; they do not, and *A driver's
 service left its one-off reminder open*, above, says what was left and how
@@ -1890,14 +1890,14 @@ each was a promise that had stopped describing it.
   `supabase/migrations/0066_guest_briefing.sql:16`: the odometer, when the
   insurance, green card and roadworthiness run out, the text of every open
   problem, and the tyres. A sensible decision that three sentences predated.
-  `guestLendIntro` (`lib/l10n/app_en.arb:1992`), `PRIVACY.md`,
+  `guestLendIntro` (`lib/l10n/app_en.arb:2001`), `PRIVACY.md`,
   `web/privacy.html` and `web/features.html` now say so.
 - **The About screen and the features page said deleting an account takes
-  every record with it** (`lib/l10n/app_en.arb:1283`). In a garage other people
+  every record with it** (`lib/l10n/app_en.arb:1284`). In a garage other people
   are still in, the entries stay, without the author's name, which is what
   `supabase/migrations/0033_account_deletion_unblocked.sql:16` decided and the
   policy already said. And the features tour still promised "how far the tank
-  still goes" (`lib/l10n/app_en.arb:1470`), the count-down decision 152 removed
+  still goes" (`lib/l10n/app_en.arb:1479`), the count-down decision 152 removed
   because it was wrong.
 
 **What found them.** Checking every sentence of a store listing and a terms
@@ -4643,7 +4643,7 @@ without holding startup up; offline it fails with
 and on disk. A request that finds the token expired awaits a refresh first
 and, when that fails the same way, rethrows it without sending
 (`supabase_client.dart` lines 262 to 279 of supabase 2.14.0);
-`lib/core/errors/app_failure.dart:70` maps it to `network`, so the copy is
+`lib/core/errors/app_failure.dart:75` maps it to `network`, so the copy is
 served. When a signal returns, the refresh ticker, running every ten seconds
 from the client's construction and started again on every resume
 (`supabase_auth.dart` line 169), refreshes the expired session and saves it;

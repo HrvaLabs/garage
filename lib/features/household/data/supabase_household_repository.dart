@@ -53,11 +53,20 @@ class SupabaseHouseholdRepository implements HouseholdRepository {
   }
 
   @override
-  Future<String> createInvite(String householdId) async {
+  Future<String> createInvite(
+    String householdId, {
+    String role = 'member',
+  }) async {
     try {
       final code = await _client.rpc<String>(
         'create_invite',
-        params: {'target_household': householdId},
+        params: {
+          'target_household': householdId,
+          // Named only when it is not the default, so a member's code is the
+          // call every build already makes and works on either side of the
+          // migration that taught the function the role (0082).
+          if (role != 'member') 'invite_role': role,
+        },
       );
       return code;
     } catch (error) {
@@ -70,7 +79,7 @@ class SupabaseHouseholdRepository implements HouseholdRepository {
     try {
       final rows = await _client
           .from('invites')
-          .select('id, code, created_at, expires_at, redeemed_at')
+          .select('id, code, created_at, expires_at, redeemed_at, role')
           .eq('household_id', householdId)
           .order('created_at', ascending: false);
       return rows.map(inviteFromRow).toList(growable: false);
@@ -266,6 +275,7 @@ Invite inviteFromRow(Map<String, dynamic> row) {
     createdAt: DateTime.parse(row['created_at'] as String),
     expiresAt: DateTime.parse(row['expires_at'] as String),
     redeemedAt: redeemed == null ? null : DateTime.parse(redeemed),
+    role: row['role'] as String? ?? 'member',
   );
 }
 

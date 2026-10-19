@@ -28,6 +28,7 @@ import '../../../core/supabase/supabase_client_provider.dart';
 import '../../../core/widgets/confirm_delete.dart';
 import '../../../core/widgets/text_prompt.dart';
 import '../../../core/widgets/busy_label.dart';
+import '../../../core/widgets/pick_one.dart';
 import '../admin_succession.dart';
 import '../providers/member_providers.dart';
 import '../providers/settlement_providers.dart';
@@ -70,10 +71,45 @@ class _HouseholdScreenState extends ConsumerState<HouseholdScreen> {
     if (household == null) {
       return;
     }
+    final l10n = AppLocalizations.of(context)!;
+    // Approved 20 September 2026: in a company garage a joiner who became a
+    // member saw every car, cost and member, the wrong default for somebody
+    // hired to drive one van. The code says which they become, a driver
+    // first; making a driver is the admin's, on a current plan, as "Make
+    // driver" is, and the database refuses anybody else's driver code.
+    var role = 'member';
+    if (ref.read(companyEnabledProvider) &&
+        ref.read(myRoleProvider) == 'admin') {
+      final picked = await showPickOne<String>(
+        context,
+        title: l10n.householdInviteWhoFor,
+        options: [
+          PickOption(
+            'driver',
+            l10n.householdInviteForDriver,
+            subtitle: l10n.householdInviteForDriverHint,
+            icon: Icons.drive_eta_outlined,
+            key: const Key('invite-for-driver'),
+          ),
+          PickOption(
+            'member',
+            l10n.householdInviteForMember,
+            subtitle: l10n.householdInviteForMemberHint,
+            icon: Icons.group_outlined,
+            key: const Key('invite-for-member'),
+          ),
+        ],
+      );
+      if (picked == null || !mounted) {
+        return;
+      }
+      role = picked;
+    }
     if (!forceNew) {
       final existing = Invites.reusable(
         ref.read(householdInvitesProvider).value ?? const [],
         DateTime.now().toUtc(),
+        role: role,
       );
       if (existing != null) {
         // Reused rather than piled up, which is deliberate; see [Invites].
@@ -82,11 +118,10 @@ class _HouseholdScreenState extends ConsumerState<HouseholdScreen> {
       }
     }
     setState(() => _busy = true);
-    final l10n = AppLocalizations.of(context)!;
     try {
       final code = await ref
           .read(householdRepositoryProvider)
-          .createInvite(household.id);
+          .createInvite(household.id, role: role);
       // Refreshed, not invalidated: the message names the code's expiry,
       // which only the list that contains the new code knows. In its own try
       // because the code already exists — a list that will not load costs the
@@ -700,6 +735,8 @@ class _HouseholdScreenState extends ConsumerState<HouseholdScreen> {
             for (final invite in invites)
               _InviteRow(
                 invite: invite,
+                // Said only where a code can be a driver's.
+                showRole: ref.watch(companyPlanProvider),
                 until: format.formatShortDate(invite.expiresAt.toLocal()),
                 onCopy: () => _copyCode(invite.code),
                 onShare: () => _shareInviteLink(invite.code),
@@ -934,6 +971,7 @@ class _SettlementCard extends StatelessWidget {
 class _InviteRow extends StatelessWidget {
   const _InviteRow({
     required this.invite,
+    required this.showRole,
     required this.until,
     required this.onCopy,
     required this.onShare,
@@ -941,6 +979,10 @@ class _InviteRow extends StatelessWidget {
   });
 
   final Invite invite;
+
+  /// Whether to say who the code is for, which a garage on the company plan
+  /// needs: one of its codes can make a driver.
+  final bool showRole;
 
   /// The expiry, formatted by the parent: the header promises "until it
   /// is used or expires", so the row says when that is.
@@ -966,11 +1008,19 @@ class _InviteRow extends StatelessWidget {
               decoration: spent ? TextDecoration.lineThrough : null,
             ),
       ),
-      subtitle: Text(switch (status) {
-        InviteStatus.active => l10n.householdInviteActiveUntil(until),
-        InviteStatus.used => l10n.householdInviteUsed,
-        InviteStatus.expired => l10n.householdInviteExpired,
-      }),
+      subtitle: Text(
+        [
+          if (showRole)
+            invite.role == 'driver'
+                ? l10n.householdInviteForDriver
+                : l10n.householdInviteForMember,
+          switch (status) {
+            InviteStatus.active => l10n.householdInviteActiveUntil(until),
+            InviteStatus.used => l10n.householdInviteUsed,
+            InviteStatus.expired => l10n.householdInviteExpired,
+          },
+        ].join(' · '),
+      ),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [

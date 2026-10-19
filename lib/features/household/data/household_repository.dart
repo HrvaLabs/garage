@@ -48,8 +48,10 @@ abstract interface class HouseholdRepository {
   /// Redeems an invite code and returns the joined household's id.
   Future<String> joinWithCode(String code);
 
-  /// Returns a fresh 8-character invite code.
-  Future<String> createInvite(String householdId);
+  /// Returns a fresh 8-character invite code, which makes whoever joins with
+  /// it a [role]: `member`, or `driver` from an admin of a garage on the
+  /// company plan.
+  Future<String> createInvite(String householdId, {String role = 'member'});
 
   /// Every code this household has issued, newest first — including used and
   /// expired ones, because "who did I already invite?" is the question this

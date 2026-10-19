@@ -94,6 +94,10 @@ class AppLocalizationsEn extends AppLocalizations {
       'A garage of drivers needs an admin. Make somebody an admin before you leave.';
 
   @override
+  String get errorDriverCodeNeedsPlan =>
+      'This code is for a driver, and the garage\'s company plan has ended. Ask whoever sent it.';
+
+  @override
   String get errorAuth => 'Sign-in failed. Check your email and password.';
 
   @override
@@ -2456,6 +2460,23 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get householdInviteNew => 'New code';
+
+  @override
+  String get householdInviteWhoFor => 'Who is the code for?';
+
+  @override
+  String get householdInviteForDriver => 'For a driver';
+
+  @override
+  String get householdInviteForDriverHint =>
+      'Sees only the car handed to them, and logs what they drive';
+
+  @override
+  String get householdInviteForMember => 'For a member';
+
+  @override
+  String get householdInviteForMemberHint =>
+      'Sees the whole garage: every car, cost and member';
 
   @override
   String economyScale(String best, String worst) {

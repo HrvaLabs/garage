@@ -24,6 +24,7 @@ import 'package:garage/features/household/screens/onboarding_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'
     show PostgrestException, User;
 
+import '../../support/driver_log.dart' show companyGarage;
 import '../../support/pump_screen.dart';
 
 /// A garage that has asked for the settlement. It is off by default now, so
@@ -85,8 +86,11 @@ class RecordingHouseholdRepository implements HouseholdRepository {
   }
 
   @override
-  Future<String> createInvite(String householdId) async {
-    calls.add('invite:$householdId');
+  Future<String> createInvite(
+    String householdId, {
+    String role = 'member',
+  }) async {
+    calls.add('invite:$householdId:$role');
     issued = [
       ...issued,
       Invite(
@@ -94,6 +98,7 @@ class RecordingHouseholdRepository implements HouseholdRepository {
         code: 'ABCD2345',
         createdAt: DateTime.now().toUtc(),
         expiresAt: DateTime.now().toUtc().add(const Duration(days: 14)),
+        role: role,
       ),
     ];
     return 'ABCD2345';
@@ -248,6 +253,11 @@ Future<NavigationLog> pumpHousehold(
   bool clipboardRefuses = false,
   AppFailure? settingsFailure,
   List<Vehicle> vehicles = const [],
+  Household household = testHousehold,
+  String role = 'admin',
+  Locale? locale,
+  double textScale = 1,
+  Size surface = const Size(420, 1400),
 }) {
   // Switching garage after a join persists the choice; unanswered, that
   // write never completes and the screen stays busy, spinner and all.
@@ -269,7 +279,11 @@ Future<NavigationLog> pumpHousehold(
     tester,
     const HouseholdScreen(),
     initialLocation: '/household',
-    surface: const Size(420, 1400),
+    surface: surface,
+    household: household,
+    role: role,
+    locale: locale,
+    textScale: textScale,
     extraRoutes: const {'/transfer'},
     overrides: [
       vehiclesProvider.overrideWith((ref) async => vehicles),
@@ -404,7 +418,7 @@ void main() {
       await tester.tap(invite.first);
       await tester.pumpAndSettle();
 
-      expect(households.calls, contains('invite:h1'));
+      expect(households.calls, contains('invite:h1:member'));
       // Listed once, in the invites list — never also in a card above the
       // button, which is what made the same code look like two codes.
       expect(find.text('ABCD2345'), findsOneWidget);
@@ -466,7 +480,7 @@ void main() {
       await tester.tap(invite);
       await tester.pumpAndSettle();
 
-      expect(households.calls, isNot(contains('invite:h1')));
+      expect(households.calls, isNot(contains('invite:h1:member')));
       expect(shared.single, contains('/join/ABCD2345'));
     });
 
@@ -1241,6 +1255,7 @@ void main() {
       String value = 'ABCD2345',
       DateTime? expiresAt,
       DateTime? redeemedAt,
+      String role = 'member',
     }) {
       return Invite(
         id: id,
@@ -1249,8 +1264,153 @@ void main() {
         expiresAt:
             expiresAt ?? DateTime.now().toUtc().add(const Duration(days: 13)),
         redeemedAt: redeemedAt,
+        role: role,
       );
     }
+
+    // Approved 20 September 2026: in a garage on the company plan a code
+    // says whether the joiner drives, and an admin is asked, a driver first.
+    group('in a garage on the company plan', () {
+      Future<RecordingHouseholdRepository> inviteFrom(
+        WidgetTester tester, {
+        List<Invite> issued = const [],
+        String role = 'admin',
+      }) async {
+        final households = RecordingHouseholdRepository(issued: issued);
+        await pumpHousehold(
+          tester,
+          households,
+          household: companyGarage,
+          role: role,
+        );
+        await tester.pumpAndSettle();
+        await tester.tap(find.widgetWithText(FilledButton, 'Invite someone'));
+        await tester.pumpAndSettle();
+        return households;
+      }
+
+      testWidgets('an admin is asked who the code is for, a driver first', (
+        tester,
+      ) async {
+        await inviteFrom(tester);
+
+        expect(find.text('Who is the code for?'), findsOneWidget);
+        expect(
+          tester.getTopLeft(find.text('For a driver')).dy,
+          lessThan(tester.getTopLeft(find.text('For a member')).dy),
+        );
+      });
+
+      testWidgets('and a driver is given a driver\'s code', (tester) async {
+        final households = await inviteFrom(tester);
+
+        await tester.tap(find.text('For a driver'));
+        await tester.pumpAndSettle();
+
+        expect(households.calls, contains('invite:h1:driver'));
+      });
+
+      testWidgets('a member\'s code waiting is not handed to a driver', (
+        tester,
+      ) async {
+        final households = await inviteFrom(tester, issued: [code()]);
+
+        await tester.tap(find.text('For a driver'));
+        await tester.pumpAndSettle();
+
+        expect(households.calls, contains('invite:h1:driver'));
+      });
+
+      testWidgets('a driver\'s code waiting is handed out again', (
+        tester,
+      ) async {
+        final households = await inviteFrom(
+          tester,
+          issued: [code(role: 'driver')],
+        );
+
+        await tester.tap(find.text('For a driver'));
+        await tester.pumpAndSettle();
+
+        expect(
+          households.calls.where((call) => call.startsWith('invite:')),
+          isEmpty,
+        );
+      });
+
+      testWidgets('putting the question away makes no code', (tester) async {
+        final households = await inviteFrom(tester);
+
+        await tester.tapAt(const Offset(10, 10));
+        await tester.pumpAndSettle();
+
+        expect(
+          households.calls.where((call) => call.startsWith('invite:')),
+          isEmpty,
+        );
+      });
+
+      testWidgets('each code says who it is for', (tester) async {
+        await pumpHousehold(
+          tester,
+          RecordingHouseholdRepository(
+            issued: [
+              code(),
+              code(id: 'i2', value: 'DRVR2345', role: 'driver'),
+            ],
+          ),
+          household: companyGarage,
+        );
+        await tester.pumpAndSettle();
+
+        expect(find.textContaining('For a driver'), findsOneWidget);
+        expect(find.textContaining('For a member'), findsOneWidget);
+      });
+
+      testWidgets('a member of the garage is not asked, and makes a '
+          'member\'s code', (tester) async {
+        // A driver is the admin's to make, as "Make driver" is; the
+        // database refuses anybody else's driver code.
+        final households = await inviteFrom(tester, role: 'member');
+
+        expect(find.text('Who is the code for?'), findsNothing);
+        expect(households.calls, contains('invite:h1:member'));
+      });
+
+      testWidgets('in Croatian on a narrow phone the question lays out', (
+        tester,
+      ) async {
+        await pumpHousehold(
+          tester,
+          RecordingHouseholdRepository(),
+          household: companyGarage,
+          locale: const Locale('hr'),
+          textScale: 1.5,
+          surface: const Size(320, 800),
+        );
+        await tester.pumpAndSettle();
+        final invite = find.widgetWithText(FilledButton, 'Pozovi nekoga');
+        await tester.ensureVisible(invite);
+        await tester.pumpAndSettle();
+        await tester.tap(invite);
+        await tester.pumpAndSettle();
+
+        expect(find.text('Za koga je kod?'), findsOneWidget);
+        expect(tester.takeException(), isNull);
+      });
+    });
+
+    testWidgets('a garage off the plan is not asked', (tester) async {
+      final households = RecordingHouseholdRepository();
+      await pumpHousehold(tester, households);
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.widgetWithText(FilledButton, 'Invite someone'));
+      await tester.pumpAndSettle();
+
+      expect(find.text('Who is the code for?'), findsNothing);
+      expect(households.calls, contains('invite:h1:member'));
+    });
 
     testWidgets('the codes already issued are listed with their state', (
       tester,
@@ -1309,7 +1469,7 @@ void main() {
       await tester.tap(find.widgetWithText(FilledButton, 'Invite someone'));
       await tester.pumpAndSettle();
 
-      expect(households.calls, contains('invite:h1'));
+      expect(households.calls, contains('invite:h1:member'));
     });
 
     testWidgets('a code can be withdrawn', (tester) async {

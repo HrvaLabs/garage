@@ -6139,7 +6139,7 @@ has its own picker now, photos only
 outside the bucket's list with a sentence about the file
 (`lib/features/vehicles/screens/vehicle_edit_screen.dart:178`). A refusal that
 still reaches storage, a 413 or a 415, maps to `invalid`
-(`lib/core/errors/app_failure.dart:110`), so a photo queued offline is dropped
+(`lib/core/errors/app_failure.dart:115`), so a photo queued offline is dropped
 rather than retried until its attempts run out: it would be refused every time.
 
 **Cost.** Objects already stored are not re-checked. A file type the pickers do
@@ -6701,7 +6701,7 @@ used to disagree by a hundredth of a day.
 
 **18 September 2026.** Demoting yourself as the garage's only admin asks
 first and names who inherits — "the role passes to Ana"
-(`lib/features/household/screens/household_screen.dart:437`); leaving as the
+(`lib/features/household/screens/household_screen.dart:472`); leaving as the
 only admin says the same in its own question (`household_screen.dart:363`);
 and the snackbar afterwards names who got the role rather than describing the
 rule. `successorOf` (`lib/features/household/admin_succession.dart:12`)
@@ -7043,7 +7043,7 @@ service, cost, odometer, trip, observation, incident — ends in
 failure on an empty list. The incident repository had done this alone since
 it was written; the check moved to `lib/core/supabase/` and the other six
 repositories took it, with a fake-server test per repository and a live case
-per table (`test_rls/rls_test.dart:7426`). A receipt's delete, which a
+per table (`test_rls/rls_test.dart:7586`). A receipt's delete, which a
 driver's policy ties to the uploader, and the garage's settings row, which a
 driver reads and may not update, take the same shape.
 
@@ -7075,7 +7075,7 @@ alone on the belief that a missing write policy refuses the same way. It
 does not: a table with no policy for the command filters every row, and a
 driver's update or delete there is the same silent 204, which a check on the
 local stack against `vehicle_documents` showed and the suite now proves
-(`test_rls/rls_test.dart:7213`). So every write a driver's screens offer on
+(`test_rls/rls_test.dart:7373`). So every write a driver's screens offer on
 them took the helper as well — a tyre set's edit, fit, retire and delete, a
 paper's delete, a part's edit and delete, a route's rename and delete, a
 rule's edit and delete — with one exception chosen rather than missed:
@@ -7497,3 +7497,24 @@ it.
 queue written before it is opened, and one more request for the rare write
 that is both edited and duplicated. A delete made the same way is still
 lost; that one needs a remembered delete.
+
+## 197. A company garage's invite code says whether the joiner drives
+
+**17 October 2026, the owner's decision of 20 September.** Every code made a
+member, and in a company garage a member sees every car, every cost and every
+other member: the wrong default for somebody hired to drive one van, and
+"Make driver" afterwards left that open until an admin remembered. The owner
+chose a role on the code, driver or member, the sheet that makes it leading
+with driver, applied by the join function. Built in 0082 with what the
+decision left open settled the way 0080 settled the same questions for "Make
+driver": only an admin of a garage whose plan is current mints a driver's
+code, and a driver's code redeemed after the plan lapsed is refused and kept,
+not turned into a member's. An admin on the plan is asked who each code is
+for; a member, or a garage off the plan, mints member's codes as before, and
+a code waiting to be handed out again is only reused for the role it was
+made for.
+
+**Cost.** One more question on every invite an admin of a fleet sends, which
+is the point of it, and a refusal a joiner can meet when the plan has lapsed
+since the code was sent. The joiner is not told on the join screen which
+role a code makes; they find out from what the app shows them after.

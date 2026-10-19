@@ -94,6 +94,10 @@ class AppLocalizationsHr extends AppLocalizations {
       'Garaža vozača treba administratora. Prije odlaska učini nekoga administratorom.';
 
   @override
+  String get errorDriverCodeNeedsPlan =>
+      'Ovaj kod je za vozača, a poslovni plan garaže je istekao. Javi se onome tko ti ga je poslao.';
+
+  @override
   String get errorAuth => 'Prijava nije uspjela. Provjeri e-mail i lozinku.';
 
   @override
@@ -2504,6 +2508,23 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get householdInviteNew => 'Novi kod';
+
+  @override
+  String get householdInviteWhoFor => 'Za koga je kod?';
+
+  @override
+  String get householdInviteForDriver => 'Za vozača';
+
+  @override
+  String get householdInviteForDriverHint =>
+      'Vidi samo vozilo koje mu je predano i bilježi ono što vozi';
+
+  @override
+  String get householdInviteForMember => 'Za člana';
+
+  @override
+  String get householdInviteForMemberHint =>
+      'Vidi cijelu garažu: sva vozila, troškove i članove';
 
   @override
   String economyScale(String best, String worst) {

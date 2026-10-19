@@ -1,9 +1,10 @@
-Correzioni dei primi giorni:
-• Un veicolo archiviato non riceve più promemoria
+Un garage aziendale ora può invitare qualcuno come autista.
+Correzioni:
+• I veicoli archiviati non ricevono promemoria
 • Un intervento dell'autista chiude il promemoria una tantum
-• Un incidente registrato offline parte col segnale
-• Gli autisti vedono la scheda Auto e solo i pulsanti utilizzabili
+• Un incidente offline parte col segnale
+• Per gli autisti: scheda Auto e solo i loro pulsanti
 • Un problema segnalato dopo mezzanotte ha la data giusta
-• Il backup aspetta il segnale invece di salvare dati vecchi
-• Le modifiche offline non si perdono più dopo un salvataggio lento
+• Il backup aspetta il segnale, non salva dati vecchi
+• Le modifiche offline restano dopo un salvataggio lento
 • I vecchi promemoria del telefono non arrivano più

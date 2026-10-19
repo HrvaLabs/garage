@@ -97,6 +97,20 @@ void main() {
     expect(failure.kind, AppFailureKind.handoverClash);
   });
 
+  test('a driver\'s code on a lapsed plan maps to its own kind', () {
+    // join_household_with_code (migration 0082): the code is good and the
+    // garage's plan has ended. "You do not have access" would send the
+    // joiner after the wrong thing.
+    final failure = AppFailure.from(
+      const PostgrestException(
+        message: "a driver's code waits for the company plan",
+        code: 'P0009',
+      ),
+    );
+
+    expect(failure.kind, AppFailureKind.driverCodeNeedsPlan);
+  });
+
   test('a garage at its free limit maps to a planLimit failure', () {
     // Raised by the unarchive guard, a transfer redeemed into a full garage
     // and a merge that would overflow one (migration 0080).

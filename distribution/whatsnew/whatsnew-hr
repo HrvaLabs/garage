@@ -1,9 +1,10 @@
-Popravci iz prvih dana:
+Poslovna garaža sada može pozvati nekoga izravno kao vozača.
+Popravci:
 • Arhivirano vozilo više ne dobiva podsjetnike
-• Vozačev servis sada zatvara i jednokratni podsjetnik
-• Nezgoda prijavljena bez signala šalje se kad signal stigne
+• Vozačev servis zatvara i jednokratni podsjetnik
+• Nezgoda prijavljena bez signala šalje se kasnije
 • Vozači vide karticu Auti i samo gumbe koje smiju koristiti
-• Problem zabilježen iza ponoći dobiva datum tog dana
-• Sigurnosna kopija sada čeka signal umjesto da spremi stare podatke
-• Izmjena bez signala više se ne gubi nakon sporog spremanja
-• Stari podsjetnici koje je telefon sam zakazao više ne stižu
+• Problem zabilježen iza ponoći ima točan datum
+• Sigurnosna kopija čeka signal, ne sprema stare podatke
+• Izmjena bez signala ne gubi se nakon sporog spremanja
+• Stari podsjetnici s telefona više ne stižu

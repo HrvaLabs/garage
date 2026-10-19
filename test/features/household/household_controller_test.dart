@@ -56,7 +56,10 @@ class FakeHouseholdRepository implements HouseholdRepository {
   }
 
   @override
-  Future<String> createInvite(String householdId) async {
+  Future<String> createInvite(
+    String householdId, {
+    String role = 'member',
+  }) async {
     calls.add('invite:$householdId');
     return 'ABCD2345';
   }

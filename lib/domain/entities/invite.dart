@@ -15,6 +15,7 @@ class Invite {
     required this.createdAt,
     required this.expiresAt,
     this.redeemedAt,
+    this.role = 'member',
   });
 
   final String id;
@@ -24,6 +25,10 @@ class Invite {
 
   /// When someone joined with it. Null while it is still outstanding.
   final DateTime? redeemedAt;
+
+  /// What the joiner becomes: `member`, or `driver` in a garage on the
+  /// company plan (migration 0082). A code from before roles made a member.
+  final String role;
 
   /// Used outranks expired: a code that let someone in did its job, and saying
   /// "expired" about it would misdescribe what happened.
@@ -42,9 +47,20 @@ abstract final class Invites {
   ///
   /// Oldest rather than newest because it expires soonest: using it up first
   /// leaves the longer-lived codes available.
-  static Invite? reusable(List<Invite> invites, DateTime now) {
+  ///
+  /// Only a code for [role]: a member's code handed to somebody hired to
+  /// drive would make them a member, which is what the role is there to stop.
+  static Invite? reusable(
+    List<Invite> invites,
+    DateTime now, {
+    String role = 'member',
+  }) {
     final active = invites
-        .where((invite) => invite.statusAt(now) == InviteStatus.active)
+        .where(
+          (invite) =>
+              invite.role == role &&
+              invite.statusAt(now) == InviteStatus.active,
+        )
         .toList();
     if (active.isEmpty) {
       return null;

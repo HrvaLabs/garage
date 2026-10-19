@@ -6456,6 +6456,166 @@ void main() {
       });
     });
 
+    group('the role an invite code carries', () {
+      // Approved by the owner on 20 September 2026: in a company garage a
+      // joiner who becomes a member sees every car, cost and member, which
+      // is the wrong default for somebody hired to drive one van. The code
+      // says what the joiner becomes, and the join applies it.
+      final joiners = <SupabaseClient>[];
+
+      Future<String> mint(
+        SupabaseClient by,
+        String household, [
+        String? role,
+      ]) async =>
+          await by.rpc(
+                'create_invite',
+                params: {
+                  'target_household': household,
+                  'invite_role': ?role,
+                },
+              )
+              as String;
+
+      Future<(SupabaseClient, String)> joiner(String label) async {
+        final who = await signUp(
+          '$label-${DateTime.now().microsecondsSinceEpoch}@example.com',
+        );
+        joiners.add(who);
+        return (who, who.auth.currentUser!.id);
+      }
+
+      tearDownAll(() async {
+        for (final who in joiners) {
+          await admin
+              .from('household_members')
+              .delete()
+              .eq('household_id', aliceHousehold)
+              .eq('user_id', who.auth.currentUser!.id);
+          await who.dispose();
+        }
+      });
+
+      test('an admin on the plan mints a driver\'s code, and the joiner '
+          'drives', () async {
+        final code = await mint(alice, aliceHousehold, 'driver');
+        final (ivan, ivanId) = await joiner('ivan');
+
+        await ivan.rpc(
+          'join_household_with_code',
+          params: {'invite_code': code},
+        );
+
+        expect(await roleOf(ivanId), 'driver');
+      });
+
+      test(
+        'a code that names no role makes a member, as every code did',
+        () async {
+          final code = await mint(alice, aliceHousehold);
+          final (jana, janaId) = await joiner('jana');
+
+          await jana.rpc(
+            'join_household_with_code',
+            params: {'invite_code': code},
+          );
+
+          expect(await roleOf(janaId), 'member');
+        },
+      );
+
+      test('the garage that issued it reads what it is for', () async {
+        final code = await mint(alice, aliceHousehold, 'driver');
+
+        final row = await eva
+            .from('invites')
+            .select('role')
+            .eq('code', code)
+            .single();
+
+        expect(row['role'], 'driver');
+      });
+
+      test('a member cannot mint a driver\'s code', () async {
+        await expectLater(
+          mint(eva, aliceHousehold, 'driver'),
+          refusedWith('42501'),
+        );
+      });
+
+      test('nor can the admin of a garage not on the plan', () async {
+        final (free, _) = await joiner('free-admin');
+        final household =
+            await free.rpc(
+                  'create_household',
+                  params: {'household_name': 'Free garage'},
+                )
+                as String;
+
+        await expectLater(
+          mint(free, household, 'driver'),
+          refusedWith('42501'),
+        );
+      });
+
+      test('nor is a role it does not know accepted', () async {
+        await expectLater(
+          mint(alice, aliceHousehold, 'admin'),
+          refusedWith('22023'),
+        );
+      });
+
+      test('nor is a code inserted by hand', () async {
+        // The function is the only way a code is made: no insert policy.
+        await expectLater(
+          alice.from('invites').insert({
+            'household_id': aliceHousehold,
+            'code': 'DRVR2345',
+            'expires_at': '2030-01-01T00:00:00Z',
+            'created_by': alice.auth.currentUser!.id,
+            'role': 'driver',
+          }),
+          refusedWith('42501'),
+        );
+      });
+
+      test('a driver\'s code waits while the plan has lapsed, and is not '
+          'used up', () async {
+        // A new driver waits for the plan (0080). Joining as a member instead
+        // would hand the whole garage to somebody it meant to give one car.
+        final code = await mint(alice, aliceHousehold, 'driver');
+        await admin
+            .from('households')
+            .update({'plan_until': '2026-01-01T00:00:00Z'})
+            .eq('id', aliceHousehold);
+        addTearDown(
+          () => admin
+              .from('households')
+              .update({'plan_until': null})
+              .eq('id', aliceHousehold),
+        );
+        final (karl, karlId) = await joiner('karl');
+
+        await expectLater(
+          karl.rpc('join_household_with_code', params: {'invite_code': code}),
+          refusedWith('P0009'),
+        );
+
+        final memberships = await admin
+            .from('household_members')
+            .select()
+            .eq('household_id', aliceHousehold)
+            .eq('user_id', karlId);
+        expect(memberships, isEmpty);
+        final invite = await admin
+            .from('invites')
+            .select('redeemed_at')
+            .eq('code', code)
+            .single();
+        expect(invite['redeemed_at'], isNull);
+      });
+    });
+
     group('the free plan', () {
       // A garage that never heard of the plan: five cars, and the sixth
       // waits. The tests run in order and each leaves the garage exactly

@@ -45,7 +45,7 @@ Both handlers **chain rather than replace**, and the platform handler returns
 its own `FlutterError.onError` to fail tests on framework errors, and swallowing
 that would turn every future red test green.
 
-**Mapping.** `AppFailure.from` (`lib/core/errors/app_failure.dart:54`) classifies
+**Mapping.** `AppFailure.from` (`lib/core/errors/app_failure.dart:59`) classifies
 anything thrown into an `AppFailureKind` and keeps the original description in
 `debugMessage`. The interesting cases are deliberate:
 

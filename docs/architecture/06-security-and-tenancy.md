@@ -223,9 +223,9 @@ and 204, not `42501`, so every entry repository a driver can write through,
 the receipt's delete and the garage's settings row read their row back and
 refuse on none (`lib/core/supabase/refused_if_none.dart:20`),
 and the suite makes that write as the app makes it
-(`test_rls/rls_test.dart:7426`). Only an insert is refused with the real
+(`test_rls/rls_test.dart:7586`). Only an insert is refused with the real
 code: a table with no driver write policy answers a driver's update or delete
-with the same zero rows (`test_rls/rls_test.dart:7213`), so the repositories
+with the same zero rows (`test_rls/rls_test.dart:7373`), so the repositories
 behind the papers, tyres, parts, routes and rules read back too — all but
 `completeOneTimeRules`, which runs after a service entry has landed and is
 left silent on purpose. Since 0081 it lands for a driver: an update policy
@@ -264,8 +264,9 @@ nothing.
 
 `household_members.role` is `admin`, `member` or, since migration 0080,
 `driver`. The creator of a household is its admin; anyone joining by code is a
-member, and the RLS suite asserts that an invite never confers admin. A driver
-is made by an admin, on the company plan, from a member.
+member, or since migration 0082 a driver when the code was a driver's, and the
+RLS suite asserts that an invite never confers admin. A driver is made by an
+admin, on the company plan, from a member or with a driver's code.
 
 `is_household_admin()` (`supabase/migrations/0020_admin_actions.sql:11`) gates the
 destructive actions:
@@ -374,6 +375,22 @@ management UI uses.
 A code is consumed **only by a join that actually adds a member**
 (`supabase/migrations/0010_join_keeps_unused_invites.sql:1`). Re-entering your own
 code no-ops instead of burning an invite the household meant for someone else.
+
+**A code carries the role it makes**, since 0082
+(`supabase/migrations/0082_invite_carries_role.sql:9`): `member`, or `driver`,
+which only an admin of a garage whose plan is current can mint, as only they
+can make a driver (`supabase/migrations/0082_invite_carries_role.sql:41`), and
+the join inserts the membership with it
+(`supabase/migrations/0082_invite_carries_role.sql:120`). Codes are made by
+the function alone: there is no insert policy, so a driver's code cannot be
+written by hand. A driver's code redeemed while the plan has lapsed is refused
+with `P0009` and left unused (`supabase/migrations/0082_invite_carries_role.sql:116`),
+since a new driver waits for the plan; joining as a member instead would hand
+the whole garage to somebody it meant to give one car. `create_invite` was
+dropped and created again with the third parameter defaulted
+(`supabase/migrations/0082_invite_carries_role.sql:17`), so the call every
+older build makes still mints a member's code, and there are not two
+overloads for PostgREST to choose between (decision 113).
 
 ## Belonging to several garages
 
