@@ -589,6 +589,29 @@ void main() {
       expect(find.byIcon(Icons.speed_outlined), findsNothing);
     });
 
+    // There is no guest policy on `incidents`. The card that offers a report
+    // is on the Car tab, which a borrowed car's page does not have.
+    testWidgets('nor the way to report an incident', (tester) async {
+      await pumpDetail(tester, borrowed: true);
+      await tester.pumpAndSettle();
+
+      expect(find.text('Car'), findsNothing);
+      expect(find.byKey(const Key('incident-add')), findsNothing);
+    });
+
+    testWidgets('which the owner finds on the Car tab', (tester) async {
+      await pumpDetail(tester);
+      await tester.pumpAndSettle();
+      await openTab(tester, 'Car');
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('incident-add')),
+        200,
+        scrollable: find.byType(Scrollable).last,
+      );
+
+      expect(find.byKey(const Key('incident-add')), findsOneWidget);
+    });
+
     testWidgets('shows the real odometer, not the stored baseline', (
       tester,
     ) async {
@@ -2039,6 +2062,21 @@ void main() {
       );
       await tester.pumpAndSettle();
     }
+
+    testWidgets('is not asked to record what the car takes', (tester) async {
+      // The parts list is read-only to a driver; its row on the Car tab
+      // said "put it here".
+      await pumpAsDriver(tester);
+      await openTab(tester, 'Car');
+
+      expect(
+        find.descendant(
+          of: find.byKey(const Key('vehicle-parts-row')),
+          matching: find.text('Nothing recorded for this car yet.'),
+        ),
+        findsOneWidget,
+      );
+    });
 
     testWidgets('has the four tabs and the everyday buttons', (tester) async {
       await pumpAsDriver(tester);

@@ -5,6 +5,7 @@ import 'package:garage/core/clock.dart';
 import 'package:garage/core/widgets/adaptive.dart';
 import 'package:garage/core/format/unit_format.dart';
 import 'package:garage/domain/entities/vehicle_document.dart';
+import 'package:garage/features/company/providers/company_providers.dart';
 import 'package:garage/features/documents/providers/document_providers.dart';
 import 'package:garage/features/documents/screens/documents_screen.dart';
 import 'package:garage/features/settings/providers/unit_providers.dart';
@@ -39,6 +40,7 @@ Future<void> pumpScreen(
   FakeDocumentRepository repository, {
   Size surface = const Size(500, 1400),
   double textScale = 1,
+  bool driver = false,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = surface;
@@ -49,6 +51,7 @@ Future<void> pumpScreen(
       overrides: [
         documentRepositoryProvider.overrideWithValue(repository),
         todayProvider.overrideWithValue(_today),
+        isDriverForVehicleProvider('v1').overrideWithValue(driver),
         vehicleProvider(
           'v1',
         ).overrideWith((ref) async => testVehicle('v1', nickname: 'Golf')),
@@ -85,6 +88,52 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Golf · Documents'), findsOneWidget);
+  });
+
+  // A driver holds select on `vehicle_documents` and nothing else (0080):
+  // every button here ended in the permission sentence.
+  group('a driver, who may read the papers and change none', () {
+    FakeDocumentRepository held() => FakeDocumentRepository([
+      document(
+        id: 'reg',
+        type: DocumentType.registration,
+        expiresOn: DateTime.utc(2027, 6, 3),
+      ),
+    ]);
+
+    testWidgets('is offered nothing to add', (tester) async {
+      await pumpScreen(tester, held(), driver: true);
+
+      expect(find.byKey(const Key('document-add')), findsNothing);
+    });
+
+    // The sheet's own providers are not stood up here, so the row is asked
+    // whether it answers a tap rather than tapped.
+    ListTile row(WidgetTester tester) => tester.widget<ListTile>(
+      find.ancestor(
+        of: find.text('Registration'),
+        matching: find.byType(ListTile),
+      ),
+    );
+
+    testWidgets('and a document opens nothing', (tester) async {
+      await pumpScreen(tester, held(), driver: true);
+
+      expect(row(tester).onTap, isNull);
+    });
+
+    testWidgets('where it opens the sheet for the admin', (tester) async {
+      await pumpScreen(tester, held());
+
+      expect(row(tester).onTap, isNotNull);
+    });
+
+    testWidgets('an empty list says so without the button', (tester) async {
+      await pumpScreen(tester, FakeDocumentRepository(), driver: true);
+
+      expect(find.text('Nothing recorded for this car yet.'), findsOneWidget);
+      expect(find.text('Add document'), findsNothing);
+    });
   });
 
   testWidgets('a car with no paperwork says what to record', (tester) async {

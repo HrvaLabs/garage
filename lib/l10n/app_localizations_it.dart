@@ -4939,6 +4939,10 @@ class AppLocalizationsIt extends AppLocalizations {
   String get companyDriverCarsTab => 'Auto';
 
   @override
+  String get companyDriverNothingRecorded =>
+      'Per questo veicolo non è ancora registrato niente.';
+
+  @override
   String get companyMyCarsEmpty =>
       'Oggi non ti è assegnato nessun veicolo. Lo consegna l\'amministratore.';
 

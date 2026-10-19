@@ -11,6 +11,7 @@ import '../../maintenance/service_type_labels.dart';
 import '../providers/vehicle_part_providers.dart';
 import '../widgets/vehicle_part_sheet.dart';
 import '../../vehicles/car_title.dart';
+import '../../company/providers/company_providers.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
 import '../../../core/widgets/confirm_delete.dart';
 
@@ -33,6 +34,8 @@ class VehiclePartsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final parts = ref.watch(vehiclePartsProvider(vehicleId));
     final any = (parts.value ?? const []).isNotEmpty;
+    // A driver reads what the car takes and writes none of it (0080).
+    final driver = ref.watch(isDriverForVehicleProvider(vehicleId));
 
     return GaragePageScaffold(
       title: carTitle(
@@ -41,7 +44,7 @@ class VehiclePartsScreen extends ConsumerWidget {
       ),
       // The empty state carries its own button, like the documents screen:
       // this list is empty for every household until the first lookup.
-      floatingActionButton: any
+      floatingActionButton: any && !driver
           ? FloatingActionButton.extended(
               key: const Key('part-add'),
               onPressed: () => showVehiclePartSheet(context, vehicleId),
@@ -61,15 +64,18 @@ class VehiclePartsScreen extends ConsumerWidget {
                     : 0,
               ),
               child: Center(
-                child: EmptyState(
-                  message: l10n.partsEmpty,
-                  action: FilledButton.icon(
-                    key: const Key('part-add-first'),
-                    onPressed: () => showVehiclePartSheet(context, vehicleId),
-                    icon: const Icon(Icons.add),
-                    label: Text(l10n.partsAdd),
-                  ),
-                ),
+                child: driver
+                    ? EmptyState(message: l10n.companyDriverNothingRecorded)
+                    : EmptyState(
+                        message: l10n.partsEmpty,
+                        action: FilledButton.icon(
+                          key: const Key('part-add-first'),
+                          onPressed: () =>
+                              showVehiclePartSheet(context, vehicleId),
+                          icon: const Icon(Icons.add),
+                          label: Text(l10n.partsAdd),
+                        ),
+                      ),
               ),
             ),
           ),
@@ -111,6 +117,7 @@ class _PartCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context)!;
     final tokens = context.tokens;
+    final driver = ref.watch(isDriverForVehicleProvider(part.vehicleId));
 
     return Padding(
       padding: const EdgeInsets.only(bottom: GarageTokens.space3),
@@ -134,16 +141,26 @@ class _PartCard extends ConsumerWidget {
             ],
           ),
           isThreeLine: part.notes?.isNotEmpty ?? false,
-          trailing: PopupMenuButton<String>(
-            key: Key('part-menu-${part.id}'),
-            onSelected: (action) => _act(context, ref, action),
-            itemBuilder: (context) => [
-              PopupMenuItem(value: 'edit', child: Text(l10n.partsEdit)),
-              PopupMenuItem(value: 'delete', child: Text(l10n.partsDelete)),
-            ],
-          ),
-          onTap: () =>
-              showVehiclePartSheet(context, part.vehicleId, existing: part),
+          trailing: driver
+              ? null
+              : PopupMenuButton<String>(
+                  key: Key('part-menu-${part.id}'),
+                  onSelected: (action) => _act(context, ref, action),
+                  itemBuilder: (context) => [
+                    PopupMenuItem(value: 'edit', child: Text(l10n.partsEdit)),
+                    PopupMenuItem(
+                      value: 'delete',
+                      child: Text(l10n.partsDelete),
+                    ),
+                  ],
+                ),
+          onTap: driver
+              ? null
+              : () => showVehiclePartSheet(
+                  context,
+                  part.vehicleId,
+                  existing: part,
+                ),
         ),
       ),
     );

@@ -2,7 +2,7 @@ Fixes from the first days in production:
 • An archived vehicle no longer gets reminders
 • A driver's service now closes its one-time reminder
 • An incident reported with no signal is sent once there is one
-• For a driver, the vehicles tab is now called Cars
+• Drivers see a Cars tab, and no buttons they cannot use
 • A problem noted after midnight is dated that day
 • A backup now waits for a signal rather than saving old copies
 • An address that leads nowhere says so, with a way back

@@ -8265,6 +8265,12 @@ abstract class AppLocalizations {
   /// **'Cars'**
   String get companyDriverCarsTab;
 
+  /// The empty tyres, documents or parts list on a driver's car. A driver reads these and cannot add to them, so the usual empty text, which asks to add the first, is not theirs.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing recorded for this car yet.'**
+  String get companyDriverNothingRecorded;
+
   /// No description provided for @companyMyCarsEmpty.
   ///
   /// In en, this message translates to:

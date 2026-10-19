@@ -149,8 +149,8 @@ sign-off keeps the card and says why.
 loses the owner's once-in-a-while acts, every one of which the policies
 refuse: a driver gets a menu of their own with *Report an incident* and
 *Create report* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:508`),
-no add-reminder row (`lib/features/vehicles/screens/vehicle_detail_screen.dart:2334`)
-and no *Add income* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1633`).
+no add-reminder row (`lib/features/vehicles/screens/vehicle_detail_screen.dart:2338`)
+and no *Add income* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1637`).
 The menu is theirs only for a car handed to them: a driver holding somebody
 else's car on a pass gets the borrower's page like anyone. The report reads
 what they can read and asks no "which driver" of them
@@ -158,11 +158,11 @@ what they can read and asks no "which driver" of them
 driver holds is their own windows, so any other pick would file an empty
 logbook. A report whose read fails says so in a snackbar rather than ending
 the tap in silence. The tyres,
-documents and parts screens still offer a driver their add buttons; the
-database refuses the write and the sheet says so (the parts sheet learned to
-in this work, `lib/features/parts/widgets/vehicle_part_sheet.dart:171`), which
-is a button that cannot work rather than one that fails silently, and is
-recorded rather than fixed.
+documents and parts screens are read-only to a driver, who holds select on
+them and nothing else: no add button, rows that open nothing, a tyre set
+with its readings and none of its actions, and an empty list that says
+nothing is recorded rather than asking for the first
+(`lib/features/tyres/screens/tyres_screen.dart:543`).
 
 ## The assignment log
 
@@ -576,15 +576,8 @@ resolve against.
   Company entry can show at the
   top of More, and the add-reminder and income rows can show on a car page
   for a moment.
-- **A borrower on a pass sees "Report an incident"** on the car's Car tab
-  (`lib/features/incidents/widgets/incidents_card.dart:52`); there is no
-  guest policy on `incidents`, so the database refuses it with the permission
-  sentence. Ruling 15's shape: recorded, not built.
 - **The failure sentence repeats on every driver row of the members screen**
   when the log could not be read; once would do.
-- **The tyres, documents and parts screens still offer a driver their add
-  buttons.** The policy refuses and the sheet says so; the buttons are wrong,
-  not silent.
 - **A driver's edit of an entry they did not write is refused, not
   silent.** Their update and delete policies are per author while their
   select policy is per car (`supabase/migrations/0080_company.sql:1253`), and
@@ -604,7 +597,8 @@ resolve against.
   intervals — answer an update or a delete with zero rows and 204 exactly as
   the per-author policy does, only an insert being a real `42501`, so every
   write a driver's screens offer on them reads its row back as the entries
-  do. The one exception is on purpose: `completeOneTimeRules` runs after the
+  do; the papers, tyres and parts screens no longer offer one. The one
+  exception is on purpose: `completeOneTimeRules` runs after the
   service entry has landed, and a refusal there would report a failure over
   an entry that was saved. Since 0081 a driver's own service completes the
   one-off rule it covers

@@ -2830,6 +2830,10 @@
   "@companyDriverCarsTab": {
     "description": "The bottom tab and sidebar label of the cars list for a driver, where everybody else sees vehiclesTitle. One word: a tab slot fits one."
   },
+  "companyDriverNothingRecorded": "Nothing recorded for this car yet.",
+  "@companyDriverNothingRecorded": {
+    "description": "The empty tyres, documents or parts list on a driver's car. A driver reads these and cannot add to them, so the usual empty text, which asks to add the first, is not theirs."
+  },
   "companyMyCarsEmpty": "No car is assigned to you today. The administrator hands one over.",
   "companyDriverNoticeTitle": "What your administrator sees",
   "companyDriverNoticeBody": "Everything you log on a company car — fill-ups, drives, costs, incidents — is visible to the garage's administrators, together with which car was yours on which day. The app records the places you type, never where the phone is.",

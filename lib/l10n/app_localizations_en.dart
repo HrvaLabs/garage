@@ -4859,6 +4859,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get companyDriverCarsTab => 'Cars';
 
   @override
+  String get companyDriverNothingRecorded =>
+      'Nothing recorded for this car yet.';
+
+  @override
   String get companyMyCarsEmpty =>
       'No car is assigned to you today. The administrator hands one over.';
 

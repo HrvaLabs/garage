@@ -1353,13 +1353,17 @@ class _PartsRow extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final count =
         (ref.watch(vehiclePartsProvider(vehicleId)).value ?? const []).length;
+    // The list is read-only to a driver, so the empty one asks them nothing.
+    final empty = ref.watch(isDriverForVehicleProvider(vehicleId))
+        ? l10n.companyDriverNothingRecorded
+        : l10n.partsEmpty;
 
     return Card(
       child: ListTile(
         key: const Key('vehicle-parts-row'),
         leading: const Icon(Icons.build_circle_outlined),
         title: Text(l10n.partsTitle),
-        subtitle: Text(count == 0 ? l10n.partsEmpty : l10n.partsCount(count)),
+        subtitle: Text(count == 0 ? empty : l10n.partsCount(count)),
         trailing: const Icon(Icons.chevron_right),
         onTap: () => context.push('/vehicles/$vehicleId/parts'),
       ),

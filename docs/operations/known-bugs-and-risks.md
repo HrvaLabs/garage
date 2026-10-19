@@ -124,18 +124,6 @@ their own window with a `confirmed_at` of their choosing. The sign-off is
 still the right person's, which is what the guard is for; the date is not
 evidence when the driver is also the one who keeps the log.
 
-### The tyres, documents and parts screens still offer a driver their add buttons
-
-**Low.** The policies refuse the insert and every sheet shows the permission
-sentence — the parts sheet learned to in this work
-(`lib/features/parts/widgets/vehicle_part_sheet.dart:171`); before it, a
-refused save closed silently — so nothing is silent, but a button that cannot
-work is still on the screen. The car page's menu, the Upkeep tab's add-rule
-row and the Costs tab's income button hide theirs
-(`lib/features/vehicles/screens/vehicle_detail_screen.dart:2334`). Left with
-the driver's four tabs as they are: ruling 15 of the plan recorded both as
-gaps rather than built them.
-
 ### A refused role read writes an empty membership list over a good cache
 
 **Low.** `_memberships()` swallows a failure and answers no rows
@@ -224,15 +212,6 @@ frames between the log landing and the member list landing. One `hasValue`
 gate on the names would hold the line back the way the log's own gate does
 (`lib/features/company/widgets/driver_on_date.dart:35`); the Reimbursements
 tab already waits for the list. Ruled acceptable for this release.
-
-### A borrower on a pass is offered "Report an incident"
-
-**Low.** The incidents card keeps its add button for whoever can open the
-Car tab (`lib/features/incidents/widgets/incidents_card.dart:52`), and there
-is no guest policy on `incidents`, so a borrower's save is refused and the
-sheet shows the permission sentence. The same shape as the tyres, documents
-and parts buttons above: wrong, not silent, and recorded under ruling 15
-rather than built.
 
 ### The role flips from member to driver when the first bootstrap fetch lands
 
@@ -1031,6 +1010,24 @@ several releases later.
 ---
 
 ## Recently fixed, worth remembering
+
+### The tyres, documents and parts screens offered a driver what they could not do
+
+**Low, fixed 17 October 2026; since the company plan.** A driver holds
+select on `vehicle_documents`, `tyre_sets`, `tyre_readings` and
+`vehicle_parts` and nothing else, so every button these three screens showed
+a driver ended in the permission sentence: adding a set, a document or a
+part, opening one to edit, and on a tyre set fitting it, editing it,
+recording its tread, retiring it and deleting it. The entry named only the
+add buttons. The screens are now read-only to a driver: no add button, rows
+that open nothing, a set card with its readings and none of its actions, and
+an empty list that says nothing has been recorded rather than asking for the
+first (`lib/features/tyres/screens/tyres_screen.dart:543`,
+`lib/features/documents/screens/documents_screen.dart:40`,
+`lib/features/parts/screens/vehicle_parts_screen.dart:38`); the Car tab's row
+for what the car takes says the same. `test/features/tyres/tyres_screen_test.dart:253`,
+`test/features/documents/documents_screen_test.dart:104` and
+`test/features/parts/vehicle_parts_screen_test.dart:80` pump each as a driver.
 
 ### A backup made with no signal was made from copies
 
@@ -4464,6 +4461,17 @@ app sold in Croatian" in this file is unchanged. Decision 154.
 ---
 
 ## Non-issues (checked, turned out fine)
+
+### A borrower on a pass is offered "Report an incident"
+
+**Checked 17 October 2026; never true.** Filed with the company plan: the
+incidents card keeps its add button for whoever sees it, and there is no
+guest policy on `incidents`. But the card is on the Car tab, and a borrowed
+car's page has no tabs: since 8 September, before incidents existed, a car
+that is not in one of your garages opens the borrower's page, the briefing
+and what the pass allows (`lib/features/vehicles/screens/vehicle_detail_screen.dart:602`).
+`test/features/vehicles/vehicle_detail_screen_test.dart:594` looks for the
+button on a borrowed car, and the test after it finds it on the owner's.
 
 ### Moving to Flutter 3.47.7: five files rewritten, two first runs failed
 

@@ -51,10 +51,12 @@ Future<void> pumpParts(
   Locale? locale,
   double textScale = 1,
   Size surface = const Size(420, 1000),
+  String role = 'admin',
 }) async {
   await pumpScreen(
     tester,
     const VehiclePartsScreen(vehicleId: 'v1'),
+    role: role,
     initialLocation: '/vehicles/v1/parts',
     locale: locale,
     textScale: textScale,
@@ -72,6 +74,33 @@ Future<void> pumpParts(
 }
 
 void main() {
+  // A driver holds select on `vehicle_parts` and nothing else (0080): the
+  // sheet learned to say so, and the buttons that led to it stayed.
+  group('a driver, who may read what the car takes and change none', () {
+    testWidgets('is offered nothing to add, edit or delete', (tester) async {
+      await pumpParts(
+        tester,
+        FakeVehiclePartRepository(parts: [oil()]),
+        role: 'driver',
+      );
+
+      expect(find.byKey(const Key('part-add')), findsNothing);
+      expect(find.byKey(const Key('part-menu-p1')), findsNothing);
+
+      await tester.tap(find.text('5W-30 ACEA C3'));
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('part-save')), findsNothing);
+    });
+
+    testWidgets('an empty list says so without the button', (tester) async {
+      await pumpParts(tester, FakeVehiclePartRepository(), role: 'driver');
+
+      expect(find.text('Nothing recorded for this car yet.'), findsOneWidget);
+      expect(find.byKey(const Key('part-add-first')), findsNothing);
+    });
+  });
+
   testWidgets('the title names the car', (tester) async {
     await pumpParts(tester, FakeVehiclePartRepository());
 

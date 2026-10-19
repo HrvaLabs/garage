@@ -16,6 +16,7 @@ import '../document_type_labels.dart';
 import '../providers/document_providers.dart';
 import '../widgets/document_sheet.dart';
 import '../../vehicles/car_title.dart';
+import '../../company/providers/company_providers.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
 
 /// The paperwork a vehicle carries, and when each piece runs out.
@@ -34,6 +35,9 @@ class DocumentsScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final documents = ref.watch(vehicleDocumentsProvider(vehicleId));
     final today = ref.watch(todayProvider);
+    // A driver reads a car's papers and writes none (0080), so nothing here
+    // offers a change the database would refuse.
+    final driver = ref.watch(isDriverForVehicleProvider(vehicleId));
     final format = UnitFormat(
       locale: Localizations.localeOf(context).languageCode,
       preferences: ref.watch(unitPreferencesProvider),
@@ -62,7 +66,7 @@ class DocumentsScreen extends ConsumerWidget {
         ref.watch(vehicleProvider(vehicleId)).value?.nickname,
         l10n.documentsTitle,
       ),
-      floatingActionButton: anyDocuments
+      floatingActionButton: anyDocuments && !driver
           ? FloatingActionButton.extended(
               key: const Key('document-add'),
               onPressed: open,
@@ -79,15 +83,20 @@ class DocumentsScreen extends ConsumerWidget {
         // types the first expiry. Two sentences and a button, so it is the
         // one that overflowed a short window at twice the text size; the
         // shared widget scrolls when it does not fit.
-        empty: () => EmptyState(
-          motif: EmptyStateMotif.document,
-          message: l10n.documentsEmpty,
-          action: FilledButton.icon(
-            onPressed: open,
-            icon: const Icon(Icons.add),
-            label: Text(l10n.documentAdd),
-          ),
-        ),
+        empty: () => driver
+            ? EmptyState(
+                motif: EmptyStateMotif.document,
+                message: l10n.companyDriverNothingRecorded,
+              )
+            : EmptyState(
+                motif: EmptyStateMotif.document,
+                message: l10n.documentsEmpty,
+                action: FilledButton.icon(
+                  onPressed: open,
+                  icon: const Icon(Icons.add),
+                  label: Text(l10n.documentAdd),
+                ),
+              ),
         // Built lazily. Five of the six types are capped at one per vehicle,
         // but `other` is deliberately not — it is the escape hatch, and a
         // household that keeps every lease and border permit in it has a list
@@ -119,7 +128,7 @@ class DocumentsScreen extends ConsumerWidget {
               document: document,
               today: today,
               format: format,
-              onTap: () => open(document),
+              onTap: driver ? null : () => open(document),
             );
           },
         ),
@@ -139,7 +148,9 @@ class _DocumentCard extends StatelessWidget {
   final VehicleDocument document;
   final DateTime today;
   final UnitFormat format;
-  final VoidCallback onTap;
+
+  /// Null for a driver, who may read the document and not change it.
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {

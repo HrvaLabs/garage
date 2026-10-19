@@ -22,6 +22,7 @@ import '../../../core/clock.dart';
 import '../../../domain/maintenance/tyre_age.dart';
 import '../../../domain/maintenance/tyre_wear_projection.dart';
 import '../../settings/providers/unit_providers.dart';
+import '../../company/providers/company_providers.dart';
 import '../../vehicles/providers/vehicle_providers.dart';
 import '../providers/tyre_providers.dart';
 import '../../vehicles/car_title.dart';
@@ -536,6 +537,10 @@ class _TyresScreenState extends ConsumerState<TyresScreen> {
     final wear =
         ref.watch(tyreWearProjectionsProvider(widget.vehicleId)).value ??
         const {};
+    // A driver reads the sets and their readings and writes neither (0080):
+    // fitting, editing, a tread reading, retiring and deleting were all
+    // refused.
+    final driver = ref.watch(isDriverForVehicleProvider(widget.vehicleId));
 
     return GaragePageScaffold(
       title: carTitle(
@@ -548,7 +553,11 @@ class _TyresScreenState extends ConsumerState<TyresScreen> {
             child: AsyncValueView<List<TyreSet>>(
               value: sets,
               onRetry: () => ref.invalidate(tyreSetsProvider(widget.vehicleId)),
-              empty: () => EmptyState(message: l10n.tyresEmpty),
+              empty: () => EmptyState(
+                message: driver
+                    ? l10n.companyDriverNothingRecorded
+                    : l10n.tyresEmpty,
+              ),
               data: (list) => ListView(
                 padding: const EdgeInsets.all(GarageTokens.space4),
                 children: [
@@ -559,6 +568,7 @@ class _TyresScreenState extends ConsumerState<TyresScreen> {
                       legalMinimumMm: TyreSet.legalMinimumMmFor(kind),
                       twoWheeled: kind == 'motorcycle',
                       wear: wear[set.id],
+                      readOnly: driver,
                       // The oldest tyre in the set, because a set is as old
                       // as its oldest rubber: replacing one does not make the
                       // other three younger, and the warning exists for the
@@ -594,14 +604,15 @@ class _TyresScreenState extends ConsumerState<TyresScreen> {
               ),
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(GarageTokens.space4),
-            child: FilledButton.icon(
-              onPressed: _editSet,
-              icon: const Icon(Icons.add),
-              label: Text(l10n.tyresAdd),
+          if (!driver)
+            Padding(
+              padding: const EdgeInsets.all(GarageTokens.space4),
+              child: FilledButton.icon(
+                onPressed: _editSet,
+                icon: const Icon(Icons.add),
+                label: Text(l10n.tyresAdd),
+              ),
             ),
-          ),
         ],
       ),
     );
@@ -616,6 +627,7 @@ class _TyreSetCard extends StatelessWidget {
     required this.twoWheeled,
     required this.wear,
     required this.age,
+    required this.readOnly,
     required this.onFit,
     required this.onEdit,
     required this.onRecordTread,
@@ -646,6 +658,9 @@ class _TyreSetCard extends StatelessWidget {
   /// [wear]: a set can be legal on tread and years past it on age, and the two
   /// are separate reasons to replace it.
   final TyreAge? age;
+
+  /// A driver's: the set and its readings, and none of the actions.
+  final bool readOnly;
 
   final VoidCallback onFit;
   final VoidCallback onEdit;
@@ -799,53 +814,54 @@ class _TyreSetCard extends StatelessWidget {
                       : context.tokens.muted,
                 ),
               ),
-            Wrap(
-              spacing: GarageTokens.space2,
-              children: [
-                if (!set.fitted && !set.isRetired)
-                  TextButton(onPressed: onFit, child: Text(l10n.tyresFit)),
-                TextButton(onPressed: onEdit, child: Text(l10n.commonEdit)),
-                if (!set.isRetired)
-                  TextButton(
-                    onPressed: onRecordTread,
-                    child: Text(l10n.tyresAddReading),
-                  ),
-                // Behind a menu: two red words wrapping to a second line,
-                // weighted the same as "Fit to vehicle", is not where a
-                // destructive action belongs.
-                PopupMenuButton<void>(
-                  tooltip: l10n.tyresMoreActions,
-                  itemBuilder: (context) => [
-                    // Fitting another set already swaps them; a household
-                    // with one set had no way to say the car is on something
-                    // else, and its storage line went on claiming a shelf.
-                    if (set.fitted && !set.isRetired)
-                      PopupMenuItem<void>(
-                        onTap: onUnfit,
-                        child: Text(l10n.tyresUnfit),
-                      ),
-                    if (set.isRetired)
-                      PopupMenuItem<void>(
-                        onTap: onUnretire,
-                        child: Text(l10n.tyresUnretire),
-                      )
-                    else
-                      PopupMenuItem<void>(
-                        // Not red: the set and its readings stay.
-                        onTap: onRetire,
-                        child: Text(l10n.tyresRetire),
-                      ),
-                    PopupMenuItem<void>(
-                      onTap: onDelete,
-                      child: Text(
-                        l10n.tyresDelete,
-                        style: TextStyle(color: context.tokens.danger),
-                      ),
+            if (!readOnly)
+              Wrap(
+                spacing: GarageTokens.space2,
+                children: [
+                  if (!set.fitted && !set.isRetired)
+                    TextButton(onPressed: onFit, child: Text(l10n.tyresFit)),
+                  TextButton(onPressed: onEdit, child: Text(l10n.commonEdit)),
+                  if (!set.isRetired)
+                    TextButton(
+                      onPressed: onRecordTread,
+                      child: Text(l10n.tyresAddReading),
                     ),
-                  ],
-                ),
-              ],
-            ),
+                  // Behind a menu: two red words wrapping to a second line,
+                  // weighted the same as "Fit to vehicle", is not where a
+                  // destructive action belongs.
+                  PopupMenuButton<void>(
+                    tooltip: l10n.tyresMoreActions,
+                    itemBuilder: (context) => [
+                      // Fitting another set already swaps them; a household
+                      // with one set had no way to say the car is on something
+                      // else, and its storage line went on claiming a shelf.
+                      if (set.fitted && !set.isRetired)
+                        PopupMenuItem<void>(
+                          onTap: onUnfit,
+                          child: Text(l10n.tyresUnfit),
+                        ),
+                      if (set.isRetired)
+                        PopupMenuItem<void>(
+                          onTap: onUnretire,
+                          child: Text(l10n.tyresUnretire),
+                        )
+                      else
+                        PopupMenuItem<void>(
+                          // Not red: the set and its readings stay.
+                          onTap: onRetire,
+                          child: Text(l10n.tyresRetire),
+                        ),
+                      PopupMenuItem<void>(
+                        onTap: onDelete,
+                        child: Text(
+                          l10n.tyresDelete,
+                          style: TextStyle(color: context.tokens.danger),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
           ],
         ),
       ),

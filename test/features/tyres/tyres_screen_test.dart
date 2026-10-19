@@ -152,12 +152,15 @@ Future<NavigationLog> pumpTyres(
   String kind = 'car',
   Locale? locale,
   double textScale = 1,
+  String role = 'admin',
 }) {
   return pumpScreen(
     tester,
     const TyresScreen(vehicleId: 'v1'),
     initialLocation: '/vehicles/v1/tyres',
     surface: surface,
+    role: role,
+    vehicles: [testVehicle('v1', kind: kind)],
     locale: locale,
     textScale: textScale,
     overrides: [
@@ -241,6 +244,31 @@ void main() {
       reason: 'the dialog overflows the short window',
     );
     expect(find.widgetWithText(FilledButton, 'Save'), findsOneWidget);
+  });
+
+  // A driver holds select on `tyre_sets` and `tyre_readings` and nothing
+  // else (0080): fitting, editing, a tread reading, retiring and deleting
+  // all ended in the permission sentence.
+  group('a driver, who may read the sets and change none', () {
+    testWidgets('sees each set with nothing to do to it', (tester) async {
+      await pumpTyres(tester, FakeTyreRepository([tyreSet()]), role: 'driver');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Winter — studded'), findsOneWidget);
+      expect(find.text('Add a set'), findsNothing);
+      expect(find.text('Fit to vehicle'), findsNothing);
+      expect(find.text('Edit'), findsNothing);
+      expect(find.text('Record tread'), findsNothing);
+      expect(find.byType(PopupMenuButton<void>), findsNothing);
+    });
+
+    testWidgets('an empty list says so without the button', (tester) async {
+      await pumpTyres(tester, FakeTyreRepository(), role: 'driver');
+      await tester.pumpAndSettle();
+
+      expect(find.text('Nothing recorded for this car yet.'), findsOneWidget);
+      expect(find.text('Add a set'), findsNothing);
+    });
   });
 
   testWidgets('a vehicle with no sets is invited to add one', (tester) async {
