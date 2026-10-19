@@ -2394,5 +2394,10 @@
     }
   },
   "webUpdateReady": "Nova verzija aplikacije Garage je spremna",
-  "webUpdateReload": "Osvježi"
+  "webUpdateReload": "Osvježi",
+  "dateTypeHint": "Upiši datum, npr. {example}",
+  "dateOutOfRange": "Odaberi datum od {first} do {last}",
+  "dateRangeStart": "Početni datum",
+  "dateRangeEnd": "Završni datum",
+  "dateFieldLabel": "Datum"
 }

@@ -25,7 +25,10 @@ Everything on the screen is taken over one period, chosen once and applied to
 all three tabs. `StatsPeriod` (`lib/domain/stats/stats_period.dart:48`) resolves
 to a `DateRange`, and `StatsData.within`
 (`lib/features/stats/providers/stats_providers.dart:73`) does the filtering in
-one place.
+one place. A period of the reader's own dates comes from `showGarageDateRange`
+(`lib/features/stats/screens/stats_screen.dart:68`): Material's range dialog
+on a phone, and on a desk the date popover twice, the start opening on today
+(decision 199).
 
 Filtering centrally is the point. A card that forgot to filter would quietly
 report the whole log under a heading that says "this month", and nothing about
@@ -73,7 +76,7 @@ but never an odometer reading has a real total and no distance, and zero would
 be a lie.
 
 The records cards multiply the per-day rate out to a month and a year
-(`lib/features/stats/screens/stats_screen.dart:41`): a year of 365.25 days, a
+(`lib/features/stats/screens/stats_screen.dart:42`): a year of 365.25 days, a
 month a twelfth of it. The year is the figure people quote and are asked for.
 Both are extrapolations — a period of three days still shows what a year at
 that rate would come to — and nothing on the card says so (decision 179).
@@ -161,7 +164,7 @@ The useful set genuinely differs by reader. Somebody running a company car wants
 cost per kilometre and does not care which station they used; somebody chasing
 economy is the other way round. Rather than guess, everything is on and anything
 can be switched off, from a sheet on the screen itself
-(`lib/features/stats/screens/stats_screen.dart:275`) rather than from Settings —
+(`lib/features/stats/screens/stats_screen.dart:277`) rather than from Settings —
 the person who wants a section gone is looking at it.
 
 `hiddenStatsSectionsProvider`
@@ -207,7 +210,7 @@ contradiction with the rows underneath it. Filtering to Fuel gives fuel totals.
 
 This is the fourth place money gets bucketed by time, and the only one in the
 domain layer — `_monthlySpend` in the stats screen
-(`lib/features/stats/screens/stats_screen.dart:902`) still hand-rolls its own
+(`lib/features/stats/screens/stats_screen.dart:904`) still hand-rolls its own
 per-month loop over fuel, services and costs, ignoring income. Worth collapsing
 into `balanceOf` the next time either is touched.
 

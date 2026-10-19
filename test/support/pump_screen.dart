@@ -305,6 +305,7 @@ Future<NavigationLog> pumpDesktop(
   String role = 'admin',
   List<Vehicle> vehicles = const [],
   Size surface = desktopSurface,
+  double textScale = 1,
 }) {
   return pumpScreen(
     tester,
@@ -317,5 +318,6 @@ Future<NavigationLog> pumpDesktop(
     role: role,
     vehicles: vehicles,
     surface: surface,
+    textScale: textScale,
   );
 }

@@ -5241,4 +5241,23 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get webUpdateReload => 'Ricarica';
+
+  @override
+  String dateTypeHint(String example) {
+    return 'Scrivi una data, ad esempio $example';
+  }
+
+  @override
+  String dateOutOfRange(String first, String last) {
+    return 'Scegli una data dal $first al $last';
+  }
+
+  @override
+  String get dateRangeStart => 'Data di inizio';
+
+  @override
+  String get dateRangeEnd => 'Data di fine';
+
+  @override
+  String get dateFieldLabel => 'Data';
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garage/core/clock.dart';
 import 'package:garage/core/widgets/adaptive.dart';
 import 'package:garage/core/widgets/garage_tab_bar.dart';
 import 'package:garage/domain/entities/cost_entry.dart';
@@ -139,6 +140,9 @@ Future<NavigationLog> pumpStats(
   /// default rather than fetched: the real one is a download.
   List<FuelStation> stations = const [],
   bool openOnCosts = false,
+
+  /// Today, for a test about what the screen opens on; the clock otherwise.
+  DateTime? today,
 }) {
   final stats = data ?? statsWith();
   return pumpScreen(
@@ -172,6 +176,7 @@ Future<NavigationLog> pumpStats(
       statsDataProvider('v1').overrideWith((ref) async => stats),
       statsDataProvider('v2').overrideWith((ref) async => stats),
       stationsProvider.overrideWith((ref) async => stations),
+      if (today != null) todayProvider.overrideWithValue(today),
     ],
   );
 }
@@ -988,6 +993,63 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  group('dates picked for the period', () {
+    testWidgets('on a desk are typed, the start opening on today', (
+      tester,
+    ) async {
+      // Noon, so the day survives the screen turning today into UTC.
+      await pumpStats(
+        tester,
+        surface: desktopSurface,
+        today: DateTime(2026, 3, 10, 12),
+      );
+      await tester.pumpAndSettle();
+
+      final custom = find.byKey(const Key('stats-period-custom'));
+      await tester.ensureVisible(custom);
+      await tester.pumpAndSettle();
+      await tester.tap(custom);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DateRangePickerDialog), findsNothing);
+      expect(
+        tester
+            .widget<CalendarDatePicker>(find.byType(CalendarDatePicker))
+            .initialDate,
+        DateTime(2026, 3, 10),
+      );
+
+      for (final date in ['1/5/2026', '2/20/2026']) {
+        await tester.enterText(find.byKey(const Key('typed-date')), date);
+        await tester.testTextInput.receiveAction(TextInputAction.done);
+        await tester.pumpAndSettle();
+      }
+
+      expect(find.byKey(const Key('typed-date')), findsNothing);
+      expect(
+        tester
+            .widget<ChoiceChip>(find.byKey(const Key('stats-period-custom')))
+            .selected,
+        isTrue,
+      );
+    });
+
+    testWidgets('on a phone are Material\'s range, as they were', (
+      tester,
+    ) async {
+      await pumpStats(tester);
+      await tester.pumpAndSettle();
+
+      final custom = find.byKey(const Key('stats-period-custom'));
+      await tester.ensureVisible(custom);
+      await tester.pumpAndSettle();
+      await tester.tap(custom);
+      await tester.pumpAndSettle();
+
+      expect(find.byType(DateRangePickerDialog), findsOneWidget);
+    });
   });
 }
 

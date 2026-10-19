@@ -192,6 +192,32 @@ each field until decision 80: appearing on focus it pushed Save below the
 fold, and holding its height left blank bands. The alternative, a plain text
 keyboard, would have taxed every ordinary amount to serve the rare one.
 
+## A date is typed in the reader's own order
+
+On a wide window the date picker has a field to type a date in, with the
+calendar under it (decision 199), and `parseTypedDate`
+(`lib/core/format/typed_date.dart:10`) reads what is typed in the order the
+reader's language writes a date: Croatian `19.9.2026.`, day first, with or
+without the spaces and the last full stop; Italian `19/9/2026`, day first;
+English `9/19/2026`, month first, as the app writes English dates. The ISO
+form, `2026-09-19`, reads in any of the three. The order is intl's `yMd` for
+the language, read loosely, and `formatTypedDate` writes the same form, so
+the date the field opens on, the example it gives and what it reads back
+agree: `19. 09. 2026.`, `19/09/2026`, `9/19/2026`.
+
+What is not a date is asked for again, in words, rather than saved as
+another one. A day the month does not have (`31.2.2026.`, `2026-02-31`) is
+refused, not rolled over into March as `DateTime` would roll it; so is
+another language's order (`19/9/2026` in English names a nineteenth month);
+and so is a two-digit year, which reads as the year 26: anything before 1900
+is refused (`lib/core/format/typed_date.dart:39`). The field then says "Type
+a date such as 9/1/2026", in the reader's own form, the example being the
+date it opened on rather than the last date allowed, which can be next
+January or 2100. A real date outside the range allowed is named with its
+bounds instead, "Pick a date from 1/1/2000 to 9/27/2026", in Croatian
+"Odaberi datum od …" with the bounds written as Croatian writes them. Either
+way the caret stays in the field, ready for the date again.
+
 ## Sharp edges
 
 - **A taller field can push a control off the test viewport.** Adding the
@@ -214,3 +240,9 @@ keyboard, would have taxed every ordinary amount to serve the rare one.
 - **`ZZ` is the "elsewhere" country code** (`lib/features/settings/screens/settings_screen.dart:59`),
   chosen from the ISO user-assigned range so it can never collide with a real
   country the app later ships rules for.
+- **intl refuses a typed date in two ways.** `parseLoose` throws a
+  `FormatException` for what is not a date, except a year no `DateTime` holds,
+  `9/19/300000` say, which it hands to the constructor, and that throws an
+  `ArgumentError`. `parseTypedDate` catches both
+  (`lib/core/format/typed_date.dart:33`); catching only the first, Enter in the
+  date field would have thrown.

@@ -2980,5 +2980,27 @@
     }
   },
   "webUpdateReady": "A new version of Garage is ready",
-  "webUpdateReload": "Reload"
+  "webUpdateReload": "Reload",
+  "dateTypeHint": "Type a date such as {example}",
+  "@dateTypeHint": {
+    "placeholders": {
+      "example": {
+        "type": "String"
+      }
+    }
+  },
+  "dateOutOfRange": "Pick a date from {first} to {last}",
+  "@dateOutOfRange": {
+    "placeholders": {
+      "first": {
+        "type": "String"
+      },
+      "last": {
+        "type": "String"
+      }
+    }
+  },
+  "dateRangeStart": "Start date",
+  "dateRangeEnd": "End date",
+  "dateFieldLabel": "Date"
 }

@@ -9,6 +9,8 @@ import 'package:garage/features/odometer/widgets/odometer_entry_sheet.dart';
 import 'package:garage/features/settings/providers/unit_providers.dart';
 import 'package:garage/l10n/app_localizations.dart';
 
+import '../../support/pump_screen.dart';
+
 class FakeOdometerRepository implements OdometerRepository {
   FakeOdometerRepository({this.entries = const [], this.failAdd = false});
 
@@ -233,5 +235,50 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('km'), findsOneWidget);
+  });
+
+  testWidgets('on a desk its date is typed, and the sheet keeps it', (
+    tester,
+  ) async {
+    // On a desk the sheet is a dialog, and the date's popover opens over it
+    // on the root navigator: what is typed there has to come back down to
+    // the sheet, and be what it saves.
+    final repository = FakeOdometerRepository();
+    await pumpDesktop(
+      tester,
+      Scaffold(
+        body: Builder(
+          builder: (context) => TextButton(
+            onPressed: () => showOdometerEntrySheet(context, 'v1'),
+            child: const Text('log'),
+          ),
+        ),
+      ),
+      overrides: [
+        odometerRepositoryProvider.overrideWithValue(repository),
+        odometerEntriesProvider(
+          'v1',
+        ).overrideWith((ref) async => repository.entries),
+      ],
+    );
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('log'));
+    await tester.pumpAndSettle();
+    expect(find.byType(Dialog), findsOneWidget);
+
+    await tester.tap(find.text('Date'));
+    await tester.pumpAndSettle();
+    await tester.enterText(find.byKey(const Key('typed-date')), '9/19/2020');
+    await tester.testTextInput.receiveAction(TextInputAction.done);
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('typed-date')), findsNothing);
+    expect(find.text('Sep 19, 2020'), findsOneWidget);
+
+    await tester.enterText(find.byKey(const Key('odometer-reading')), '84210');
+    await tester.tap(find.text('Save'));
+    await tester.pumpAndSettle();
+
+    expect(repository.added.single.date, DateTime.utc(2020, 9, 19));
   });
 }

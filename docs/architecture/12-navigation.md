@@ -179,7 +179,7 @@ because the toolbar carried a title, a vehicle-name dropdown and an icon button.
 
 The rule this leaves: **app-bar actions are icons; anything with a variable-width
 label belongs in the body.** Statistics now puts its vehicle picker beside the
-period bar (`lib/features/stats/screens/stats_screen.dart:142`), which is also
+period bar (`lib/features/stats/screens/stats_screen.dart:144`), which is also
 where someone would look for a filter.
 **The trip log is a partial exception, knowingly.** Its toolbar still carries a
 vehicle dropdown, and adding the routes icon beside it pushed "Svi automobili"
@@ -449,7 +449,16 @@ caps it at a menu's width, 360 pixels; the quick-add and the timeline's
 filter keep a form's 480. The service types pass `centred: true` and stay a
 dialog in the middle
 (`lib/features/maintenance/widgets/service_type_field.dart:109`): thirty rows
-and a search would cover the window from wherever they hung.
+and a search would cover the window from wherever they hung. A date is one of
+these cards too, though not through `showAdaptiveChoice`, since a phone keeps
+Material's dialog for it: on a desk `showGarageDatePicker`
+(`lib/core/widgets/date_pickers.dart:54`) opens the card at a menu's width,
+with a field to type the date in and the calendar under it
+([10](10-localization-and-units.md#a-date-is-typed-in-the-readers-own-order)).
+The card is kept inside the window but not scrolled
+(`lib/core/widgets/anchored_popover.dart:309`): a builder that can be taller
+than the room left scrolls itself, as the date's does at large text on the
+smallest tablet held sideways (`lib/core/widgets/date_pickers.dart:311`).
 
 Where it hangs from is settled as it opens
 (`lib/core/widgets/anchored_popover.dart:148`), the first of:

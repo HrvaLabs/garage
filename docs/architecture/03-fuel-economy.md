@@ -204,7 +204,7 @@ the lowest consumption and so the longest range** — the two read in opposite
 directions, which is the one thing in that file worth reading twice.
 
 It shows on the statistics screen, under "On a full tank", for a chosen car or
-for a garage that has only one (`stats_screen.dart:183`). It is silent for a
+for a garage that has only one (`stats_screen.dart:185`). It is silent for a
 car with no tank capacity recorded, which is most of them, and for a garage of
 two with no filter set: a tank belongs to one vehicle, and averaging a diesel
 estate with a city runabout answers nobody's question.

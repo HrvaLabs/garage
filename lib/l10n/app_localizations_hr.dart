@@ -5248,4 +5248,23 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get webUpdateReload => 'Osvježi';
+
+  @override
+  String dateTypeHint(String example) {
+    return 'Upiši datum, npr. $example';
+  }
+
+  @override
+  String dateOutOfRange(String first, String last) {
+    return 'Odaberi datum od $first do $last';
+  }
+
+  @override
+  String get dateRangeStart => 'Početni datum';
+
+  @override
+  String get dateRangeEnd => 'Završni datum';
+
+  @override
+  String get dateFieldLabel => 'Datum';
 }

@@ -6,6 +6,7 @@ import '../../../core/format/unit_format.dart';
 import '../../../core/theme/garage_theme.dart';
 import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/adaptive.dart';
+import '../../../core/widgets/date_pickers.dart';
 import '../../../core/widgets/garage_tab_bar.dart';
 import '../../../core/widgets/page_scaffold.dart';
 import '../../../core/widgets/routed_tabs.dart';
@@ -65,13 +66,14 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
   DateRange? _customRange;
 
   Future<void> _pickRange(DateTime today) async {
-    final picked = await showDateRangePicker(
+    final picked = await showGarageDateRange(
       context: context,
       firstDate: DateTime(2000),
       lastDate: DateTime(today.year + 1),
-      initialDateRange: _customRange == null
+      initialRange: _customRange == null
           ? null
           : DateTimeRange(start: _customRange!.from, end: _customRange!.to),
+      now: today,
     );
     if (picked == null || !mounted) {
       return;

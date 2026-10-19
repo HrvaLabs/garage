@@ -1618,5 +1618,10 @@
     }
   },
   "webUpdateReady": "È pronta una nuova versione di Garage",
-  "webUpdateReload": "Ricarica"
+  "webUpdateReload": "Ricarica",
+  "dateTypeHint": "Scrivi una data, ad esempio {example}",
+  "dateOutOfRange": "Scegli una data dal {first} al {last}",
+  "dateRangeStart": "Data di inizio",
+  "dateRangeEnd": "Data di fine",
+  "dateFieldLabel": "Data"
 }

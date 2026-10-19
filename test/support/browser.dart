@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/router/app_router.dart';
+import 'package:garage/core/widgets/date_pickers.dart';
 import 'package:garage/core/widgets/page_title.dart';
 import 'package:garage/core/widgets/routed_tabs.dart';
 import 'package:go_router/go_router.dart';
@@ -60,16 +61,19 @@ class FakeBrowser {
 }
 
 /// Runs the rest of the test as the web build: each page names the browser's
-/// tab, a tab strip writes its tab to the address, and a pushed page shows its
-/// own. Off in a test as on Android, so a test about the web asks for it,
-/// before it pumps the app.
+/// tab, a tab strip writes its tab to the address, a pushed page shows its
+/// own, and a date's popover opens with its field ready to type in. Off in a
+/// test as on Android, so a test about the web asks for it, before it pumps
+/// the app.
 FakeBrowser asTheWeb(WidgetTester tester) {
   final browser = FakeBrowser._(tester);
   final titled = PageTitle.enabled;
   final writes = RoutedTabs.writesAddress;
   final reflects = GoRouter.optionURLReflectsImperativeAPIs;
+  final focuses = GarageDatePicker.focusesField;
   PageTitle.enabled = true;
   RoutedTabs.writesAddress = true;
+  GarageDatePicker.focusesField = true;
   reflectPushedPagesInAddress();
 
   final messenger = tester.binding.defaultBinaryMessenger;
@@ -93,6 +97,7 @@ FakeBrowser asTheWeb(WidgetTester tester) {
       ..setMockMethodCallHandler(SystemChannels.navigation, null);
     PageTitle.enabled = titled;
     RoutedTabs.writesAddress = writes;
+    GarageDatePicker.focusesField = focuses;
     GoRouter.optionURLReflectsImperativeAPIs = reflects;
   });
   return browser;

@@ -99,7 +99,7 @@ series and comes out far too low. `currentKm` takes the highest reading whatever
 its date, so where the car stands jumps forward at the same time. The two errors
 pull the projection in opposite directions and both are wrong.
 
-The pickers now stop at today as well (`lib/core/widgets/date_pickers.dart:12`),
+The pickers now stop at today as well (`lib/core/widgets/date_pickers.dart:20`),
 which is the cheapest place to catch a fat-fingered year. That is a
 convenience, not the guard: the guard stays in the domain because the entry
 sheets are not the only door: the Fuelio and CSV importers and a restored backup

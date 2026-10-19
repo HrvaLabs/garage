@@ -8810,6 +8810,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reload'**
   String get webUpdateReload;
+
+  /// No description provided for @dateTypeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a date such as {example}'**
+  String dateTypeHint(String example);
+
+  /// No description provided for @dateOutOfRange.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick a date from {first} to {last}'**
+  String dateOutOfRange(String first, String last);
+
+  /// No description provided for @dateRangeStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Start date'**
+  String get dateRangeStart;
+
+  /// No description provided for @dateRangeEnd.
+  ///
+  /// In en, this message translates to:
+  /// **'End date'**
+  String get dateRangeEnd;
+
+  /// No description provided for @dateFieldLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get dateFieldLabel;
 }
 
 class _AppLocalizationsDelegate

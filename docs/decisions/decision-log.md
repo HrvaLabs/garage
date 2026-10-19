@@ -1195,7 +1195,7 @@ every non-tab destination has a labelled entry point.
 `actions`. At twice the default text size the toolbar overflowed by 46 pixels: a
 title, a car's name and an icon in a fixed-width row that cannot wrap. The picker
 moved into the body beside the period bar
-(`lib/features/stats/screens/stats_screen.dart:142`).
+(`lib/features/stats/screens/stats_screen.dart:144`).
 
 **Why not shrink the control.** Capping the dropdown's width buys one text scale
 and fails at the next; the overflow is structural, not a tuning problem. A
@@ -5439,7 +5439,7 @@ behind each and the number of tanks it rests on. Nothing in it decays, so
 nothing in it goes stale.
 
 **Shown for one car, including the garage that only has one**
-(`stats_screen.dart:183`). A tank belongs to a vehicle, so averaging across a
+(`stats_screen.dart:185`). A tank belongs to a vehicle, so averaging across a
 diesel estate and a city runabout answers nobody. But the filter defaults to
 the whole garage even when the garage is one car, and for that reader "all
 vehicles" names their only car — a card should not need unlocking by a filter
@@ -6685,7 +6685,7 @@ a quarter, a half-year, a year, two and five that fits five labels, puts the
 year where the year turns and the month's name elsewhere, and labels a span
 too short to cross a boundary by its two ends. The records cards on the costs
 and distance tabs add "Average per year" under the day and the month
-(`lib/features/stats/screens/stats_screen.dart:41`).
+(`lib/features/stats/screens/stats_screen.dart:42`).
 
 **What was wrong.** The axis was labelled at the first reading, the last and
 the day halfway between — "7/25", "2/26", "9/26" — which read as three dates
@@ -7804,3 +7804,43 @@ included; nothing there reads it, and a phone's choice is the sheet it was.
 a choice that opens itself as a page loads hangs where the last click landed.
 The quick entry's "Which vehicle?", which the launcher's shortcuts open, is
 the only one.
+
+**A date is typed.** On a desk `showGarageDatePicker`
+(`lib/core/widgets/date_pickers.dart:54`) opens a popover hung as a choice
+is, a menu's 360 pixels wide, with a field that reads the reader's own order
+(`19.9.2026.`, `19/9/2026`, `9/19/2026`, or `2026-09-19` in any language) and
+the calendar under it, Monday first in English as on a phone. Enter takes
+what is typed and a click takes the day; a day that does not exist, a
+two-digit year or a date outside the allowed range is asked for again, in
+words, the caret staying in the field
+([10](../architecture/10-localization-and-units.md#a-date-is-typed-in-the-readers-own-order)).
+Material's dialog was a phone's on a monitor: a calendar in the middle of
+it, and a pen icon to reach the typing. Every date the app asks for gets the
+popover, since each goes through that function, and so does Statistics'
+"Pick dates", which is the popover twice (`showGarageDateRange`,
+`lib/core/widgets/date_pickers.dart:108`). Its start opens on the last
+range's start or on today, not on the last date allowed, which there is next
+January; its end on the last end, or on the start when that is later, since
+a calendar opened before its first date trips the framework's own assertion.
+A phone keeps Material's dialog and Material's range.
+
+The field has the focus as the popover opens on the web only
+(`lib/core/widgets/date_pickers.dart:157`). A tablet held sideways is a desk
+too, and there a focused field would put the on-screen keyboard over the
+calendar, so it opens on the calendar and a tap on the field types. A year
+chosen from the calendar's list of years is not a day picked, though
+Material's calendar reports it as one, the day it had selected moved to that
+year: the popover looks for the list still on show when the report comes
+(`lib/core/widgets/date_pickers.dart:291`), and stays open with the field
+following. The field is labelled above it, as every form field in the app
+is (`LabeledField`, `lib/core/widgets/date_pickers.dart:319`): with the
+question when the caller asks one, "Start date" say, which then needs no
+title of its own, and with "Date" otherwise. A screen reader hears the label
+as its own text just before the field, as beside every other field. On the
+smallest tablet held sideways, at large text, the label, the field with an
+error and the calendar are taller than the window, and the card scrolls
+then, and only then, the calendar keeping its full height
+(`lib/core/widgets/date_pickers.dart:311`). *Cost:* there is no OK. A day
+clicked is the answer, so a day clicked by mistake is a date picked, put
+right by opening the picker again, where Material's dialog let a day be
+clicked and then confirmed.

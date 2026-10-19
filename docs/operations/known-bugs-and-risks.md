@@ -1000,6 +1000,41 @@ several releases later.
 
 ## Recently fixed, worth remembering
 
+### The date's card ran off the smallest sideways tablet at large text
+
+**Low, caught before shipping, 19 October 2026, by measuring.**
+`showAnchoredPopover` keeps its card inside the window
+(`lib/core/widgets/anchored_popover.dart:309`) but does not scroll it, so a
+builder taller than the room left overflows. The date's card, its question
+as a title over the field, an error under the field and the calendar, was
+588 pixels at 1.75× text and 660 at twice it, and a 1024×600 tablet held
+sideways leaves 568: the bottom of the calendar was cut off, 20 and 92
+pixels of it. The card's column now scrolls
+(`lib/core/widgets/date_pickers.dart:311`), only when the window cannot hold
+it, and the calendar keeps its full height. The question is now the field's
+own label, one line where the title took two at twice the text, and the card
+scrolls 13 and 44 pixels there. `test/core/widgets/date_pickers_test.dart:364`
+opens it at twice the text, with a question and an error, and types into
+it; the test after it finds nothing to scroll at a desk's ordinary text. The
+next popover with a tall builder has the same edge.
+
+### A year chosen in a date's calendar would have closed it on a day nobody clicked
+
+**Low, caught before shipping, 19 October 2026.** On a desk the date popover
+closes when a day is clicked in its calendar, and Material's
+`CalendarDatePicker` reports a year chosen from its list of years through the
+same `onDateChanged`, as the day it had selected moved to that year. Choosing
+2024 to look for a day in it would have closed the popover on a day of 2024
+nobody picked, and choosing the year already on show, which moves no month to
+tell it by, on the date it opened with. The calendar reports the year before
+it goes back to the days, so its list of years is still there to find: the
+popover looks for it when the report comes
+(`lib/core/widgets/date_pickers.dart:291`), and finding it stays open, the
+field showing the new date. `test/core/widgets/date_pickers_test.dart:208`
+chooses the year on show, then another, and finds the popover open both
+times. A Flutter release that went back to the days before reporting would
+fail that test rather than close the popover unnoticed.
+
 ### With the accessibility layer on, a choice hung from an old press
 
 **Low, caught before shipping, 19 October 2026, in a browser look.** On the
