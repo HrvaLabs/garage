@@ -168,6 +168,11 @@ scaffolds, with Retry. Retry, resume and a replay clear every mark and
 refetch every covered list (`invalidateReads`,
 `lib/core/sync/invalidate_reads.dart`); a list still served from a copy marks
 itself again, so the banner names the oldest copy of what is being shown.
+Only the newest fetch of a list keeps or marks: an older one still in
+flight, overtaken by a Retry, answers its caller and touches neither
+(`lib/core/sync/read_cache.dart:90`). The marks are cleared whenever the
+signed-in user changes, since a session ended on the server goes through no
+sign-out (`lib/core/sync/read_cache_providers.dart:23`).
 What a queued entry gets is still a **merge into the read**, deduped on its
 own id — a cached read now as much as a fresh one, since the queue decorator
 wraps the repository the cache lives in. Sign-out and account deletion clear

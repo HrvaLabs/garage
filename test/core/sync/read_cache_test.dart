@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -148,6 +149,38 @@ void main() {
       expect(cache.copiesServed, 2);
       expect(cache.stale.value.byKey, marks);
     });
+
+    test('a fetch a newer one overtook neither keeps nor marks', () async {
+      // Retry tapped twice as the signal comes back: the first fetch is still
+      // timing out when the second lands. Failing afterwards, it found the
+      // copy the second had just kept and marked a list that was fresh.
+      await cache.rows('fuel/v1', () async => rowsOf('f1'));
+      final slow = Completer<Rows>();
+      final first = cache.rows('fuel/v1', () => slow.future);
+      await cache.rows('fuel/v1', () async => rowsOf('f2'));
+
+      slow.completeError(offline);
+
+      expect(await first, rowsOf('f2'));
+      expect(cache.stale.value.any, isFalse);
+    });
+
+    test(
+      'nor, succeeding late, keeps rows older than the newer fetch\'s',
+      () async {
+        final slow = Completer<Rows>();
+        final first = cache.rows('fuel/v1', () => slow.future);
+        await cache.rows('fuel/v1', () async => rowsOf('f2'));
+
+        slow.complete(rowsOf('f1'));
+        await first;
+
+        expect(
+          await cache.rows('fuel/v1', () async => throw offline),
+          rowsOf('f2'),
+        );
+      },
+    );
 
     test('the oldest stale copy is the one the banner names', () async {
       await cache.rows('fuel/v1', () async => rowsOf('f1'));

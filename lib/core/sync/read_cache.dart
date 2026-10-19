@@ -69,6 +69,12 @@ class ReadCache {
   int get copiesServed => _copiesServed;
   int _copiesServed = 0;
 
+  /// The newest fetch of each list, by when it started. Retry tapped twice
+  /// as the signal comes back puts two in flight; the first, timing out after
+  /// the second has landed, would otherwise mark a list that is fresh, or
+  /// keep rows older than the ones already kept.
+  final Map<String, int> _newest = {};
+
   /// What [fetch] returns, kept as the copy for [key]; the copy instead when
   /// [fetch] fails for want of a connection.
   ///
@@ -80,9 +86,11 @@ class ReadCache {
   Future<Rows> rows(String key, Future<Rows> Function() fetch) async {
     final user = userId();
     final storeKey = user == null ? null : '$user/$key';
+    final started = _newest[key] = (_newest[key] ?? 0) + 1;
+    bool overtaken() => _newest[key] != started;
     try {
       final fresh = await fetch();
-      if (storeKey != null) {
+      if (storeKey != null && !overtaken()) {
         await _keep(storeKey, fresh);
         _unmark(key);
       }
@@ -97,8 +105,11 @@ class ReadCache {
       if (copy == null) {
         rethrow;
       }
+      // Counted either way: whoever asked was answered with a copy.
       _copiesServed++;
-      _mark(key, copy.storedAt);
+      if (!overtaken()) {
+        _mark(key, copy.storedAt);
+      }
       return copy.rows;
     }
   }

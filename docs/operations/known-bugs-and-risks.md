@@ -431,17 +431,6 @@ garage's outbox. That needs a builder bug, which the log line is there to
 surface; a counter that marks a row processed after some number of failed
 builds is the fix if one ever happens.
 
-### A slow read that fails can mark a list stale after a fast one succeeded
-
-**Low.** `ReadCache.rows` (`lib/core/sync/read_cache.dart:80`) has no per-key
-guard against two fetches of the same list in flight at once. Tap Retry twice
-as the signal comes back and the first fetch can still be timing out when the
-second has landed: the second keeps its rows and unmarks the key, then the
-first fails, finds that copy and marks the key again, so the banner names a
-copy under a list that is fresh. The next Retry or resume clears it. The fix
-is a per-key generation counter, so a fetch that is no longer the newest for
-its key neither keeps nor marks.
-
 ### The banner disappears while a Retry that will fail is in flight
 
 **Low.** Retry clears every mark before it refetches
@@ -461,23 +450,6 @@ started with a signal is not shown as in progress without one. A draft is
 rewritten as the car moves, so a copy would be stale by the time it served; a
 single-row shape of the cache is what it would take, if real use asks.
 
-### Stale marks survive a server-side sign-out
-
-**Low.** `ReadCache.stale` is keyed by list, not by user
-(`lib/core/sync/read_cache.dart:60`), and only `forget()` clears it
-(`lib/core/sync/read_cache.dart:111`), which the controller calls on a
-sign-out the person asks for
-(`lib/features/auth/providers/auth_providers.dart:138`) and on account
-deletion. A session ended remotely, a refresh token refused or the account
-signed out elsewhere, goes through neither, and the one `ReadCache` lives as
-long as the app (`lib/core/sync/read_cache_providers.dart:14`), so another
-account signing in on that phone is shown the first account's marks: a banner
-naming a copy it was never served, until the next resume or replay clears
-every mark (`lib/core/sync/sync_providers.dart:144`) or a fetch of the same
-key succeeds, which a different garage's keys never will. The copies
-themselves are keyed by user and stay unread. The fix is `unmarkAll()`
-(`lib/core/sync/read_cache.dart:132`) when the signed-in user changes.
-
 ### The preferences file grows with the cache
 
 **Low, and a risk rather than a bug.** Every list is one key of up to a
@@ -489,13 +461,13 @@ of one list rewrites a garage's every copy, and `SharedPreferences.getInstance()
 carries the lot across the platform channel at its first use, which is
 startup. A browser's storage for the whole origin is a few megabytes, so a
 handful of full keys is the ceiling there, and a write past it is caught and
-recorded (`lib/core/sync/read_cache.dart:157`). The spec named a file store
+recorded (`lib/core/sync/read_cache.dart:168`). The spec named a file store
 behind the same `ReadCacheStore` interface as the replacement, on the
 conditional-import pattern of `queued_files.dart`.
 
 Fix later, in the same place: a key over the limit is dropped and a failure
 recorded on **every** successful fetch of that list
-(`lib/core/sync/read_cache.dart:144`), where the spec said once; a `Set` of
+(`lib/core/sync/read_cache.dart:155`), where the spec said once; a `Set` of
 reported keys would silence the repeats.
 
 ### The dashboard logs a "setState during build" from its reminder listeners
@@ -993,6 +965,25 @@ several releases later.
 
 ## Recently fixed, worth remembering
 
+### The offline banner could name a copy nobody was being shown
+
+**Low, fixed 17 October 2026; since the read cache in September.** Two ways.
+`ReadCache.rows` kept no order among fetches of one list, so Retry tapped
+twice as the signal came back left the first fetch timing out after the
+second had landed: failing, it found the copy the second had just kept and
+marked a fresh list; succeeding late, it kept rows older than the second's.
+Only the newest fetch of a list now keeps or marks
+(`lib/core/sync/read_cache.dart:90`); an older one still answers its caller,
+from its own rows or the copy, and the backup still counts the copy.
+And the marks are kept by list, not by account, and were forgotten only by a
+sign-out the person asked for, so a session ended on the server — a refresh
+token refused, a sign-out elsewhere — left them for the next account on the
+phone, whose banner then named a copy it was never served. They are now
+cleared whenever the signed-in user changes
+(`lib/core/sync/read_cache_providers.dart:23`).
+`test/core/sync/read_cache_test.dart:153` and
+`test/core/sync/read_cache_providers_test.dart:12` stage each.
+
 ### "A former member" flashed while the names loaded
 
 **Low, fixed 17 October 2026; since the company plan.** `driverNameOnProvider`
@@ -1479,7 +1470,7 @@ stand-in yet and will show the same shape if it ever fails under load.
 ### Offline, a list showed its copy only after about seven seconds
 
 **Was Medium.** The copy is served when the fetch fails
-(`lib/core/sync/read_cache.dart:84`), and postgrest 2.8.0 took its time
+(`lib/core/sync/read_cache.dart:92`), and postgrest 2.8.0 took its time
 failing: it retried every GET that threw three times, pausing 1, 2 and 4
 seconds between attempts, so a screen opened with no signal showed a spinner
 for seven seconds and then the copy, and every list on it paid the wait on its
