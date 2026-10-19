@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:garage/l10n/app_localizations.dart';
 
+import '../../../core/clock.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/errors/failure_log.dart';
 import '../../../core/format/unit_format.dart';
@@ -295,6 +296,10 @@ class _ReminderRuleSheetState extends ConsumerState<ReminderRuleSheet> {
       );
 
       final doneKm = _kmFrom(_doneKm);
+      // Given by its reading alone, the service is dated today: the calendar
+      // day here, which for the first hours of a Croatian day is not the UTC
+      // instant's.
+      final now = ref.read(clockProvider)();
       if (doneKm != null || _doneDate != null) {
         await writeNew(
           () => ref
@@ -303,7 +308,7 @@ class _ReminderRuleSheetState extends ConsumerState<ReminderRuleSheet> {
                 ServiceEntry(
                   id: _doneEntryId,
                   vehicleId: _vehicleId,
-                  date: _doneDate ?? DateTime.now().toUtc(),
+                  date: _doneDate ?? DateTime.utc(now.year, now.month, now.day),
                   odometerKm: doneKm ?? 0,
                   serviceTypeKeys: [key],
                   createdBy: '',

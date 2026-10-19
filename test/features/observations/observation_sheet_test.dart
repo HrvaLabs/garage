@@ -4,6 +4,7 @@ import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:garage/core/files/file_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garage/core/clock.dart';
 import 'package:garage/domain/entities/observation.dart';
 import 'package:garage/features/observations/providers/observation_providers.dart';
 import 'package:garage/features/observations/widgets/observation_sheet.dart';
@@ -25,6 +26,7 @@ Future<void> pumpSheet(
   Locale? locale,
   double textScale = 1,
   Size surface = const Size(420, 1400),
+  DateTime? today,
 }) async {
   await pumpScreen(
     tester,
@@ -49,6 +51,7 @@ Future<void> pumpSheet(
       observationRepositoryProvider.overrideWithValue(repository),
       if (pickedFile != null)
         filePickerProvider.overrideWithValue(() async => pickedFile),
+      if (today != null) todayProvider.overrideWithValue(today),
     ],
   );
   await tester.pumpAndSettle();
@@ -74,6 +77,25 @@ void main() {
     expect(repository.saved!.note, 'Vibration since the pothole on Ilica');
     expect(repository.saved!.isOpen, isTrue);
     expect(repository.saved!.id, isNotEmpty);
+  });
+
+  testWidgets('a note is filed under the day it is, where it is', (
+    tester,
+  ) async {
+    // Half past midnight in Zagreb is still the previous day in UTC. The
+    // sheet showed the right day and saved the UTC instant's, so a note
+    // written after midnight was filed under the day before.
+    final repository = RecordingObservations();
+    await pumpSheet(tester, repository, today: DateTime(2026, 9, 19, 0, 30));
+
+    await tester.enterText(
+      find.byKey(const Key('observation-note')),
+      'Brakes squeal when cold',
+    );
+    await tester.tap(find.byKey(const Key('observation-save')));
+    await tester.pumpAndSettle();
+
+    expect(repository.saved!.noticedOn, DateTime.utc(2026, 9, 19));
   });
 
   testWidgets('an empty note is refused rather than saved blank', (

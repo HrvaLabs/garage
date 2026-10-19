@@ -1,7 +1,8 @@
 Fixes from the first days in production:
 • An archived vehicle no longer gets reminders
-• When a driver logs a service, its one-time reminder now closes too
-• An incident reported with no signal is kept on your phone and sent when there is one
+• A driver's service now closes its one-time reminder
+• An incident reported with no signal is kept and sent once there is one
 • For a driver, the vehicles tab is now called Cars
+• A problem noted after midnight is dated that day
 • An address that leads nowhere says so in your language, with a way back
 • Old reminders the phone set for itself no longer arrive beside the garage's own

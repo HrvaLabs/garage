@@ -1,7 +1,8 @@
 Popravci iz prvih dana:
 • Arhivirano vozilo više ne dobiva podsjetnike
-• Kad vozač zabilježi servis, sada se zatvara i jednokratni podsjetnik za njega
-• Nezgoda prijavljena bez signala sprema se na telefon i šalje kad bude signala
+• Servis koji vozač zabilježi sada zatvara i jednokratni podsjetnik
+• Nezgoda prijavljena bez signala čuva se i šalje kad signal stigne
 • Za vozače se kartica vozila sada zove Auti
+• Problem zabilježen iza ponoći dobiva datum tog dana
 • Adresa koja ne vodi nikamo to sada kaže na tvom jeziku, s putem natrag
 • Stari podsjetnici koje je telefon sam zakazao više ne stižu uz one iz garaže

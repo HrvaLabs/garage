@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:garage/l10n/app_localizations.dart';
 
+import '../../../core/clock.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/ids.dart';
 import '../../../core/format/unit_format.dart';
@@ -58,8 +59,7 @@ class _ObservationFormState extends ConsumerState<_ObservationForm> {
   late final _odometer = TextEditingController(
     text: widget.existing?.odometerKm?.toString() ?? '',
   );
-  late DateTime _noticedOn =
-      widget.existing?.noticedOn ?? DateTime.now().toUtc();
+  late DateTime _noticedOn;
 
   /// Minted before the first keystroke, so a photo can be taken at the car and
   /// attached before the note is written — which is the order these actually
@@ -85,8 +85,14 @@ class _ObservationFormState extends ConsumerState<_ObservationForm> {
   void initState() {
     super.initState();
     _attachments = ref.read(attachmentRepositoryProvider);
+    // The calendar day where the note is written, as the incident sheet
+    // does: for the first hours of a Croatian day the UTC instant's date is
+    // still yesterday's.
+    _noticedOn = widget.existing?.noticedOn ?? _day(ref.read(todayProvider));
     _openedOn = _noticedOn;
   }
+
+  DateTime _day(DateTime date) => DateTime.utc(date.year, date.month, date.day);
 
   @override
   void dispose() {
@@ -165,7 +171,7 @@ class _ObservationFormState extends ConsumerState<_ObservationForm> {
                 onPressed: _pickDate,
                 child: Align(
                   alignment: AlignmentDirectional.centerStart,
-                  child: Text(format.formatDate(_noticedOn.toLocal())),
+                  child: Text(format.formatDate(_noticedOn)),
                 ),
               ),
             ),
@@ -217,7 +223,7 @@ class _ObservationFormState extends ConsumerState<_ObservationForm> {
       lastDate: lastLoggableDate(_noticedOn),
     );
     if (picked != null && mounted) {
-      setState(() => _noticedOn = picked);
+      setState(() => _noticedOn = _day(picked));
     }
   }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:garage/l10n/app_localizations.dart';
 
+import '../../../core/clock.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/format/unit_format.dart';
 import '../../../core/theme/garage_theme.dart';
@@ -232,7 +233,15 @@ class _ObservationRow extends ConsumerWidget {
     final controller = ref.read(observationControllerProvider.notifier);
     switch (action) {
       case 'resolve':
-        await controller.resolve(observation, DateTime.now().toUtc());
+        // The calendar day where it is said, as the sheet dates the note:
+        // the UTC instant's date is the day before for the first hours of a
+        // Croatian day, which the database refuses as settled before it was
+        // noticed.
+        final now = ref.read(clockProvider)();
+        await controller.resolve(
+          observation,
+          DateTime.utc(now.year, now.month, now.day),
+        );
       case 'reopen':
         await controller.reopen(observation);
       case 'edit':

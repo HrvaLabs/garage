@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garage/core/clock.dart';
 import 'package:garage/core/format/unit_format.dart';
 import 'package:garage/features/settings/providers/unit_providers.dart';
 import 'package:garage/domain/entities/reminder_rule.dart';
@@ -109,6 +110,7 @@ Future<void> pumpSheet(
   /// for. Each is served by its own [vehicleProvider].
   List<Vehicle> vehicles = const [],
   UnitPreferences? preferences,
+  DateTime? now,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = const Size(420, 1000);
@@ -133,6 +135,7 @@ Future<void> pumpSheet(
         ),
         if (preferences != null)
           unitPreferencesProvider.overrideWithValue(preferences),
+        if (now != null) clockProvider.overrideWithValue(() => now),
       ],
       child: MaterialApp(
         localizationsDelegates: AppLocalizations.localizationsDelegates,
@@ -543,6 +546,25 @@ void main() {
         'service_oil_change',
       ]);
       expect(repository.upserted, hasLength(1));
+    });
+
+    testWidgets('a service given by its reading alone is dated today, here', (
+      tester,
+    ) async {
+      // Half past midnight in Zagreb is still the day before in UTC, and the
+      // UTC instant's date filed the service under it.
+      final repository = RecordingMaintenanceRepository();
+      await pumpSheet(tester, repository, now: DateTime(2026, 9, 19, 0, 30));
+      await tester.pumpAndSettle();
+
+      await pickServiceType(tester, 'Oil change');
+      await tester.enterText(
+        find.byKey(const Key('rule-last-done-km')),
+        '42000',
+      );
+      await tapSave(tester);
+
+      expect(repository.services.single.date, DateTime.utc(2026, 9, 19));
     });
 
     testWidgets('leaving it blank logs no service', (tester) async {

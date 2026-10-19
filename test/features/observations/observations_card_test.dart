@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garage/core/clock.dart';
 import 'package:garage/core/errors/app_failure.dart';
 import 'package:garage/domain/entities/observation.dart';
 import 'package:garage/features/observations/data/observation_repository.dart';
@@ -58,15 +59,19 @@ Observation seen({
 
 Future<void> pumpCard(
   WidgetTester tester,
-  RecordingObservations repository,
-) async {
+  RecordingObservations repository, {
+  DateTime? now,
+}) async {
   await pumpScreen(
     tester,
     const Scaffold(
       body: SingleChildScrollView(child: ObservationsCard(vehicleId: 'v1')),
     ),
     surface: const Size(420, 1400),
-    overrides: [observationRepositoryProvider.overrideWithValue(repository)],
+    overrides: [
+      observationRepositoryProvider.overrideWithValue(repository),
+      if (now != null) clockProvider.overrideWithValue(() => now),
+    ],
   );
   await tester.pumpAndSettle();
 }
@@ -182,6 +187,26 @@ void main() {
     expect(repository.calls, ['update:o1']);
     expect(repository.saved!.resolvedOn, isNotNull);
     expect(repository.saved!.note, 'Rattles when cold');
+  });
+
+  testWidgets('one noticed after midnight can be settled the same night', (
+    tester,
+  ) async {
+    // The day it stopped is the calendar day where it is said, as the day it
+    // was noticed is: the UTC instant's date is the day before for the first
+    // hours of a Croatian day, which the database refuses as settled before
+    // it was noticed.
+    final repository = RecordingObservations(
+      stored: [seen(noticedOn: DateTime.utc(2026, 9, 19))],
+    );
+    await pumpCard(tester, repository, now: DateTime(2026, 9, 19, 0, 45));
+
+    await tester.tap(find.byKey(const Key('observation-menu-o1')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('It has stopped').last);
+    await tester.pumpAndSettle();
+
+    expect(repository.saved!.resolvedOn, DateTime.utc(2026, 9, 19));
   });
 
   testWidgets('a noise that came back reopens the same row', (tester) async {

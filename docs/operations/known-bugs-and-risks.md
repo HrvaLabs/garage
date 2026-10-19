@@ -321,17 +321,6 @@ time-out that committed and then a change made offline, together. An upsert
 on replay would save the edit; nothing short of a remembered delete saves the
 delete.
 
-### The observation sheet dates a new note by the UTC instant
-
-**Low, pre-existing.** A new observation defaults its day to
-`DateTime.now().toUtc()`
-(`lib/features/observations/widgets/observation_sheet.dart:62`), so a note
-written after ten in the evening in Zagreb's summer, or after eleven in
-winter, is filed under tomorrow. The incident sheet, written beside it, uses
-the local calendar day through `todayProvider`
-(`lib/features/incidents/widgets/incident_sheet.dart:93`); the observation
-sheet should do the same.
-
 ### A corrupt receipt behind a good header still fails the pack at save
 
 **Low.** `_placeable` (`lib/features/reports/report_builder.dart:920`) asks
@@ -1057,6 +1046,29 @@ several releases later.
 ---
 
 ## Recently fixed, worth remembering
+
+### A problem noted after midnight was filed under the day before
+
+**Low, fixed 17 October 2026; since observations arrived.** A new problem
+defaulted its day to `DateTime.now().toUtc()`, and a UTC value is stored as
+its UTC date, so from midnight until two in the morning in Zagreb's summer
+(one in winter) a note was filed under the previous day while the sheet's
+date button, which converted back to local time, showed the right one. This
+entry had it backwards, "after ten in the evening, filed under tomorrow",
+which is the direction west of Greenwich, not here. The sheet now
+takes the calendar day where it is written from `todayProvider`, as the
+incident sheet does (`lib/features/observations/widgets/observation_sheet.dart:91`).
+That alone would have broken the same night's "It has stopped": the day it
+stopped was the UTC instant's too, a day before the day noticed, which the
+table's check refuses (`supabase/migrations/0060_observations.sql:47`), so the
+card dates it from the clock's local day as well
+(`lib/features/observations/widgets/observations_card.dart:240`). The reminder
+sheet had the same default for the service it logs when only the reading of
+the last one is given (`lib/features/maintenance/widgets/reminder_rule_sheet.dart:311`).
+Each has a test at half past midnight:
+`test/features/observations/observation_sheet_test.dart:82`,
+`test/features/observations/observations_card_test.dart:192` and
+`test/features/maintenance/reminder_rule_sheet_test.dart:551`.
 
 ### Reminders a phone set before push was on still fired
 
