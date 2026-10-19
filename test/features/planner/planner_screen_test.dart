@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/widgets/adaptive.dart';
+import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/domain/maintenance/bundling.dart';
 import 'package:garage/domain/maintenance/reminder_projection.dart';
 import 'package:garage/features/maintenance/data/maintenance_repository.dart';
@@ -568,5 +569,30 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('lays out on a desk: the sidebar, nothing floating', (
+    tester,
+  ) async {
+    await pumpPlanner(
+      tester,
+      weeks: [
+        RunwayWeek(start: _monday, items: [projection()]),
+      ],
+      bundles: [bundle()],
+      furtherOut: [
+        projection(
+          ruleId: 'r3',
+          serviceTypeKey: 'service_timing_belt',
+          due: _monday.add(const Duration(days: 200)),
+        ),
+      ],
+      surface: desktopSurface,
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(GarageSidebar), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsNothing);
   });
 }

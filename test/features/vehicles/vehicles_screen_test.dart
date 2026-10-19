@@ -10,6 +10,7 @@ import 'package:garage/domain/entities/guest_pass.dart';
 import 'package:garage/domain/entities/household.dart';
 import 'package:garage/domain/entities/vehicle_assignment.dart';
 import 'package:garage/core/widgets/adaptive.dart';
+import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/domain/entities/vehicle.dart';
 import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
@@ -661,5 +662,30 @@ void main() {
       ),
     );
     expect(search.focusNode.hasPrimaryFocus, isTrue);
+  });
+
+  testWidgets('lays out on a desk: the sidebar, Add vehicle in the top bar, '
+      'nothing floating', (tester) async {
+    await pumpVehicles(
+      tester,
+      vehicles: [
+        testVehicle('v1', nickname: 'Golf'),
+        testVehicle('v2', nickname: 'Passat'),
+      ],
+      archived: [testVehicle('v3', nickname: 'Yugo', archived: true)],
+      surface: desktopSurface,
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(GarageSidebar), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(PageHeader),
+        matching: find.widgetWithText(FilledButton, 'Add vehicle'),
+      ),
+      findsOneWidget,
+    );
   });
 }

@@ -23,6 +23,7 @@ import 'package:garage/domain/maintenance/bundling.dart';
 import 'package:garage/domain/maintenance/reminder_projection.dart';
 import 'package:garage/features/costs/providers/cost_providers.dart';
 import 'package:garage/features/dashboard/providers/dashboard_providers.dart';
+import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/core/widgets/skeleton.dart';
 import 'package:garage/features/dashboard/screens/dashboard_screen.dart';
@@ -1832,5 +1833,43 @@ void main() {
 
       expect(tester.takeException(), isNull);
     });
+  });
+
+  // A desk is the window's choice: the sidebar for the bar, and the +, which
+  // is the quick-add, as the top bar's Add (decision 200).
+  testWidgets('lays out on a desk: the sidebar, Add in the top bar, nothing '
+      'floating', (tester) async {
+    await pumpDashboard(
+      tester,
+      vehicles: [
+        testVehicle('v1', nickname: 'Golf'),
+        testVehicle('v2', nickname: 'Panda'),
+      ],
+      projections: [projection()],
+      timeline: [
+        TimelineItem(
+          entryId: 'f1',
+          kind: TimelineKind.fuel,
+          date: _today,
+          vehicleId: 'v1',
+          amount: 62,
+          createdBy: 'u1',
+        ),
+      ],
+      surface: desktopSurface,
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(GarageSidebar), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsNothing);
+    expect(find.byKey(const Key('dashboard-add')), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(PageHeader),
+        matching: find.byKey(const Key('top-bar-quick-add')),
+      ),
+      findsOneWidget,
+    );
   });
 }

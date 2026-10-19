@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:riverpod/misc.dart' show Override;
 import 'package:garage/core/clock.dart';
 import 'package:garage/core/errors/app_failure.dart';
+import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/garage_tab_bar.dart';
 import 'package:garage/core/widgets/async_value_view.dart';
 import 'package:garage/domain/entities/household.dart';
@@ -824,5 +825,36 @@ void main() {
 
       expect(find.byType(PopupMenuItem<String>), findsNothing);
     });
+  });
+
+  testWidgets('lays out on a desk, every tab: the sidebar, nothing floating', (
+    tester,
+  ) async {
+    await pumpConsole(
+      tester,
+      fleet: [window('a1', from: DateTime.utc(2026, 9, 1))],
+      surface: desktopSurface,
+    );
+
+    for (final tab in const [
+      'Drivers and cars',
+      'Deadlines',
+      'Incidents',
+      'Reimbursements',
+      'Accountant pack',
+      'Settings',
+    ]) {
+      await tester.tap(
+        find.descendant(
+          of: find.byType(GarageTabBar),
+          matching: find.text(tab),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull, reason: tab);
+      expect(find.byType(GarageSidebar), findsOneWidget, reason: tab);
+      expect(find.byType(FloatingActionButton), findsNothing, reason: tab);
+    }
   });
 }

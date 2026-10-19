@@ -424,7 +424,12 @@ Three ways to be modal, and no fourth (decision 175):
 `test/ci/modal_surfaces_test.dart:58` fails a bare `showModalBottomSheet`,
 `showDialog`, `AlertDialog` or `SimpleDialog` outside the helpers, and its
 allowance names the two exceptions and why: the password-recovery dialog, which
-lands before any screen exists, and the spinner over a running import.
+lands before any screen exists, and the spinner over a running import. A
+phone's own idioms are held the same way, each to the file that shows it on a
+phone and something else on a desk: `test/ci/desktop_idioms_test.dart` allows
+a bottom sheet in `adaptive.dart` alone, Material's date pickers in
+`date_pickers.dart` alone, and a floating button in `PrimaryAction` alone
+(decision 200).
 
 Three surfaces are known not to fit and are left for their own decisions:
 lending is a two-step flow in a sheet, the code box pops itself to push a
@@ -830,8 +835,8 @@ trip in the trip log. A click opens each, and its form deletes it.
 
 `test/core/widgets/selection_test.dart:182` copies pages and charts as the
 web build; each row's screen test drags a mouse across its figure
-(`test/features/fuel/fuel_log_screen_test.dart:190`,
-`test/features/vehicles/vehicle_detail_screen_test.dart:2623`,
+(`test/features/fuel/fuel_log_screen_test.dart:192`,
+`test/features/vehicles/vehicle_detail_screen_test.dart:2625`,
 `test/features/trips/trip_log_screen_test.dart:161`), aimed at the
 characters with `mouseDragAcross` (`test/support/selection.dart:14`).
 

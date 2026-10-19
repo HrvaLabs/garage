@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/clock.dart';
 import 'package:garage/core/widgets/adaptive.dart';
+import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/garage_tab_bar.dart';
 import 'package:garage/domain/entities/cost_entry.dart';
 import 'package:garage/domain/entities/fuel_entry.dart';
@@ -1050,6 +1051,53 @@ void main() {
 
       expect(find.byType(DateRangePickerDialog), findsOneWidget);
     });
+  });
+
+  testWidgets('lays out on a desk, every tab: the sidebar, nothing floating', (
+    tester,
+  ) async {
+    await pumpStats(
+      tester,
+      data: statsWith(
+        fuel: [fill('f1', 50000), fill('f2', 50500), fill('f3', 51000)],
+        costs: [
+          CostEntry(
+            id: 'c1',
+            vehicleId: 'v1',
+            date: DateTime.utc(2026, 5, 3),
+            category: CostCategories.insurance,
+            amount: 300,
+            createdBy: 'u1',
+          ),
+        ],
+        trips: [
+          TripEntry(
+            id: 't1',
+            vehicleId: 'v1',
+            date: DateTime.utc(2026, 5, 4),
+            distanceKm: 120,
+            purpose: TripPurpose.business,
+            createdBy: 'u1',
+          ),
+        ],
+      ),
+      surface: desktopSurface,
+    );
+    await tester.pumpAndSettle();
+
+    for (final tab in const ['Fill-ups', 'Costs', 'Distance', 'Trips']) {
+      await tester.tap(
+        find.descendant(
+          of: find.byType(GarageTabBar),
+          matching: find.text(tab),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull, reason: tab);
+      expect(find.byType(GarageSidebar), findsOneWidget, reason: tab);
+      expect(find.byType(FloatingActionButton), findsNothing, reason: tab);
+    }
   });
 }
 

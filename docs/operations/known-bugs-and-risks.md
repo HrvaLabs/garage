@@ -93,6 +93,14 @@ times out of five, so it is not the server's clock or timing: whatever the
 page sends on its first fetch after the form is what is refused. It has not
 been seen on a device and has not been investigated; it is worth one look,
 against the real project too, before a first sign-in on the web is trusted.
+Seen once more on 19 October 2026, probably in a quieter shape: the
+dashboard loaded, and the sidebar had no Company link for the garage's admin
+until a reload. That is what a refused membership read leaves: the startup
+fetch records and swallows it
+(`lib/features/household/data/supabase_garage_bootstrap_repository.dart:132`),
+and with no role read and none cached the role is `member`, to whom the
+console is not offered. The requests were not captured, so the refusal is
+inferred. A second sign-in after clearing the browser's storage had the link.
 
 ### A second handover on the same day is refused
 
@@ -546,7 +554,7 @@ projections resolved, for exactly that reason.
 
 **Attempted again, 4 September 2026, and not reproduced — with a reason worth
 writing down.** The dashboard's own harness cannot produce it: `pumpDashboard`
-(`test/features/dashboard/dashboard_screen_test.dart:104`) overrides
+(`test/features/dashboard/dashboard_screen_test.dart:105`) overrides
 `bundlesProvider`, `householdProjectionsProvider`, `allVehiclesProvider` and
 every provider they derive from, so the listeners fire against futures the test
 supplies and never against the real graph being invalidated mid-build. Any
@@ -664,7 +672,9 @@ again as the dialog opens because it reads its address through
 `GoRouterState.of`, which depends on the page's route and so hears it stop
 being the top. The barrier covers the arrow, so nothing can press it; what
 shows is the bar changing shape under the dialog. A menu or a popover is a
-route over the page too and should do the same; only the form was seen.
+route over the page too and does the same: on 19 October the arrow came under
+Statistics' Pick dates and under a tyre set's right-click menu, both on pages
+opened by their address.
 
 ### Vehicle page loose ends from its first critique
 
@@ -4809,7 +4819,7 @@ guest policy on `incidents`. But the card is on the Car tab, and a borrowed
 car's page has no tabs: since 8 September, before incidents existed, a car
 that is not in one of your garages opens the borrower's page, the briefing
 and what the pass allows (`lib/features/vehicles/screens/vehicle_detail_screen.dart:604`).
-`test/features/vehicles/vehicle_detail_screen_test.dart:624` looks for the
+`test/features/vehicles/vehicle_detail_screen_test.dart:626` looks for the
 button on a borrowed car, and the test after it finds it on the owner's.
 
 ### Moving to Flutter 3.47.7: five files rewritten, two first runs failed

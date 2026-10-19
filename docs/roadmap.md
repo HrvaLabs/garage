@@ -306,10 +306,12 @@ garages; a firm with branches runs several garages. *The paid lever is the
 car, on the garage*: a "Company" plan switches the module on and is priced per
 car per month, sold on the web with Stripe and never inside the app, so the
 stores take nothing and the promise of decision 155 holds (nothing ever gates
-reading, exporting or deleting). *The console is Flutter web first*, sized for
-a desk; because the database is the security boundary, a Vue console could
-replace it later without touching the backend, and will only if Flutter web
-disappoints at desk work.
+reading, exporting or deleting). *The console is the app*: the same Flutter
+codebase as the phone, made to read as a website on a desk, not a second
+client beside it (decided 20 September, decision 200). The database being the
+security boundary would have let another client in without touching the
+backend; it would also have been a second set of screens, and a second place
+for every bug to be fixed.
 
 **Stage 1 — the fleet month, no orders.** A `driver` role beside admin and
 member, enforced in the database the way guest passes are: `user_vehicle_ids()`
@@ -330,8 +332,8 @@ ledger and every receipt, per car, as one PDF and a ZIP. Per-driver exports.
 shell first, then Stage 2, then the rest of the web design. The console is no
 longer "Flutter web first, a Vue console later": decided 20 September, one
 codebase and a desktop layer for every screen in three plans (the design is
-in the gitignored specs directory; the decision log records it when Plan 1
-lands).
+in the gitignored specs directory). Plan 1 landed on 19 October 2026
+(decisions 188, 189, 198, 199 and 200).
 
 **Stage 2 — travel orders.** The legal *putni nalog*: numbered per garage and
 year, employee and position, destination and purpose, planned and actual
@@ -352,8 +354,8 @@ handover notifications; Stripe billing with a 30-day trial.
 policy and two tests per table a driver may reach — plus employee data under
 the GDPR: the policy has to say what an admin sees, and companies need a
 data-processing agreement, a lawyer's document that blocks the plan's launch,
-not Stage 1's code. Foreign multi-country trips, telematics import and the
-Vue console stay out until a company asks.
+not Stage 1's code. Foreign multi-country trips and telematics import stay
+out until a company asks.
 
 ---
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/widgets/adaptive.dart';
+import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/domain/entities/cost_entry.dart';
 import 'package:garage/features/household/data/household_repository.dart';
 import 'package:garage/features/household/providers/member_providers.dart';
@@ -748,5 +749,32 @@ void main() {
       ),
     );
     expect(search.focusNode.hasPrimaryFocus, isTrue);
+  });
+
+  testWidgets('lays out on a desk: the sidebar, nothing floating', (
+    tester,
+  ) async {
+    await pumpTimeline(
+      tester,
+      items: [
+        item(kind: TimelineKind.fuel, entryId: 'f1'),
+        item(
+          kind: TimelineKind.service,
+          entryId: 's1',
+          serviceTypeKeys: const ['service_oil_change'],
+        ),
+        item(
+          kind: TimelineKind.cost,
+          entryId: 'c1',
+          costCategory: CostCategories.insurance,
+        ),
+      ],
+      surface: desktopSurface,
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(GarageSidebar), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsNothing);
   });
 }

@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/format/unit_format.dart';
 import 'package:garage/core/theme/garage_tokens.dart';
 import 'package:garage/core/widgets/adaptive.dart';
+import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/domain/account/account_identity.dart';
 import 'package:garage/domain/entities/fuel_entry.dart';
@@ -21,7 +22,8 @@ import 'package:garage/l10n/app_localizations.dart';
 
 import '../../support/browser.dart';
 import '../../support/floating_button.dart';
-import '../../support/pump_screen.dart' show desktopSurface, pumpScreen;
+import '../../support/pump_screen.dart'
+    show desktopSurface, pumpDesktop, pumpScreen;
 import '../../support/selection.dart';
 
 FuelEntry fill({
@@ -528,5 +530,40 @@ void main() {
       final rowY = tester.getTopLeft(find.byKey(const ValueKey('f1'))).dy;
       expect(headerY, lessThan(rowY));
     });
+  });
+
+  // [pumpFuelLog] mounts a bare MaterialApp, which has no sidebar or top bar
+  // to check: the desk's case is pumped in the app's own frame.
+  testWidgets('lays out on a desk: the sidebar, Log a fill-up in the top '
+      'bar, nothing floating', (tester) async {
+    await pumpDesktop(
+      tester,
+      const FuelLogScreen(vehicleId: 'v1'),
+      initialLocation: '/vehicles/v1/fuel',
+      vehicles: [car()],
+      overrides: [
+        rawFuelEntriesProvider('v1').overrideWith(
+          (ref) async => [
+            fill(id: 'f1', odometerKm: 50310),
+            fill(id: 'f2', odometerKm: 51140, station: 'INA'),
+          ],
+        ),
+        entriesWithAttachmentsProvider.overrideWith(
+          (ref) async => const <String>{},
+        ),
+      ],
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(GarageSidebar), findsOneWidget);
+    expect(find.byType(FloatingActionButton), findsNothing);
+    expect(
+      find.descendant(
+        of: find.byType(PageHeader),
+        matching: find.widgetWithText(FilledButton, 'Log a fill-up'),
+      ),
+      findsOneWidget,
+    );
   });
 }

@@ -7974,3 +7974,88 @@ suggestions from the browser, nor anything else the browser's own menu
 offered there; Flutter's cut, copy and paste take its place. *Cost:* for a
 beat, at a desk's first frame in a browser and as a window widens across the
 line, a page's content pane is empty, until the browser answers.
+
+## 200. One codebase for the web, and the guard that holds it
+
+**19 October 2026, the owner's decision of 20 September.** The company
+console looked "like a tablet view, not web", and the roadmap offered a way
+out: a Vue console, which the database being the security boundary would
+have let in without touching the backend. That is withdrawn. The web stays
+the same Flutter codebase as the phone, made to read as a website on a desk,
+and the console is one of its pages. Decisions 188, 189, 198 and 199 built
+it: a first load that is quick, the desktop shell, and the web's idioms. This
+records what holds now that they are in, and what holds it.
+
+**What holds.** The web's idioms are the web build's. Every page the router
+shows, and every tab, has an address that opens it, and the browser's tab is
+named after the page, at every width, a phone's browser being a browser too.
+At a wide window in a browser a page's text can be selected, the browser's
+own right-click menu gives way to the app's, and a link in the sidebar or a
+crumb opens in a new tab on a middle click. The shell and its density follow
+`GarageBreakpoints.isWide`, 900 pixels wide and 600 on the short side, not
+the platform: a tablet held sideways gets the sidebar, the top bar, the
+popovers, the typed dates, the keys and the right-click menus, as a desk
+does. A phone's layouts did not change, nor did its code path beyond what
+decision 199 names (a tab opened from its address, presses recorded that
+nothing reads, a right-click region with nothing to do). The 45 screen tests
+that pump a phone's window in Croatian read word for word as they did before
+the desktop work began; the harness now draws the app's frame around them.
+
+**The guard.** `test/ci/desktop_idioms_test.dart` holds each phone idiom to
+the one file that adapts it, the way `test/ci/modal_surfaces_test.dart`
+holds the modal helpers: a `FloatingActionButton` and the scaffold's
+floating slot to `PrimaryAction` and the two scaffolds, the bottom bar to the
+tab scaffold, a bottom sheet to `adaptive.dart`, Material's date and time
+pickers to `date_pickers.dart`, `SnackBarBehavior` to `window_snackbars.dart`;
+and nowhere a snackbar given its own width, margin or behaviour, an ink
+splash picked by hand, or a `NavigationRail`. Each was broken once and seen
+to fail. It reads the source with the comments taken out and the strings
+kept, so a `//` inside a string, a URL's, hides nothing after it on the
+line, as stripping everything after `//` would have. It holds what is
+written, not what is drawn: a button floated by hand in a `Stack` passes it.
+
+What is drawn is held by a desk's layout test on eight screens, at 1440 by
+900 in the app's frame: the dashboard, the timeline, vehicles, the planner,
+the fuel log, a car's page on every tab, the console on every tab and
+statistics on every tab. Each finds the sidebar, nothing floating and no
+overflow, a page's own act in its top bar and a tab's act outside it. The
+fuel log's act and Vehicles' are found by their label, having no key: a key
+given to a `PrimaryAction` reaches the phone's floating button too, which a
+phone's test holds to the button the screen used to build, key and all. The
+fuel log's own helper builds a bare `MaterialApp`, which has no frame to
+check, so its case is pumped through `pumpDesktop`.
+
+**Looked at in Chrome**, signed in against the local stack, at 1440 by 900
+and at 1024 by 768, where the sidebar is icons: the dashboard, the timeline,
+vehicles, a car on every tab and its tyres, the planner, the garage, the
+console on every tab, statistics on every tab, trips, stations and settings,
+and a driver's dashboard and car. No overflow, no floating button, no bottom
+sheet and no Material date dialog. The timeline's filter, a form's car and
+its date opened beside the click; `/`, `n` and `?` did what they say; a tyre
+set's right-click opened its menu, and `n` under it opened nothing. Two
+things the look found are in known-bugs: the first sign-in once drew the
+admin's sidebar without the console, and the back arrow that grows under a
+dialog grows under a popover and a menu too.
+
+**Open.** What reads wrong at a desk is not done yet:
+
+- Lists are not tables yet. The timeline, trips, and the console's
+  deadlines, incidents and accountant pack are a phone's rows at a desk's
+  width, and a row's button can sit on a line of its own under the row at
+  the pane's far edge, away from the text it acts on: the accountant pack's
+  Remind driver and the Costs tab's Photo now.
+- Forms are still a phone's. The console's company details run their fields
+  and Save across the pane, 1,167 pixels of it at 1440; the Upkeep tab's Add
+  reminder is a filled button as wide as the pane; the Costs tab ends in a
+  footer of Add cost and Add income, and the tyres page in Add a set. An
+  entry form is a phone's form, one field under another, in a dialog a
+  form's width (decision 175).
+- Enter does not save an entry form, and in a browser the arrows scroll the
+  page rather than move between rows: those keys wait for the forms and the
+  tables.
+- At 1024 pixels the planner's List and Calendar switch spans the pane.
+
+*What it cost:* a second presentation of every part of the shell to keep
+working, desk tests beside the phone's, and a guard that has to be told of a
+new adaptive file. *What it did not:* a second client, a second set of
+screens, or a second place for a bug to be fixed.

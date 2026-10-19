@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:garage/core/errors/app_failure.dart';
 import 'package:garage/core/widgets/adaptive.dart';
+import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/garage_tab_bar.dart';
+import 'package:garage/core/widgets/page_header.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/domain/entities/cost_entry.dart';
 import 'package:garage/domain/entities/fuel_entry.dart';
@@ -847,7 +849,7 @@ void main() {
         greaterThan(GarageBreakpoints.contentMaxWidth),
         reason: 'the strip was capped at the reading column',
       );
-      // Everything but the navigation rail and its divider.
+      // Everything but the sidebar.
       expect(strip, greaterThan(1400 - 300));
     });
 
@@ -2694,5 +2696,49 @@ void main() {
         );
       }
     });
+  });
+
+  // A tab's own act is the tab's, so on a desk it sits above the tab's
+  // content rather than in the page's top bar (decision 198).
+  testWidgets('lays out on a desk, every tab: the sidebar, each tab\'s act '
+      'above it, nothing floating', (tester) async {
+    await pumpDetail(
+      tester,
+      fuel: [fill('f1', 50000), fill('f2', 50500)],
+      services: [service()],
+      costs: [cost()],
+      projections: [projection()],
+      surface: desktopSurface,
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byType(PageHeader), findsOneWidget);
+    for (final (tab, act) in const [
+      ('Fuel', 'log-fuel'),
+      ('Upkeep', 'log-service'),
+      ('Car', null),
+      ('Costs', null),
+    ]) {
+      await tester.tap(
+        find.descendant(
+          of: find.byType(GarageTabBar),
+          matching: find.text(tab),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull, reason: tab);
+      expect(find.byType(GarageSidebar), findsOneWidget, reason: tab);
+      expect(find.byType(FloatingActionButton), findsNothing, reason: tab);
+      if (act != null) {
+        final button = find.byKey(Key(act));
+        expect(tester.widget(button), isA<FilledButton>(), reason: tab);
+        expect(
+          find.descendant(of: find.byType(PageHeader), matching: button),
+          findsNothing,
+          reason: tab,
+        );
+      }
+    }
   });
 }
