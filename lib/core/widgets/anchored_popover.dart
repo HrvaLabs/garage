@@ -22,7 +22,8 @@ import 'pointer_anchor.dart';
 ///   ([PopoverStandIn]): a key that opens the quick-add has no control of
 ///   its own, and the top bar's Add is the one that means the same;
 /// - the focused control, as when Enter pressed it, though not a focus that
-///   is the page's own;
+///   is the page's own, nor one Tab passes over, as the page's text is after
+///   a click on it;
 /// - nothing, and then it is centred over the page's content pane
 ///   ([PopoverPane]), or the window's middle when the page has none.
 Future<T?> showAnchoredPopover<T>(
@@ -161,7 +162,7 @@ Rect? _anchor(RenderBox overlay, Object? standIn) {
     return control;
   }
   final focused = FocusManager.instance.primaryFocus;
-  if (focused == null || focused is FocusScopeNode) {
+  if (focused == null || focused is FocusScopeNode || focused.skipTraversal) {
     return null;
   }
   final rect = focused.context == null
@@ -170,7 +171,10 @@ Rect? _anchor(RenderBox overlay, Object? standIn) {
   // A control, not what holds the keys for a whole page: the route's own
   // scope is skipped above, and a focus around a page is as tall as it.
   // Hung from either one's corner, a popover would sit in the window's bottom
-  // left corner, over the sidebar.
+  // left corner, over the sidebar. A focus Tab passes over is skipped above
+  // too, as no key reached it: a desk page's text, which a click on it
+  // focuses (`SelectablePage`), is as short as a control when there is
+  // little of it.
   return rect != null && rect.height <= overlay.size.height / 2 ? rect : null;
 }
 

@@ -92,98 +92,102 @@ class EconomyChart extends StatelessWidget {
       height: 220,
       child: Padding(
         padding: const EdgeInsets.all(GarageTokens.space4),
-        child: LineChart(
-          LineChartData(
-            minX: minX,
-            maxX: maxX,
-            minY: minY,
-            maxY: maxY,
-            lineTouchData: LineTouchData(
-              touchTooltipData: LineTouchTooltipData(
-                getTooltipColor: (_) => tokens.surface,
-                getTooltipItems: (spots) => [
-                  for (final spot in spots)
-                    LineTooltipItem(
-                      formatEconomy(spot.y),
-                      GarageTheme.numeric(
-                        Theme.of(context).textTheme.labelMedium!,
-                      ).copyWith(color: tokens.accent),
-                    ),
-                ],
-              ),
-            ),
-            gridData: FlGridData(
-              show: true,
-              getDrawingHorizontalLine: (_) =>
-                  FlLine(color: tokens.border, strokeWidth: 1),
-              getDrawingVerticalLine: (_) =>
-                  FlLine(color: tokens.border, strokeWidth: 1),
-            ),
-            borderData: FlBorderData(
-              show: true,
-              border: Border.all(color: tokens.border),
-            ),
-            titlesData: FlTitlesData(
-              topTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              rightTitles: const AxisTitles(
-                sideTitles: SideTitles(showTitles: false),
-              ),
-              leftTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 44,
-                  interval: yInterval,
-                  // One decimal, in the household's own numerals. Through
-                  // SideTitleWidget so the lowest label is not clipped by
-                  // the axis it sits on.
-                  getTitlesWidget: (value, meta) {
-                    // fl_chart labels both ends of the scale as well as every
-                    // multiple of the interval, and the multiples are counted
-                    // from zero rather than from the bottom of the scale — so
-                    // a tick can land a fraction above the minimum and print
-                    // on top of it. Seen on a device as "5.2" over "5.1".
-                    if (_crowded(value, minY, maxY, yInterval)) {
-                      return const SizedBox.shrink();
-                    }
-                    return SideTitleWidget(
-                      meta: meta,
-                      child: Text(yFormat.format(value), style: axisStyle),
-                    );
-                  },
+        // The plot is a drawing, its labels places on it: a desk selecting
+        // the page leaves it out (decision 199).
+        child: SelectionContainer.disabled(
+          child: LineChart(
+            LineChartData(
+              minX: minX,
+              maxX: maxX,
+              minY: minY,
+              maxY: maxY,
+              lineTouchData: LineTouchData(
+                touchTooltipData: LineTouchTooltipData(
+                  getTooltipColor: (_) => tokens.surface,
+                  getTooltipItems: (spots) => [
+                    for (final spot in spots)
+                      LineTooltipItem(
+                        formatEconomy(spot.y),
+                        GarageTheme.numeric(
+                          Theme.of(context).textTheme.labelMedium!,
+                        ).copyWith(color: tokens.accent),
+                      ),
+                  ],
                 ),
               ),
-              bottomTitles: AxisTitles(
-                sideTitles: SideTitles(
-                  showTitles: true,
-                  reservedSize: 28,
-                  interval: xInterval,
-                  // The reading itself: in thousands, three fills a fortnight
-                  // apart all printed "121".
-                  getTitlesWidget: (value, meta) {
-                    // The same crowding as the scale above: "43,245" printed
-                    // over "44,011.364" on a device.
-                    if (_crowded(value, minX, maxX, xInterval)) {
-                      return const SizedBox.shrink();
-                    }
-                    return SideTitleWidget(
-                      meta: meta,
-                      child: Text(xFormat.format(value), style: axisStyle),
-                    );
-                  },
+              gridData: FlGridData(
+                show: true,
+                getDrawingHorizontalLine: (_) =>
+                    FlLine(color: tokens.border, strokeWidth: 1),
+                getDrawingVerticalLine: (_) =>
+                    FlLine(color: tokens.border, strokeWidth: 1),
+              ),
+              borderData: FlBorderData(
+                show: true,
+                border: Border.all(color: tokens.border),
+              ),
+              titlesData: FlTitlesData(
+                topTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                rightTitles: const AxisTitles(
+                  sideTitles: SideTitles(showTitles: false),
+                ),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 44,
+                    interval: yInterval,
+                    // One decimal, in the household's own numerals. Through
+                    // SideTitleWidget so the lowest label is not clipped by
+                    // the axis it sits on.
+                    getTitlesWidget: (value, meta) {
+                      // fl_chart labels both ends of the scale as well as every
+                      // multiple of the interval, and the multiples are counted
+                      // from zero rather than from the bottom of the scale — so
+                      // a tick can land a fraction above the minimum and print
+                      // on top of it. Seen on a device as "5.2" over "5.1".
+                      if (_crowded(value, minY, maxY, yInterval)) {
+                        return const SizedBox.shrink();
+                      }
+                      return SideTitleWidget(
+                        meta: meta,
+                        child: Text(yFormat.format(value), style: axisStyle),
+                      );
+                    },
+                  ),
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 28,
+                    interval: xInterval,
+                    // The reading itself: in thousands, three fills a fortnight
+                    // apart all printed "121".
+                    getTitlesWidget: (value, meta) {
+                      // The same crowding as the scale above: "43,245" printed
+                      // over "44,011.364" on a device.
+                      if (_crowded(value, minX, maxX, xInterval)) {
+                        return const SizedBox.shrink();
+                      }
+                      return SideTitleWidget(
+                        meta: meta,
+                        child: Text(xFormat.format(value), style: axisStyle),
+                      );
+                    },
+                  ),
                 ),
               ),
+              lineBarsData: [
+                LineChartBarData(
+                  spots: spots,
+                  isCurved: false,
+                  color: tokens.accent,
+                  barWidth: 2,
+                  dotData: const FlDotData(show: true),
+                ),
+              ],
             ),
-            lineBarsData: [
-              LineChartBarData(
-                spots: spots,
-                isCurved: false,
-                color: tokens.accent,
-                barWidth: 2,
-                dotData: const FlDotData(show: true),
-              ),
-            ],
           ),
         ),
       ),

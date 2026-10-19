@@ -11,6 +11,7 @@ import 'garage_sidebar.dart';
 import 'page_header.dart';
 import 'page_title.dart';
 import 'primary_action.dart';
+import 'selectable_page.dart';
 import 'stale_reads_banner.dart';
 
 /// The app's primary sections. Shared so every top-level screen presents the
@@ -167,7 +168,10 @@ class GarageTabScaffold extends StatelessWidget {
             // one above the sidebar. A tab is a section: no crumbs.
             child: PopoverPane(
               child: title == null
-                  ? AdaptiveContent(width: contentWidth, child: content)
+                  ? AdaptiveContent(
+                      width: contentWidth,
+                      child: SelectablePage(child: content),
+                    )
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
@@ -187,7 +191,7 @@ class GarageTabScaffold extends StatelessWidget {
                         Expanded(
                           child: AdaptiveContent(
                             width: contentWidth,
-                            child: content,
+                            child: SelectablePage(child: content),
                           ),
                         ),
                       ],

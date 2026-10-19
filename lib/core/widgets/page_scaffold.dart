@@ -13,6 +13,7 @@ import 'garage_sidebar.dart';
 import 'page_header.dart';
 import 'page_title.dart';
 import 'primary_action.dart';
+import 'selectable_page.dart';
 import 'stale_reads_banner.dart';
 
 /// Scaffold for a screen that was pushed onto another, the counterpart to
@@ -140,7 +141,10 @@ class GaragePageScaffold extends ConsumerWidget {
                   // stopped short of both sides.
                   ?bottom,
                   Expanded(
-                    child: AdaptiveContent(width: contentWidth, child: content),
+                    child: AdaptiveContent(
+                      width: contentWidth,
+                      child: SelectablePage(child: content),
+                    ),
                   ),
                 ],
               ),

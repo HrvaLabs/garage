@@ -1397,7 +1397,7 @@ class _ServiceHistoryRow extends ConsumerWidget {
 
     return Dismissible(
       key: ValueKey(entry.id),
-      direction: DismissDirection.endToStart,
+      direction: deleteSwipeDirection(context),
       background: const DeleteSwipeBackground(),
       confirmDismiss: (_) => confirmDelete(context),
       onDismissed: (_) => deleteSwipedEntry(
@@ -1458,7 +1458,7 @@ class _ReadingHistoryRow extends ConsumerWidget {
 
     return Dismissible(
       key: ValueKey(entry.id),
-      direction: DismissDirection.endToStart,
+      direction: deleteSwipeDirection(context),
       background: const DeleteSwipeBackground(),
       confirmDismiss: (_) => confirmDelete(context),
       onDismissed: (_) => deleteSwipedEntry(
@@ -1673,7 +1673,7 @@ class _CostMoneyRow extends ConsumerWidget {
 
     return Dismissible(
       key: ValueKey(entry.id),
-      direction: DismissDirection.endToStart,
+      direction: deleteSwipeDirection(context),
       background: const DeleteSwipeBackground(),
       confirmDismiss: (_) => confirmDelete(context),
       onDismissed: (_) => deleteSwipedEntry(
@@ -1725,7 +1725,7 @@ class _IncomeMoneyRow extends ConsumerWidget {
 
     return Dismissible(
       key: ValueKey(entry.id),
-      direction: DismissDirection.endToStart,
+      direction: deleteSwipeDirection(context),
       background: const DeleteSwipeBackground(),
       confirmDismiss: (_) => confirmDelete(context),
       onDismissed: (_) => deleteSwipedEntry(

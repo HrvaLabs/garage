@@ -21,7 +21,7 @@ On a wide window the tabs lead a sidebar instead, `GarageSidebar` (see
 [The desktop sidebar](#the-desktop-sidebar)); a pushed screen keeps the sidebar
 rather than swapping it for a back button, because a browser window that loses
 its navigation on every push leaves the back button as the only way out
-(`lib/core/widgets/page_scaffold.dart:90`). The page's title moves from an app
+(`lib/core/widgets/page_scaffold.dart:91`). The page's title moves from an app
 bar into a top bar across the content pane, with a breadcrumb (see
 [The top bar](#the-top-bar)).
 
@@ -102,7 +102,7 @@ screen. The console is a pushed page with its own tab strip, not a sixth tab:
 Material caps the bar at five, and the fleet is one thing, however many views
 it has. A driver's Vehicles tab is titled "My cars" on its own page
 (`lib/features/vehicles/screens/vehicles_screen.dart:96`) and labelled "Cars"
-in the bar (`lib/core/widgets/garage_bottom_nav.dart:62`) and the sidebar
+in the bar (`lib/core/widgets/garage_bottom_nav.dart:63`) and the sidebar
 (`lib/core/widgets/garage_sidebar.dart:85`): the bar takes one-word labels by
 test, so the tab could not carry the title's two words, and the owner chose the
 word (decision 194).
@@ -433,16 +433,16 @@ route, and merging garages is a screen that holds a picker and a confirmation.
 ## A choice on a desk
 
 On a wide window `showAdaptiveChoice` opens a popover, `showAnchoredPopover`
-(`lib/core/widgets/anchored_popover.dart:28`): a card pushed on the root
+(`lib/core/widgets/anchored_popover.dart:29`): a card pushed on the root
 navigator, as a menu is, below and to the right of where it was asked for,
 above that when there is no room below, and ending where that does when there
-is no room to its right (`lib/core/widgets/anchored_popover.dart:295`),
+is no room to its right (`lib/core/widgets/anchored_popover.dart:299`),
 always a margin inside the window
-(`lib/core/widgets/anchored_popover.dart:306`). A click outside it or Escape
+(`lib/core/widgets/anchored_popover.dart:310`). A click outside it or Escape
 puts it away with nothing picked. A screen reader is taken into it and told
 it opened by the name Material's own menus give, "Popup menu", except on
 Apple's systems, where those give none either
-(`lib/core/widgets/anchored_popover.dart:250`). The page under it stops being
+(`lib/core/widgets/anchored_popover.dart:254`). The page under it stops being
 the top while it is open and keeps its shape for that (`PageTitle`, below),
 so the choice reaches the control that asked (decision 199). `showPickOne`
 caps it at a menu's width, 360 pixels; the quick-add and the timeline's
@@ -456,12 +456,12 @@ Material's dialog for it: on a desk `showGarageDatePicker`
 with a field to type the date in and the calendar under it
 ([10](10-localization-and-units.md#a-date-is-typed-in-the-readers-own-order)).
 The card is kept inside the window but not scrolled
-(`lib/core/widgets/anchored_popover.dart:309`): a builder that can be taller
+(`lib/core/widgets/anchored_popover.dart:313`): a builder that can be taller
 than the room left scrolls itself, as the date's does at large text on the
 smallest tablet held sideways (`lib/core/widgets/date_pickers.dart:311`).
 
 Where it hangs from is settled as it opens
-(`lib/core/widgets/anchored_popover.dart:148`), the first of:
+(`lib/core/widgets/anchored_popover.dart:149`), the first of:
 
 1. **The last press**, which `PointerAnchor`
    (`lib/core/widgets/pointer_anchor.dart:16`) keeps from a pointer route the
@@ -470,7 +470,7 @@ Where it hangs from is settled as it opens
    control was. A press on the control that stands for the choice (step 2)
    hangs it from that control instead, below it, as a menu button's menu
    opens: hung from the press inside it, the card covered the button's lower
-   half (`lib/core/widgets/anchored_popover.dart:155`). A key the web build
+   half (`lib/core/widgets/anchored_popover.dart:156`). A key the web build
    makes up, for a modifier it finds held on a pointer event, does not count
    (`lib/core/widgets/pointer_anchor.dart:46`). Nor, on the web with the
    accessibility layer on, does the press
@@ -478,7 +478,7 @@ Where it hangs from is settled as it opens
    then reaches the app as an accessibility tap, the press kept back, so the
    last press passed on is some other one.
 2. **The control that stands for what it offers**, a `PopoverStandIn`
-   (`lib/core/widgets/anchored_popover.dart:55`) given the same action as the
+   (`lib/core/widgets/anchored_popover.dart:56`) given the same action as the
    choice's `standIn`. The top bar's Add stands for `showQuickAdd`
    (`lib/features/dashboard/widgets/quick_add_button.dart:29`), so the
    quick-add hangs from Add whether Add was pressed or a key opened it, and
@@ -487,19 +487,23 @@ Where it hangs from is settled as it opens
 3. **The focused control**, unless what has the focus is the page itself:
    the route's scope, or a focus around a page that holds its keys, as tall
    as the page. A control is no taller than half the window
-   (`lib/core/widgets/anchored_popover.dart:174`); hung from a page's corner,
+   (`lib/core/widgets/anchored_popover.dart:178`); hung from a page's corner,
    a popover would sit in the window's bottom left corner, over the sidebar.
+   A focus Tab passes over is no control either
+   (`lib/core/widgets/anchored_popover.dart:165`), as no key reached it: a
+   desk page's text after a click on it, as short as a control when there is
+   little of it.
 4. **Nothing**, and then it is centred over the page's content pane, the
-   `PopoverPane` (`lib/core/widgets/anchored_popover.dart:90`) both scaffolds
-   put beside the sidebar (`lib/core/widgets/page_scaffold.dart:99`,
-   `lib/core/widgets/garage_bottom_nav.dart:168`). On a page without one, or
+   `PopoverPane` (`lib/core/widgets/anchored_popover.dart:91`) both scaffolds
+   put beside the sidebar (`lib/core/widgets/page_scaffold.dart:100`,
+   `lib/core/widgets/garage_bottom_nav.dart:169`). On a page without one, or
    from a dialog, which sits in the middle itself, it is centred in the
    window.
 
 A stand-in and a pane count only on the page on top. Every page under it
 stays built, top bar and all, so each remembers its route
-(`lib/core/widgets/anchored_popover.dart:126`) and is found while that route
-is current (`lib/core/widgets/anchored_popover.dart:130`). The pointer route
+(`lib/core/widgets/anchored_popover.dart:127`) and is found while that route
+is current (`lib/core/widgets/anchored_popover.dart:131`). The pointer route
 records presses at every width and on Android too; only a popover reads
 them, and a phone has none. The keyboard's handler is put back whenever a
 frame starts (`lib/core/widgets/pointer_anchor.dart:32`): a widget test drops
@@ -611,8 +615,8 @@ into each other.
 
 On a wide window a page names itself in a top bar, `PageHeader`
 (`lib/core/widgets/page_header.dart:125`), where a phone has its app bar. Both
-scaffolds draw it (`lib/core/widgets/page_scaffold.dart:105`,
-`lib/core/widgets/garage_bottom_nav.dart:174`) across the content pane beside
+scaffolds draw it (`lib/core/widgets/page_scaffold.dart:106`,
+`lib/core/widgets/garage_bottom_nav.dart:178`) across the content pane beside
 the sidebar, above a rule; the content keeps its own column under it. The
 title used to be a heading held to that column, with the page's actions at the
 column's end. The bar belongs to the page, not to its text, as a tab strip
@@ -658,7 +662,7 @@ one: Vehicles, Garage (`/household`), Company and API access (`/api-access`). A 
 pages, `/vehicles/<id>/fuel` and the rest, name Vehicles and then the car; the
 car's own page names only Vehicles, its title being the car, and a new car is
 not a car. The car's name is `vehicleProvider`'s, which the scaffold reads
-(`lib/core/widgets/page_scaffold.dart:114`); until there is one, while the car
+(`lib/core/widgets/page_scaffold.dart:115`); until there is one, while the car
 loads or for a car the startup fetch does not know, the crumbs stop at
 Vehicles rather than read "Vehicles › Vehicles". A driver's Vehicles reads
 "Cars", as the sidebar's link does (decision 194). A tab, any other section,
@@ -739,8 +743,8 @@ or under, such an address.
 **The browser's tab** is named after the page on top, "Statistics · Garage",
 by `PageTitle` (`lib/core/widgets/page_title.dart:20`); the garage's own
 screen, called what the app is called, is named once. Both scaffolds wrap
-their page in it (`lib/core/widgets/page_scaffold.dart:67`,
-`lib/core/widgets/garage_bottom_nav.dart:136`), and a screen outside them wraps
+their page in it (`lib/core/widgets/page_scaffold.dart:68`,
+`lib/core/widgets/garage_bottom_nav.dart:137`), and a screen outside them wraps
 itself; `test/ci/page_addresses_test.dart:31` fails one that does neither. A
 page says its name when it comes on top (`lib/core/widgets/page_title.dart:56`),
 so closing Calculator over Statistics names Statistics again, and a page
@@ -750,3 +754,67 @@ wrapper that came and went with that would build the page again under every
 menu, losing the menu's choice. The name goes with the colour the app's own
 title gives the window (`lib/core/widgets/page_title.dart:74`), which the web
 paints its bar in. Off the web nothing is named.
+
+## Text a desk can select
+
+In a browser at a wide window a page's text can be selected and copied, as a
+web page's can (decision 199). Both scaffolds put `SelectablePage`
+(`lib/core/widgets/selectable_page.dart:20`) around a page's content under
+its top bar (`lib/core/widgets/page_scaffold.dart:146`, and
+`lib/core/widgets/garage_bottom_nav.dart:173` and
+`lib/core/widgets/garage_bottom_nav.dart:194` for a tab), so the sidebar,
+the bar and a tab strip stay controls and only the page is text. A mouse
+dragged across a figure selects it. A click on the page's text takes the
+keyboard, as a click in a browser does, and the system's keys select the
+page and copy it: ⌘A and ⌘C on a Mac, Ctrl elsewhere. Tab passes over the
+page, as over a web page, from the top bar to the page's first control: the
+focus a click gives the text is one traversal skips
+(`lib/core/widgets/selectable_page.dart:39`). A right-click opens the browser's
+own menu, whose Copy takes the selection the click landed in, or else the
+word under the pointer: the framework writes it into an invisible element
+under the page for the browser to copy from. What is copied runs one piece
+of text into the next with nothing between them, so a figure copies as
+itself and a page copied whole as one run of words, read in rows across its
+columns (open in known-bugs). The browser's own find does not reach the
+words: Flutter draws them, and a page loaded as usual has none of them in
+the document for it to search.
+
+It is the web's, and a wide window's. `SelectablePage.web`
+(`lib/core/widgets/selectable_page.dart:28`) is the web build, as
+`PageTitle.enabled` is, and the scaffolds' phone shapes have no selection. A
+tablet held sideways is wide too, and there, as on a phone and in a
+phone-sized browser, a long press stays the row's. The tour, signed out,
+keeps a phone's shape at every width and so has none. A window resized
+across 900 pixels already builds the page again in its other shape (open in
+known-bugs); the selection belongs to the desk's shape and is there or not by
+the build alone, so it adds nothing to that.
+
+A chart's plot leaves itself out. Each of the six puts
+`SelectionContainer.disabled` around its fl_chart widget
+(`lib/features/vehicles/widgets/economy_chart.dart:97`), whose `SideTitles`
+draw the axis labels; none of the six draws a label outside it. The labels
+are places on a drawing, and selected with the page they were copied between
+its sentences as a run of stray numbers,
+`7.36.96.66.36.05.850,00050,40050,600`. What a chart says around its plot is
+the page's and copies with it: a card's heading, a donut's legend with its
+amounts, the bars' key, the economy trend's guidance while there is no line
+to draw. A drag across the economy trend is still its readout, the chart
+taking the drag before the page's selection does; the other five draw no
+readout, and a drag across one of their plots selects none of it.
+
+A row swiped to delete does not swipe there. `deleteSwipeDirection`
+(`lib/core/widgets/confirm_delete.dart:183`) answers `none` wherever the
+row's text can be selected. A `Dismissible` takes a sideways drag from any
+pointer, a mouse's too, and a pixel sooner than the selection does, so a
+mouse dragged across a fill-up's amount pulled the row away instead of
+selecting the figure; and nothing in it tells a finger from a mouse, so a
+touch screen at a desk loses the swipe as well. Six rows: a fill-up in the
+fuel log; a service, a reading, a cost and an income on a car's page; and a
+trip in the trip log. A click opens each, and its form deletes it.
+
+`test/core/widgets/selection_test.dart:159` copies pages and charts as the
+web build; each row's screen test drags a mouse across its figure
+(`test/features/fuel/fuel_log_screen_test.dart:190`,
+`test/features/vehicles/vehicle_detail_screen_test.dart:2623`,
+`test/features/trips/trip_log_screen_test.dart:161`), aimed at the
+characters with `mouseDragAcross` (`test/support/selection.dart:14`).

@@ -132,60 +132,65 @@ class OdometerChart extends StatelessWidget {
             const SizedBox(height: GarageTokens.space3),
             SizedBox(
               height: 220,
-              child: LineChart(
-                LineChartData(
-                  minX: axis.minX,
-                  maxX: axis.maxX,
-                  minY: (lowest / interval).floorToDouble() * interval,
-                  maxY: (highest / interval).ceilToDouble() * interval,
-                  gridData: FlGridData(
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine: (_) =>
-                        FlLine(color: tokens.border, strokeWidth: 1),
-                  ),
-                  borderData: FlBorderData(show: false),
-                  lineTouchData: const LineTouchData(enabled: false),
-                  titlesData: FlTitlesData(
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
+              // The plot is a drawing, its labels places on it: a desk
+              // selecting the page leaves it out (decision 199).
+              child: SelectionContainer.disabled(
+                child: LineChart(
+                  LineChartData(
+                    minX: axis.minX,
+                    maxX: axis.maxX,
+                    minY: (lowest / interval).floorToDouble() * interval,
+                    maxY: (highest / interval).ceilToDouble() * interval,
+                    gridData: FlGridData(
+                      drawVerticalLine: false,
+                      getDrawingHorizontalLine: (_) =>
+                          FlLine(color: tokens.border, strokeWidth: 1),
                     ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 52,
-                        interval: interval,
-                        getTitlesWidget: (value, _) => Text(
-                          // Thousands, so a six-figure odometer does not eat
-                          // half the chart's width in axis labels.
-                          '${(value / 1000).toStringAsFixed(0)}k',
-                          style: axisStyle,
-                        ),
+                    borderData: FlBorderData(show: false),
+                    lineTouchData: const LineTouchData(enabled: false),
+                    titlesData: FlTitlesData(
+                      topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
                       ),
-                    ),
-                    bottomTitles: AxisTitles(sideTitles: bottomTitles),
-                  ),
-                  lineBarsData: [
-                    for (final line in series)
-                      LineChartBarData(
-                        spots: [
-                          for (final reading in line)
-                            FlSpot(x(reading.date), y(reading.km)),
-                        ],
-                        isCurved: false,
-                        barWidth: 2,
-                        color: tokens.muted,
-                        dotData: FlDotData(
-                          getDotPainter: (spot, _, _, _) => FlDotCirclePainter(
-                            radius: 3,
-                            color: tokens.accent,
-                            strokeWidth: 0,
+                      rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 52,
+                          interval: interval,
+                          getTitlesWidget: (value, _) => Text(
+                            // Thousands, so a six-figure odometer does not eat
+                            // half the chart's width in axis labels.
+                            '${(value / 1000).toStringAsFixed(0)}k',
+                            style: axisStyle,
                           ),
                         ),
                       ),
-                  ],
+                      bottomTitles: AxisTitles(sideTitles: bottomTitles),
+                    ),
+                    lineBarsData: [
+                      for (final line in series)
+                        LineChartBarData(
+                          spots: [
+                            for (final reading in line)
+                              FlSpot(x(reading.date), y(reading.km)),
+                          ],
+                          isCurved: false,
+                          barWidth: 2,
+                          color: tokens.muted,
+                          dotData: FlDotData(
+                            getDotPainter: (spot, _, _, _) =>
+                                FlDotCirclePainter(
+                                  radius: 3,
+                                  color: tokens.accent,
+                                  strokeWidth: 0,
+                                ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),

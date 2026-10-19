@@ -70,20 +70,24 @@ class SpendDonut extends StatelessWidget {
             const SizedBox(height: GarageTokens.space3),
             SizedBox(
               height: 180,
-              child: PieChart(
-                PieChartData(
-                  centerSpaceRadius: 48,
-                  sectionsSpace: 2,
-                  startDegreeOffset: -90,
-                  sections: [
-                    for (var i = 0; i < slices.length; i++)
-                      PieChartSectionData(
-                        value: slices[i].amount,
-                        color: palette[i % palette.length],
-                        showTitle: false,
-                        radius: 34,
-                      ),
-                  ],
+              // The ring is a drawing, and a desk selecting the page leaves
+              // it out; the legend under it is the page's (decision 199).
+              child: SelectionContainer.disabled(
+                child: PieChart(
+                  PieChartData(
+                    centerSpaceRadius: 48,
+                    sectionsSpace: 2,
+                    startDegreeOffset: -90,
+                    sections: [
+                      for (var i = 0; i < slices.length; i++)
+                        PieChartSectionData(
+                          value: slices[i].amount,
+                          color: palette[i % palette.length],
+                          showTitle: false,
+                          radius: 34,
+                        ),
+                    ],
+                  ),
                 ),
               ),
             ),

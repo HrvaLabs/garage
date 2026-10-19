@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -14,11 +15,14 @@ import 'package:garage/features/attachments/providers/attachment_providers.dart'
 import 'package:garage/features/fuel/providers/fuel_providers.dart';
 import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 import 'package:garage/features/fuel/screens/fuel_log_screen.dart';
+import 'package:garage/features/fuel/widgets/fuel_entry_sheet.dart';
 import 'package:garage/features/settings/providers/unit_providers.dart';
 import 'package:garage/l10n/app_localizations.dart';
 
+import '../../support/browser.dart';
 import '../../support/floating_button.dart';
-import '../../support/pump_screen.dart' show desktopSurface;
+import '../../support/pump_screen.dart' show desktopSurface, pumpScreen;
+import '../../support/selection.dart';
 
 FuelEntry fill({
   required String id,
@@ -181,6 +185,107 @@ void main() {
       findsOneWidget,
     );
     expect(find.byKey(const ValueKey('f1')), findsOneWidget);
+  });
+
+  group('swiping a fill-up away', () {
+    /// The log as the app draws it: in its frame, at [surface].
+    Future<void> pumpLogInFrame(WidgetTester tester, Size surface) async {
+      await pumpScreen(
+        tester,
+        const FuelLogScreen(vehicleId: 'v1'),
+        initialLocation: '/vehicles/v1/fuel',
+        surface: surface,
+        vehicles: [car()],
+        overrides: [
+          rawFuelEntriesProvider(
+            'v1',
+          ).overrideWith((ref) async => [fill(id: 'f1', odometerKm: 51140)]),
+          entriesWithAttachmentsProvider.overrideWith(
+            (ref) async => const <String>{},
+          ),
+        ],
+      );
+      await tester.pumpAndSettle();
+    }
+
+    /// Drags [kind] from the fill-up's amount most of the way across the
+    /// window, toward the row's start, as a finger deletes it on a phone.
+    Future<void> swipe(WidgetTester tester, PointerDeviceKind kind) async {
+      await tester.dragFrom(
+        tester.getCenter(find.textContaining('€67.27')),
+        const Offset(-500, 0),
+        kind: kind,
+      );
+      await tester.pumpAndSettle();
+    }
+
+    group('on a desk in a browser', () {
+      testWidgets('a mouse dragged across the amount selects it', (
+        tester,
+      ) async {
+        final browser = asTheWeb(tester);
+        await pumpLogInFrame(tester, desktopSurface);
+
+        await mouseDragAcross(tester, find.textContaining('€67.27'), '€67.27');
+        await copyWithKeyboard(tester);
+
+        expect(browser.copied, '€67.27');
+        expect(find.byKey(const ValueKey('f1')), findsOneWidget);
+      });
+
+      testWidgets('and never swipes the row away, however far it goes', (
+        tester,
+      ) async {
+        asTheWeb(tester);
+        await pumpLogInFrame(tester, desktopSurface);
+
+        await swipe(tester, PointerDeviceKind.mouse);
+
+        expect(find.text('Delete entry?'), findsNothing);
+      });
+
+      // Dismissible takes any pointer, and a mouse could not be kept off it
+      // without a finger's swipe going too.
+      testWidgets('nor does a finger: the row is opened and deleted there', (
+        tester,
+      ) async {
+        asTheWeb(tester);
+        await pumpLogInFrame(tester, desktopSurface);
+
+        await swipe(tester, PointerDeviceKind.touch);
+        expect(find.text('Delete entry?'), findsNothing);
+
+        await tester.tap(
+          find.textContaining('€67.27'),
+          kind: PointerDeviceKind.mouse,
+        );
+        await tester.pumpAndSettle();
+        expect(
+          find.descendant(
+            of: find.byType(FuelEntrySheet),
+            matching: find.text('Delete'),
+          ),
+          findsOneWidget,
+        );
+      });
+    });
+
+    testWidgets('a tablet held sideways still swipes it away', (tester) async {
+      await pumpLogInFrame(tester, desktopSurface);
+
+      await swipe(tester, PointerDeviceKind.touch);
+
+      expect(find.text('Delete entry?'), findsOneWidget);
+    });
+
+    testWidgets('and so does a phone, in a browser too', (tester) async {
+      asTheWeb(tester);
+      await pumpLogInFrame(tester, const Size(400, 900));
+
+      await swipe(tester, PointerDeviceKind.touch);
+
+      expect(find.text('Delete entry?'), findsOneWidget);
+    });
   });
 
   testWidgets('a phone logs a fill-up from the floating button', (

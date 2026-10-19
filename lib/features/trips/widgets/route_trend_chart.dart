@@ -36,64 +36,68 @@ class RouteTrendChart extends StatelessWidget {
 
     return SizedBox(
       height: 200,
-      child: BarChart(
-        BarChartData(
-          // From zero, not from the lowest bucket. A trend drawn on a cropped
-          // axis makes four minutes look like a catastrophe, and this chart
-          // exists to answer whether a change is real.
-          minY: 0,
-          maxY: ceiling * 1.15,
-          gridData: FlGridData(
-            drawVerticalLine: false,
-            horizontalInterval: step,
-            getDrawingHorizontalLine: (_) =>
-                FlLine(color: tokens.border, strokeWidth: 1),
-          ),
-          borderData: FlBorderData(show: false),
-          barTouchData: const BarTouchData(enabled: false),
-          titlesData: FlTitlesData(
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
+      // The plot is a drawing, its labels places on it: a desk selecting
+      // the page leaves it out (decision 199).
+      child: SelectionContainer.disabled(
+        child: BarChart(
+          BarChartData(
+            // From zero, not from the lowest bucket. A trend drawn on a cropped
+            // axis makes four minutes look like a catastrophe, and this chart
+            // exists to answer whether a change is real.
+            minY: 0,
+            maxY: ceiling * 1.15,
+            gridData: FlGridData(
+              drawVerticalLine: false,
+              horizontalInterval: step,
+              getDrawingHorizontalLine: (_) =>
+                  FlLine(color: tokens.border, strokeWidth: 1),
             ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 34,
-                interval: step,
-                getTitlesWidget: (value, meta) {
-                  // The top tick often lands above the tallest box, where a
-                  // label is a number pointing at nothing.
-                  if (value > ceiling) {
-                    return const SizedBox.shrink();
-                  }
-                  return Text(value.toStringAsFixed(0), style: axisStyle);
-                },
+            borderData: FlBorderData(show: false),
+            barTouchData: const BarTouchData(enabled: false),
+            titlesData: FlTitlesData(
+              topTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 34,
+                  interval: step,
+                  getTitlesWidget: (value, meta) {
+                    // The top tick often lands above the tallest box, where a
+                    // label is a number pointing at nothing.
+                    if (value > ceiling) {
+                      return const SizedBox.shrink();
+                    }
+                    return Text(value.toStringAsFixed(0), style: axisStyle);
+                  },
+                ),
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 28,
+                  getTitlesWidget: (value, _) {
+                    final index = value.toInt();
+                    if (index < 0 || index >= buckets.length) {
+                      return const SizedBox.shrink();
+                    }
+                    if (index % every != 0) {
+                      return const SizedBox.shrink();
+                    }
+                    return Text(buckets[index].label, style: axisStyle);
+                  },
+                ),
               ),
             ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 28,
-                getTitlesWidget: (value, _) {
-                  final index = value.toInt();
-                  if (index < 0 || index >= buckets.length) {
-                    return const SizedBox.shrink();
-                  }
-                  if (index % every != 0) {
-                    return const SizedBox.shrink();
-                  }
-                  return Text(buckets[index].label, style: axisStyle);
-                },
-              ),
-            ),
+            barGroups: [
+              for (var i = 0; i < buckets.length; i++)
+                BarChartGroupData(x: i, barRods: [_rod(buckets[i], tokens)]),
+            ],
           ),
-          barGroups: [
-            for (var i = 0; i < buckets.length; i++)
-              BarChartGroupData(x: i, barRods: [_rod(buckets[i], tokens)]),
-          ],
         ),
       ),
     );

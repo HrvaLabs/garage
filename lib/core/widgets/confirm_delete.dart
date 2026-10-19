@@ -171,3 +171,16 @@ Future<void> deleteSwipedEntry(
     refresh();
   }
 }
+
+/// Which way a row is swiped to delete it: toward its start, or not at all
+/// where its text can be selected, on a desk in a browser (decision 199).
+///
+/// A [Dismissible] takes a sideways drag from any pointer, a mouse's too,
+/// and a pixel sooner than the page's selection does, so a mouse dragged
+/// across a row's amount pulled the row away instead of selecting the figure.
+/// Nothing in it tells a finger from a mouse, so there the row does not swipe
+/// at all: a click opens it, and its form deletes it.
+DismissDirection deleteSwipeDirection(BuildContext context) =>
+    SelectionContainer.maybeOf(context) == null
+    ? DismissDirection.endToStart
+    : DismissDirection.none;

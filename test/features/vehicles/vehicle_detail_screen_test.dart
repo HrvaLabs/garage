@@ -7,6 +7,7 @@ import 'package:garage/core/widgets/garage_tab_bar.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/domain/entities/cost_entry.dart';
 import 'package:garage/domain/entities/fuel_entry.dart';
+import 'package:garage/domain/entities/income_entry.dart';
 import 'package:garage/domain/entities/service_entry.dart';
 import 'package:garage/domain/entities/vehicle.dart';
 import 'package:garage/domain/fuel/fuel_economy.dart';
@@ -14,6 +15,7 @@ import 'package:garage/domain/maintenance/reminder_projection.dart';
 import 'package:garage/features/costs/providers/cost_providers.dart';
 import 'package:garage/features/fuel/providers/fuel_providers.dart';
 import 'package:garage/features/fuel/widgets/fuel_entry_row.dart';
+import 'package:garage/features/income/providers/income_providers.dart';
 import 'package:garage/domain/entities/trip_draft.dart';
 import 'package:garage/features/trips/providers/trip_providers.dart';
 import 'package:garage/features/maintenance/providers/maintenance_providers.dart';
@@ -36,6 +38,7 @@ import '../../support/fake_attachments.dart';
 import '../../support/floating_button.dart';
 import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
+import '../../support/selection.dart';
 import 'package:garage/features/vehicles/data/vehicle_repository.dart';
 import 'package:garage/domain/entities/household.dart';
 import 'package:garage/domain/entities/odometer_entry.dart';
@@ -2613,5 +2616,83 @@ void main() {
       'upkeep',
       'fuel',
     ]);
+  });
+
+  // On a desk in a browser a mouse drag across a row selects its figure, and
+  // a Dismissible would have taken the drag first and pulled the row away.
+  group('a history row on a desk', () {
+    final reading = OdometerEntry(
+      id: 'o1',
+      vehicleId: 'v1',
+      date: DateTime.utc(2026, 4, 9),
+      odometerKm: 49500,
+      createdBy: 'u1',
+      notes: 'Tyre change',
+    );
+    final income = IncomeEntry(
+      id: 'i1',
+      vehicleId: 'v1',
+      date: DateTime.utc(2026, 6, 1),
+      category: IncomeCategories.ride,
+      amount: 25,
+      createdBy: 'u1',
+    );
+
+    Future<void> pumpHistory(WidgetTester tester) async {
+      await pumpDetail(
+        tester,
+        surface: desktopSurface,
+        services: [service()],
+        readings: [reading],
+        costs: [cost()],
+        overrides: [
+          incomeEntriesProvider('v1').overrideWith((ref) async => [income]),
+        ],
+      );
+      await tester.pumpAndSettle();
+    }
+
+    /// The row's own words, not the same figure in a card above the list.
+    Finder onARow(String words) => find.descendant(
+      of: find.byType(Dismissible),
+      matching: find.textContaining(words),
+    );
+
+    for (final (tab, words) in [
+      ('Upkeep', '€210.50'),
+      ('Upkeep', 'Tyre change'),
+      ('Costs', '€320.00'),
+      ('Costs', '€25.00'),
+    ]) {
+      testWidgets('in a browser has "$words" on $tab selected by a mouse, '
+          'not swiped away', (tester) async {
+        final browser = asTheWeb(tester);
+        await pumpHistory(tester);
+        await openTab(tester, tab);
+
+        await mouseDragAcross(tester, onARow(words), words);
+        await copyWithKeyboard(tester);
+
+        expect(browser.copied, words);
+        expect(find.text('Delete entry?'), findsNothing);
+      });
+    }
+
+    testWidgets('on a tablet held sideways is still swiped away', (
+      tester,
+    ) async {
+      await pumpHistory(tester);
+
+      for (final tab in ['Upkeep', 'Costs']) {
+        await openTab(tester, tab);
+        expect(
+          tester
+              .widgetList<Dismissible>(find.byType(Dismissible))
+              .map((row) => row.direction),
+          [DismissDirection.endToStart, DismissDirection.endToStart],
+          reason: tab,
+        );
+      }
+    });
   });
 }

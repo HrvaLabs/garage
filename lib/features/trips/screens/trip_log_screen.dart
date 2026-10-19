@@ -272,7 +272,7 @@ class _TripRow extends ConsumerWidget {
 
     return Dismissible(
       key: ValueKey(trip.id),
-      direction: DismissDirection.endToStart,
+      direction: deleteSwipeDirection(context),
       background: const DeleteSwipeBackground(),
       confirmDismiss: (_) => confirmDelete(context),
       onDismissed: (_) => deleteSwipedEntry(

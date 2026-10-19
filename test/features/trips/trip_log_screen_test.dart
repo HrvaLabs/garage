@@ -9,8 +9,10 @@ import 'package:garage/features/trips/providers/trip_providers.dart';
 import 'package:garage/features/trips/screens/trip_log_screen.dart';
 import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 
+import '../../support/browser.dart';
 import '../../support/floating_button.dart';
 import '../../support/pump_screen.dart';
+import '../../support/selection.dart';
 
 /// The fleet as the test can change it mid-session: a car can be transferred
 /// away or deleted by somebody else while this screen is open.
@@ -152,5 +154,37 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  // On a desk in a browser a mouse drag across a row selects its figure, and
+  // a Dismissible would have taken the drag first and pulled the row away.
+  group('a trip on a desk', () {
+    final distance = find.descendant(
+      of: find.byType(Dismissible),
+      matching: find.text('120 km'),
+    );
+
+    testWidgets('in a browser has its distance selected by a mouse, not '
+        'swiped away', (tester) async {
+      final browser = asTheWeb(tester);
+      await pumpTrips(tester, [trip('t1')], surface: desktopSurface);
+
+      await mouseDragAcross(tester, distance, '120 km');
+      await copyWithKeyboard(tester);
+
+      expect(browser.copied, '120 km');
+      expect(find.text('Delete entry?'), findsNothing);
+    });
+
+    testWidgets('on a tablet held sideways is still swiped away', (
+      tester,
+    ) async {
+      await pumpTrips(tester, [trip('t1')], surface: desktopSurface);
+
+      expect(
+        tester.widget<Dismissible>(find.byType(Dismissible)).direction,
+        DismissDirection.endToStart,
+      );
+    });
   });
 }

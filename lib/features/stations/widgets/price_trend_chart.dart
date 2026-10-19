@@ -45,91 +45,95 @@ class PriceTrendChart extends StatelessWidget {
 
     return SizedBox(
       height: 120,
-      child: LineChart(
-        LineChartData(
-          minX: 0,
-          maxX: span.toDouble(),
-          // Exactly the range the fortnight covered.
-          //
-          // These were padded by a tenth, which put the axis bounds a little
-          // outside the real ones — and fl_chart walks its labels up from
-          // `minY` by `interval`, so a padded band emitted a third label a
-          // few pixels from the second and the two printed on top of each
-          // other. Two labels, at the two prices that mean something.
-          minY: flat ? lowest - 0.05 : lowest,
-          maxY: flat ? highest + 0.05 : highest,
-          gridData: const FlGridData(show: false),
-          borderData: FlBorderData(show: false),
-          lineTouchData: const LineTouchData(enabled: false),
-          titlesData: FlTitlesData(
-            topTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            rightTitles: const AxisTitles(
-              sideTitles: SideTitles(showTitles: false),
-            ),
-            leftTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                // A price's own width plus the gap to the line; see _inside.
-                reservedSize: 48 + _priceGap,
-                interval: flat ? 0.1 : (highest - lowest),
-                // The *widget* decides, not the interval.
-                //
-                // fl_chart offers title positions of its own as well as the
-                // ones the interval walks to, and on a 120-pixel band two of
-                // them landed a few pixels apart and printed on top of each
-                // other — seen on the live Croatian feed. Anything that is
-                // not one of the two ends renders as nothing, so no
-                // arithmetic here has to be exactly right for the axis to be
-                // readable.
-                getTitlesWidget: (value, meta) {
-                  final ends = [lowest, highest];
-                  final tolerance = flat ? 0.001 : (highest - lowest) / 100;
-                  final end = ends.where(
-                    (price) => (value - price).abs() <= tolerance,
-                  );
-                  if (end.isEmpty) {
-                    return const SizedBox.shrink();
-                  }
-                  return _inside(
-                    meta,
-                    Text(format.formatMoney(end.first), style: axisStyle),
-                    space: _priceGap,
-                  );
-                },
+      // The plot is a drawing, its labels places on it: a desk selecting
+      // the page leaves it out (decision 199).
+      child: SelectionContainer.disabled(
+        child: LineChart(
+          LineChartData(
+            minX: 0,
+            maxX: span.toDouble(),
+            // Exactly the range the fortnight covered.
+            //
+            // These were padded by a tenth, which put the axis bounds a little
+            // outside the real ones — and fl_chart walks its labels up from
+            // `minY` by `interval`, so a padded band emitted a third label a
+            // few pixels from the second and the two printed on top of each
+            // other. Two labels, at the two prices that mean something.
+            minY: flat ? lowest - 0.05 : lowest,
+            maxY: flat ? highest + 0.05 : highest,
+            gridData: const FlGridData(show: false),
+            borderData: FlBorderData(show: false),
+            lineTouchData: const LineTouchData(enabled: false),
+            titlesData: FlTitlesData(
+              topTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              rightTitles: const AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  // A price's own width plus the gap to the line; see _inside.
+                  reservedSize: 48 + _priceGap,
+                  interval: flat ? 0.1 : (highest - lowest),
+                  // The *widget* decides, not the interval.
+                  //
+                  // fl_chart offers title positions of its own as well as the
+                  // ones the interval walks to, and on a 120-pixel band two of
+                  // them landed a few pixels apart and printed on top of each
+                  // other — seen on the live Croatian feed. Anything that is
+                  // not one of the two ends renders as nothing, so no
+                  // arithmetic here has to be exactly right for the axis to be
+                  // readable.
+                  getTitlesWidget: (value, meta) {
+                    final ends = [lowest, highest];
+                    final tolerance = flat ? 0.001 : (highest - lowest) / 100;
+                    final end = ends.where(
+                      (price) => (value - price).abs() <= tolerance,
+                    );
+                    if (end.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
+                    return _inside(
+                      meta,
+                      Text(format.formatMoney(end.first), style: axisStyle),
+                      space: _priceGap,
+                    );
+                  },
+                ),
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  reservedSize: 20,
+                  interval: span / 2,
+                  getTitlesWidget: (value, meta) {
+                    final date = firstDay.add(Duration(days: value.round()));
+                    return _inside(
+                      meta,
+                      Text('${date.day}/${date.month}', style: axisStyle),
+                    );
+                  },
+                ),
               ),
             ),
-            bottomTitles: AxisTitles(
-              sideTitles: SideTitles(
-                showTitles: true,
-                reservedSize: 20,
-                interval: span / 2,
-                getTitlesWidget: (value, meta) {
-                  final date = firstDay.add(Duration(days: value.round()));
-                  return _inside(
-                    meta,
-                    Text('${date.day}/${date.month}', style: axisStyle),
-                  );
-                },
+            lineBarsData: [
+              LineChartBarData(
+                spots: [
+                  for (final point in series)
+                    FlSpot(
+                      point.date.difference(firstDay).inDays.toDouble(),
+                      point.avgPrice,
+                    ),
+                ],
+                isCurved: true,
+                barWidth: 2,
+                color: tokens.accent,
+                dotData: const FlDotData(show: false),
               ),
-            ),
+            ],
           ),
-          lineBarsData: [
-            LineChartBarData(
-              spots: [
-                for (final point in series)
-                  FlSpot(
-                    point.date.difference(firstDay).inDays.toDouble(),
-                    point.avgPrice,
-                  ),
-              ],
-              isCurved: true,
-              barWidth: 2,
-              color: tokens.accent,
-              dotData: const FlDotData(show: false),
-            ),
-          ],
         ),
       ),
     );

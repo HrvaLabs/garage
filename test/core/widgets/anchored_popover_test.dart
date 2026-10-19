@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -9,7 +10,9 @@ import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/page_scaffold.dart';
 import 'package:garage/core/widgets/pick_one.dart';
 import 'package:garage/core/widgets/pointer_anchor.dart';
+import 'package:garage/core/widgets/selectable_page.dart';
 
+import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
 
 const _options = [PickOption('a', 'Alpha'), PickOption('b', 'Beta')];
@@ -276,6 +279,58 @@ void main() {
 
       expect(FocusManager.instance.primaryFocus, isA<FocusScopeNode>());
       showPickOne<String>(page, options: _options);
+      await tester.pumpAndSettle();
+
+      final pane = tester.getRect(find.byType(PopoverPane));
+      expect(popover(tester).center.dx, closeTo(pane.center.dx, 1));
+      expect(popover(tester).center.dy, closeTo(pane.center.dy, 1));
+    });
+
+    // A page's text takes the keys from a click, so they reach the
+    // selection, and Tab passes over it: it is no control a key reached. A
+    // block of it shorter than half the window, as one built straight on
+    // SelectablePage can be, passed for one, and the card hung from its
+    // corner. The scaffolds give theirs the pane's whole height.
+    testWidgets('and after a click on a desk page\'s text in a browser', (
+      tester,
+    ) async {
+      asTheWeb(tester);
+      await pumpScreen(
+        tester,
+        Builder(
+          builder: (context) => CallbackShortcuts(
+            bindings: {
+              const SingleActivator(LogicalKeyboardKey.keyK): () =>
+                  showPickOne<String>(context, options: _options),
+            },
+            child: const Scaffold(
+              body: Row(
+                children: [
+                  SizedBox(width: 240),
+                  Expanded(
+                    child: PopoverPane(
+                      child: Align(
+                        alignment: Alignment.topLeft,
+                        child: SelectablePage(child: Text('A short page')),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        surface: desktopSurface,
+      );
+      await tester.pumpAndSettle();
+      await tester.tap(
+        find.text('A short page'),
+        kind: PointerDeviceKind.mouse,
+      );
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(FocusManager.instance.primaryFocus?.debugLabel, 'SelectablePage');
+
+      await tester.sendKeyEvent(LogicalKeyboardKey.keyK);
       await tester.pumpAndSettle();
 
       final pane = tester.getRect(find.byType(PopoverPane));

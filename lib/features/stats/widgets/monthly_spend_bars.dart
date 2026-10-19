@@ -56,78 +56,82 @@ class MonthlySpendBars extends StatelessWidget {
           children: [
             SizedBox(
               height: 200,
-              child: BarChart(
-                BarChartData(
-                  maxY: maxTotal * 1.1,
-                  gridData: FlGridData(
-                    drawVerticalLine: false,
-                    getDrawingHorizontalLine: (_) =>
-                        FlLine(color: tokens.border, strokeWidth: 1),
+              // The plot is a drawing, its labels places on it: a desk
+              // selecting the page leaves it out (decision 199).
+              child: SelectionContainer.disabled(
+                child: BarChart(
+                  BarChartData(
+                    maxY: maxTotal * 1.1,
+                    gridData: FlGridData(
+                      drawVerticalLine: false,
+                      getDrawingHorizontalLine: (_) =>
+                          FlLine(color: tokens.border, strokeWidth: 1),
+                    ),
+                    borderData: FlBorderData(show: false),
+                    barTouchData: const BarTouchData(enabled: false),
+                    titlesData: FlTitlesData(
+                      topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 40,
+                          getTitlesWidget: (value, _) =>
+                              Text(value.toStringAsFixed(0), style: axisStyle),
+                        ),
+                      ),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 24,
+                          getTitlesWidget: (value, _) {
+                            final index = value.toInt();
+                            if (index < 0 || index >= months.length) {
+                              return const SizedBox.shrink();
+                            }
+                            // Label every other month to keep the axis legible.
+                            if (index.isOdd) {
+                              return const SizedBox.shrink();
+                            }
+                            final month = months[index].month;
+                            return Text(
+                              '${month.month}/${month.year % 100}',
+                              style: axisStyle,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    barGroups: [
+                      for (var i = 0; i < months.length; i++)
+                        BarChartGroupData(
+                          x: i,
+                          barRods: [
+                            BarChartRodData(
+                              toY: months[i].total,
+                              width: 12,
+                              borderRadius: BorderRadius.circular(3),
+                              rodStackItems: [
+                                BarChartRodStackItem(
+                                  0,
+                                  months[i].fuel,
+                                  tokens.accent,
+                                ),
+                                BarChartRodStackItem(
+                                  months[i].fuel,
+                                  months[i].total,
+                                  tokens.muted,
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                    ],
                   ),
-                  borderData: FlBorderData(show: false),
-                  barTouchData: const BarTouchData(enabled: false),
-                  titlesData: FlTitlesData(
-                    topTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    rightTitles: const AxisTitles(
-                      sideTitles: SideTitles(showTitles: false),
-                    ),
-                    leftTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 40,
-                        getTitlesWidget: (value, _) =>
-                            Text(value.toStringAsFixed(0), style: axisStyle),
-                      ),
-                    ),
-                    bottomTitles: AxisTitles(
-                      sideTitles: SideTitles(
-                        showTitles: true,
-                        reservedSize: 24,
-                        getTitlesWidget: (value, _) {
-                          final index = value.toInt();
-                          if (index < 0 || index >= months.length) {
-                            return const SizedBox.shrink();
-                          }
-                          // Label every other month to keep the axis legible.
-                          if (index.isOdd) {
-                            return const SizedBox.shrink();
-                          }
-                          final month = months[index].month;
-                          return Text(
-                            '${month.month}/${month.year % 100}',
-                            style: axisStyle,
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                  barGroups: [
-                    for (var i = 0; i < months.length; i++)
-                      BarChartGroupData(
-                        x: i,
-                        barRods: [
-                          BarChartRodData(
-                            toY: months[i].total,
-                            width: 12,
-                            borderRadius: BorderRadius.circular(3),
-                            rodStackItems: [
-                              BarChartRodStackItem(
-                                0,
-                                months[i].fuel,
-                                tokens.accent,
-                              ),
-                              BarChartRodStackItem(
-                                months[i].fuel,
-                                months[i].total,
-                                tokens.muted,
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                  ],
                 ),
               ),
             ),

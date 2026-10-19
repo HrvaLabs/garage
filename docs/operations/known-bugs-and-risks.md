@@ -69,6 +69,15 @@ Chrome or the load, and whether a person's Chrome ever does it, is not known.
 Until it is, a look that stops answering needs a new browser, not a fix to
 the page.
 
+Two more from a look on 19 October 2026. agent-browser's `press Meta+c` set
+off keydowns of a key named `*` with ⌘ held, about four thousand a second,
+until the browser was closed, and the first time it took the tab with it;
+`keydown Meta` then `keydown c` reaches the page without the modifier on the
+second key, so the app sees no shortcut. A chord dispatched from the page as
+`KeyboardEvent`s on `window`, with `metaKey: true` on each, reaches the app as
+a person's keys do. And the wheel scrolls nothing at any width, as the store
+listing's screenshot notes say; a taller viewport shows what is below.
+
 ### In a headless browser, the first load after signing in answers 401 until Retry
 
 **Unknown for people; seen 18 October 2026.** Looking at the web build in a
@@ -567,6 +576,51 @@ metrics strip showed "—" for total spent while the phone layout showed
 €61.63, and the vehicle card had no odometer. Not reproduced; may be a
 partial load in a headless debug session. Unconfirmed.
 
+### A window resized across 900 pixels builds its page again
+
+**Low; open, found 19 October 2026.** The two scaffolds draw a page in one
+tree on a phone and in another at a desk: an app bar over the content, or a
+sidebar beside it under a top bar. Resized across the wide breakpoint, a
+window builds the page's content again from nothing, and what lived inside it
+goes: the scroll position, a field's text that the field held itself, any
+widget's own state. What a screen holds above its scaffold survives, which is
+where the forms keep their fields. Measured before the desk's text selection
+went in (decision 199): a list scrolled 300 pixels, a typed word and a
+counter were all gone after 1440 → 400 → 1440 pixels. The selection belongs
+to the desk's tree and adds nothing to it. The frame keeps one shape for its
+own state (`lib/core/widgets/app_frame.dart:21`); the scaffolds would need
+the content under one key in both trees, the phone's included.
+
+### A page copied whole runs its words together
+
+**Low; open, found 19 October 2026.** On the web at a desk a page's text can
+be selected and copied (decision 199), and Flutter joins what it copies with
+nothing between one piece of text and the next: Statistics copied whole
+begins `All vehiclesOctaviaTransitGolfAll timeThis year…`. It reads in rows
+across both columns, so two cards side by side interleave, and a dropdown's
+other choices, which Flutter keeps laid out under the one on show, come
+along (`Octavia`, `Transit` and `Golf` above, under "All vehicles"). A
+figure dragged across copies as itself, which is what the selection is
+mostly for. Breaking the run at each line would take a selection delegate of
+our own. And select-all takes only what has been built: a list built as it
+scrolls, the fuel log or the timeline, copies the rows built so far, not the
+whole log (27 of 200 rows on a 1440 × 900 page, measured once with a throwaway test).
+
+### A page with nothing under it grows a back arrow while a dialog is open
+
+**Low; open, found 19 October 2026.** At a desk, a pushed page opened by its
+address, or gone to from a crumb, has nothing under it and so no back arrow.
+A click on a fill-up in the fuel log opened that way opened its form, and
+under the dialog's barrier the top bar showed a back arrow, the title moved
+right to make room, until the form closed. The bar offers the arrow when
+`Navigator.of(context).canPop()` (`lib/core/widgets/page_scaffold.dart:130`),
+which counts the dialog, a route on the same navigator. The scaffold builds
+again as the dialog opens because it reads its address through
+`GoRouterState.of`, which depends on the page's route and so hears it stop
+being the top. The barrier covers the arrow, so nothing can press it; what
+shows is the bar changing shape under the dialog. A menu or a popover is a
+route over the page too and should do the same; only the form was seen.
+
 ### Vehicle page loose ends from its first critique
 
 Found by the September 2026 critique of the vehicle page, planner and
@@ -912,7 +966,7 @@ store screenshots.
 
 The axis now runs from the lowest price to the highest, and
 `getTitlesWidget` renders nothing for any value that is not one of those two
-ends (`lib/features/stations/widgets/price_trend_chart.dart:86`), so the
+ends (`lib/features/stations/widgets/price_trend_chart.dart:89`), so the
 arithmetic no longer has to be exactly right for the axis to be readable.
 `test/features/stations/price_trend_chart_test.dart` covers both.
 
@@ -1004,7 +1058,7 @@ several releases later.
 
 **Low, caught before shipping, 19 October 2026, by measuring.**
 `showAnchoredPopover` keeps its card inside the window
-(`lib/core/widgets/anchored_popover.dart:309`) but does not scroll it, so a
+(`lib/core/widgets/anchored_popover.dart:313`) but does not scroll it, so a
 builder taller than the room left overflows. The date's card, its question
 as a title over the field, an error under the field and the calendar, was
 588 pixels at 1.75× text and 660 at twice it, and a 1024×600 tablet held
@@ -1064,10 +1118,10 @@ keyboard handler when a test ends and keeps the pointer router's routes, so
 a press made earlier in the test was taken for where a keyboard choice should
 hang. `PointerAnchor.install` now puts the handler back each time a frame
 starts, and the route still once (`lib/core/widgets/pointer_anchor.dart:26`).
-`test/core/widgets/anchored_popover_test.dart:484` drops the handlers as the
+`test/core/widgets/anchored_popover_test.dart:539` drops the handlers as the
 binding does and still finds a key forgetting the press; with the handler
 added once, the keyboard test at
-`test/core/widgets/anchored_popover_test.dart:112`, third in its file, fails
+`test/core/widgets/anchored_popover_test.dart:115`, third in its file, fails
 too. Anything else that listens to the keyboard from a static has the same
 edge.
 
@@ -1331,7 +1385,7 @@ take one-word labels by test, which "My cars", "Moja vozila" and "Le mie
 auto" are not, so the word was the owner's to choose. On 20 September the
 owner chose "Cars", "Auti" and "Auto", for a driver only. The bottom bar and
 the sidebar read the role and take that label for the cars tab
-(`lib/core/widgets/garage_bottom_nav.dart:62`,
+(`lib/core/widgets/garage_bottom_nav.dart:63`,
 `lib/core/widgets/garage_sidebar.dart:85`); everybody else keeps
 "Vehicles". `test/core/widgets/garage_bottom_nav_test.dart` holds the new
 label to one word in every language with the others, and asks for both
@@ -1873,7 +1927,7 @@ beside one in a measuring sliver.
 edge and the first date was centred on the left one, so in the corner they read
 as one number, "€1.7510/7", and the last date hung half off the right. Each
 label is now kept inside the chart along its own axis
-(`lib/features/stations/widgets/price_trend_chart.dart:149`).
+(`lib/features/stations/widgets/price_trend_chart.dart:153`).
 
 ### The service sheet's type picker was listed as blanking on a fetch error
 
@@ -4450,7 +4504,7 @@ hundred metres from the end label. The decimals were the same cause once
 removed — a fractional interval put ticks between kilometres, and
 `decimalPattern` printed them faithfully.
 
-`_crowded` (`lib/features/vehicles/widgets/economy_chart.dart:199`) now
+`_crowded` (`lib/features/vehicles/widgets/economy_chart.dart:203`) now
 suppresses any tick within a third of an interval of either end, both axes use
 whole-number intervals, and the odometer side formats to no decimals. The
 regression test walks five odometer ranges and asserts no label repeats and no
@@ -4690,6 +4744,18 @@ app sold in Croatian" in this file is unchanged. Decision 154.
 
 ## Non-issues (checked, turned out fine)
 
+### A selectable row's words show the text cursor
+
+**Checked 19 October 2026; they do not.** On a desk in a browser a page's
+text can be selected (decision 199), and Flutter gives each `Text` in a
+selection area the text cursor, the I-beam. The worry was that a clickable
+row would show it over its words and the hand only in its blank space. It
+does not: `InkWell` hands its own cursor to the text inside it through
+`DefaultSelectionStyle`, so a `ListTile` with `onTap`, a button or a chip
+keeps the hand over its words, measured over a fill-up row's amount in a
+widget test as the web. Nothing in the app makes a tap target from a bare
+`GestureDetector`, which would not pass it on.
+
 ### A borrower on a pass is offered "Report an incident"
 
 **Checked 17 October 2026; never true.** Filed with the company plan: the
@@ -4698,7 +4764,7 @@ guest policy on `incidents`. But the card is on the Car tab, and a borrowed
 car's page has no tabs: since 8 September, before incidents existed, a car
 that is not in one of your garages opens the borrower's page, the briefing
 and what the pass allows (`lib/features/vehicles/screens/vehicle_detail_screen.dart:604`).
-`test/features/vehicles/vehicle_detail_screen_test.dart:621` looks for the
+`test/features/vehicles/vehicle_detail_screen_test.dart:624` looks for the
 button on a borrowed car, and the test after it finds it on the owner's.
 
 ### Moving to Flutter 3.47.7: five files rewritten, two first runs failed

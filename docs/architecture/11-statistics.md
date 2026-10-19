@@ -94,7 +94,7 @@ February is therefore a tenth wider than one in July (decision 179).
 
 **A legend never cuts a figure short.** The spend donut measures its widest
 amount in the style it is drawn in and gives every amount that width
-(`lib/features/stats/widgets/spend_donut.dart:163`); the label takes what is
+(`lib/features/stats/widgets/spend_donut.dart:167`); the label takes what is
 left. When even the swatch, the share and the amount would not fit the row,
 the share is dropped before the amount is touched (decision 178). This widget
 has broken three ways — an overflow, a ragged column, and an ellipsis in the

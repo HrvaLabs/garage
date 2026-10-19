@@ -4494,7 +4494,7 @@ and a median not at all, and the question is what the drive usually takes.
 certain than it is. Below five journeys a period is drawn as an indication
 (`sparseBucketBelow`), and a comparison whose ends are thin says so in words.
 
-**The axis starts at zero** (`lib/features/trips/widgets/route_trend_chart.dart:44`). A cropped axis makes
+**The axis starts at zero** (`lib/features/trips/widgets/route_trend_chart.dart:47`). A cropped axis makes
 four minutes look like a catastrophe, which is the opposite of what a screen
 built to test a suspicion should do.
 
@@ -6653,9 +6653,9 @@ until the app was reopened.
 
 **18 September 2026.** The spend donut's legend gives every amount the width
 of the widest one, measured in the style it is drawn in
-(`lib/features/stats/widgets/spend_donut.dart:163`), and the label takes
+(`lib/features/stats/widgets/spend_donut.dart:167`), and the label takes
 what is left. When the swatch, the share and the amount would not fit the row
-on their own, the share is dropped (`spend_donut.dart:99`).
+on their own, the share is dropped (`spend_donut.dart:103`).
 
 **What was wrong.** Decision 152 let the amount flex so the row could not
 overflow, and the fix for the ragged column that caused gave it a quarter of
@@ -7762,7 +7762,7 @@ hangs from the press that opened it, or from the button itself when the press
 landed on the one that stands for the choice, below and to the right as a
 desktop menu opens, turned back inside the window where it would run off an
 edge, and put away with nothing picked by a click outside it or by Escape
-(`showAnchoredPopover`, `lib/core/widgets/anchored_popover.dart:28`). Hung
+(`showAnchoredPopover`, `lib/core/widgets/anchored_popover.dart:29`). Hung
 from a press inside the top bar's Add, the quick-add covered the lower half
 of the button that opened it; a desk's menu button opens its menu below it.
 `showAdaptiveChoice` opens it where it opened a dialog a form's width in the
@@ -7844,3 +7844,37 @@ then, and only then, the calendar keeping its full height
 clicked is the answer, so a day clicked by mistake is a date picked, put
 right by opening the picker again, where Material's dialog let a day be
 clicked and then confirmed.
+
+**Text can be selected.** In a browser at a wide window a page's content is
+one selection, as a web page is (`SelectablePage`,
+`lib/core/widgets/selectable_page.dart:20`): a mouse dragged across a
+figure selects it, a click on the page's text takes the keyboard, and the
+system's keys select it all and copy it (⌘ on a Mac, Ctrl elsewhere). The
+sidebar, the top bar and a tab strip stay controls, and Tab passes over the
+page to its first control, so a keyboard alone reaches the text for Ctrl+A
+only after a click on it, as on a web page. It is the web's alone, and the
+wide window's: a tablet held sideways is wide too, and there a long press
+stays the row's, as on a phone and in a phone-sized browser. Scrollbars
+already stay on show at a desk (decision 198). A chart's plot leaves itself
+out: its labels are places on a drawing, and copied with the page they came
+out between its sentences as a run of stray numbers. Its heading, legend and
+guidance, the words around the plot, are the page's and copy with it, a
+donut's amounts included. A drag across the economy trend stays its readout,
+the chart taking the drag before the selection does; the other five have
+none. A right-click is the
+browser's own menu, whose Copy takes the selection the click landed in, or
+the word under the pointer
+([12](../architecture/12-navigation.md#text-a-desk-can-select)).
+
+*Cost:* no row swipes to delete in a browser at a wide window, a touch
+screen's included. A `Dismissible` takes a sideways drag from any pointer and
+a pixel before the selection does, so a mouse dragged across a fill-up's
+amount pulled the row away, and nothing in it tells a finger from a mouse;
+`deleteSwipeDirection` (`lib/core/widgets/confirm_delete.dart:183`) turns
+the swipe off wherever the row's text can be selected. The six rows that
+swiped (a fill-up; a car's service, reading, cost and income; a trip) open
+with a click, and their forms delete them. *Cost:* what is copied runs
+together, Flutter joining one piece of text straight to the next, so a page
+copied whole is one run of words, read in rows across its columns; a figure
+dragged across copies as itself. The browser's own find still does not
+reach the words, which Flutter draws; a selection changes nothing there.

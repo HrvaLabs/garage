@@ -5,11 +5,12 @@ import 'package:garage/core/router/app_router.dart';
 import 'package:garage/core/widgets/date_pickers.dart';
 import 'package:garage/core/widgets/page_title.dart';
 import 'package:garage/core/widgets/routed_tabs.dart';
+import 'package:garage/core/widgets/selectable_page.dart';
 import 'package:go_router/go_router.dart';
 
 /// The browser around the web build, as much of it as a test needs: the name
-/// it gives the tab, and a history the app writes its addresses to and Back
-/// reads them from.
+/// it gives the tab, a history the app writes its addresses to and Back
+/// reads them from, and the clipboard a copy lands on.
 class FakeBrowser {
   FakeBrowser._(this._tester);
 
@@ -21,6 +22,9 @@ class FakeBrowser {
 
   /// The colour each name came with, which the browser draws its bar in.
   final List<int?> titleColours = [];
+
+  /// What the page last copied, or null when it has copied nothing.
+  String? copied;
 
   final List<({String uri, Object? state})> _history = [];
   int _at = -1;
@@ -62,18 +66,20 @@ class FakeBrowser {
 
 /// Runs the rest of the test as the web build: each page names the browser's
 /// tab, a tab strip writes its tab to the address, a pushed page shows its
-/// own, and a date's popover opens with its field ready to type in. Off in a
-/// test as on Android, so a test about the web asks for it, before it pumps
-/// the app.
+/// own, a date's popover opens with its field ready to type in, and a page's
+/// text on a desk can be selected. Off in a test as on Android, so a test
+/// about the web asks for it, before it pumps the app.
 FakeBrowser asTheWeb(WidgetTester tester) {
   final browser = FakeBrowser._(tester);
   final titled = PageTitle.enabled;
   final writes = RoutedTabs.writesAddress;
   final reflects = GoRouter.optionURLReflectsImperativeAPIs;
   final focuses = GarageDatePicker.focusesField;
+  final selects = SelectablePage.web;
   PageTitle.enabled = true;
   RoutedTabs.writesAddress = true;
   GarageDatePicker.focusesField = true;
+  SelectablePage.web = true;
   reflectPushedPagesInAddress();
 
   final messenger = tester.binding.defaultBinaryMessenger;
@@ -82,6 +88,10 @@ FakeBrowser asTheWeb(WidgetTester tester) {
       final arguments = call.arguments as Map<Object?, Object?>;
       browser.titles.add(arguments['label']! as String);
       browser.titleColours.add(arguments['primaryColor'] as int?);
+    }
+    if (call.method == 'Clipboard.setData') {
+      final arguments = call.arguments as Map<Object?, Object?>;
+      browser.copied = arguments['text'] as String?;
     }
     return null;
   });
@@ -98,6 +108,7 @@ FakeBrowser asTheWeb(WidgetTester tester) {
     PageTitle.enabled = titled;
     RoutedTabs.writesAddress = writes;
     GarageDatePicker.focusesField = focuses;
+    SelectablePage.web = selects;
     GoRouter.optionURLReflectsImperativeAPIs = reflects;
   });
   return browser;
