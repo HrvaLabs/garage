@@ -5180,4 +5180,19 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get dateFieldLabel => 'Date';
+
+  @override
+  String get shortcutsTitle => 'Keyboard shortcuts';
+
+  @override
+  String get shortcutsSearch => 'Search this page';
+
+  @override
+  String get shortcutsQuickAdd => 'Add a fill-up, a service or a cost';
+
+  @override
+  String get shortcutsHelp => 'Show this list';
+
+  @override
+  String get shortcutsClose => 'Close a dialog or a menu';
 }

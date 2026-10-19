@@ -5267,4 +5267,19 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get dateFieldLabel => 'Datum';
+
+  @override
+  String get shortcutsTitle => 'Prečaci na tipkovnici';
+
+  @override
+  String get shortcutsSearch => 'Pretraži ovu stranicu';
+
+  @override
+  String get shortcutsQuickAdd => 'Dodaj točenje, servis ili trošak';
+
+  @override
+  String get shortcutsHelp => 'Prikaži ovaj popis';
+
+  @override
+  String get shortcutsClose => 'Zatvori prozor ili izbornik';
 }

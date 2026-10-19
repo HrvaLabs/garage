@@ -187,7 +187,7 @@ to and what the whole visible list came to. The arithmetic is `balanceOf`
 `({double? amount, bool isIncome})` — rather than the timeline's own
 `TimelineItem`, because a domain function has no business knowing what a fill-up
 is. The screen adapts its rows with `_ledgerEntry`
-(`lib/features/timeline/screens/timeline_screen.dart:517`).
+(`lib/features/timeline/screens/timeline_screen.dart:521`).
 
 **Net, signed, income-aware.** A month is `income − spending`, so a car earning
 its keep as a taxi can show `+€117.60` in the household's success colour while

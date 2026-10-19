@@ -3002,5 +3002,10 @@
   },
   "dateRangeStart": "Start date",
   "dateRangeEnd": "End date",
-  "dateFieldLabel": "Date"
+  "dateFieldLabel": "Date",
+  "shortcutsTitle": "Keyboard shortcuts",
+  "shortcutsSearch": "Search this page",
+  "shortcutsQuickAdd": "Add a fill-up, a service or a cost",
+  "shortcutsHelp": "Show this list",
+  "shortcutsClose": "Close a dialog or a menu"
 }

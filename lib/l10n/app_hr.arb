@@ -2399,5 +2399,10 @@
   "dateOutOfRange": "Odaberi datum od {first} do {last}",
   "dateRangeStart": "Početni datum",
   "dateRangeEnd": "Završni datum",
-  "dateFieldLabel": "Datum"
+  "dateFieldLabel": "Datum",
+  "shortcutsTitle": "Prečaci na tipkovnici",
+  "shortcutsSearch": "Pretraži ovu stranicu",
+  "shortcutsQuickAdd": "Dodaj točenje, servis ili trošak",
+  "shortcutsHelp": "Prikaži ovaj popis",
+  "shortcutsClose": "Zatvori prozor ili izbornik"
 }

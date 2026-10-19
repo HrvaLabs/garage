@@ -11,6 +11,7 @@ import '../../../core/widgets/month_header.dart';
 import '../../../domain/format/month_grouping.dart';
 import '../../../domain/stats/entry_balance.dart';
 import '../../../core/widgets/async_value_view.dart';
+import '../../../core/widgets/desktop_shortcuts.dart';
 import '../../../core/widgets/garage_bottom_nav.dart';
 import '../../costs/cost_category_labels.dart';
 import '../../income/income_category_labels.dart';
@@ -209,43 +210,46 @@ class _TimelineScreenState extends ConsumerState<TimelineScreen> {
                   GarageTokens.space4,
                   GarageTokens.space2,
                 ),
-                child: TextField(
-                  key: const Key('timeline-search'),
-                  controller: _search,
-                  decoration: InputDecoration(
-                    labelText: l10n.timelineSearch,
-                    // What it looks at, said once. Searching a station name
-                    // and finding nothing reads as a broken search rather
-                    // than as a search of something else.
-                    helperText: _search.text.isEmpty
-                        ? null
-                        : l10n.timelineSearchCovers,
-                    helperMaxLines: 2,
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (_search.text.isNotEmpty)
+                child: SearchShortcutTarget(
+                  builder: (context, focusNode) => TextField(
+                    key: const Key('timeline-search'),
+                    focusNode: focusNode,
+                    controller: _search,
+                    decoration: InputDecoration(
+                      labelText: l10n.timelineSearch,
+                      // What it looks at, said once. Searching a station name
+                      // and finding nothing reads as a broken search rather
+                      // than as a search of something else.
+                      helperText: _search.text.isEmpty
+                          ? null
+                          : l10n.timelineSearchCovers,
+                      helperMaxLines: 2,
+                      prefixIcon: const Icon(Icons.search),
+                      suffixIcon: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (_search.text.isNotEmpty)
+                            IconButton(
+                              tooltip: l10n.commonClear,
+                              icon: const Icon(Icons.clear),
+                              onPressed: () => setState(_search.clear),
+                            ),
                           IconButton(
-                            tooltip: l10n.commonClear,
-                            icon: const Icon(Icons.clear),
-                            onPressed: () => setState(_search.clear),
+                            key: const Key('timeline-filter'),
+                            tooltip: l10n.timelineFilter,
+                            isSelected: _kinds.isNotEmpty || _vehicleId != null,
+                            icon: Badge.count(
+                              count: _kinds.length,
+                              isLabelVisible: _kinds.isNotEmpty,
+                              child: const Icon(Icons.filter_list),
+                            ),
+                            onPressed: _pickKinds,
                           ),
-                        IconButton(
-                          key: const Key('timeline-filter'),
-                          tooltip: l10n.timelineFilter,
-                          isSelected: _kinds.isNotEmpty || _vehicleId != null,
-                          icon: Badge.count(
-                            count: _kinds.length,
-                            isLabelVisible: _kinds.isNotEmpty,
-                            child: const Icon(Icons.filter_list),
-                          ),
-                          onPressed: _pickKinds,
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
+                    onChanged: (_) => setState(() {}),
                   ),
-                  onChanged: (_) => setState(() {}),
                 ),
               ),
               // The six kinds live behind the search field's filter button

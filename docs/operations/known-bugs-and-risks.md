@@ -586,10 +586,38 @@ goes: the scroll position, a field's text that the field held itself, any
 widget's own state. What a screen holds above its scaffold survives, which is
 where the forms keep their fields. Measured before the desk's text selection
 went in (decision 199): a list scrolled 300 pixels, a typed word and a
-counter were all gone after 1440 → 400 → 1440 pixels. The selection belongs
-to the desk's tree and adds nothing to it. The frame keeps one shape for its
-own state (`lib/core/widgets/app_frame.dart:21`); the scaffolds would need
-the content under one key in both trees, the phone's included.
+counter were all gone after 1440 → 400 → 1440 pixels. The selection and
+the desk's keys belong to the desk's tree and add nothing to it. The frame
+keeps one shape for its own state (`lib/core/widgets/app_frame.dart:23`);
+the scaffolds would need the content under one key in both trees, the
+phone's included.
+
+### With the accessibility layer on, a click leaves the ring a Tab drew
+
+**Low; open, found 19 October 2026 by reading, not seen.** On a desk the
+button with the focus is drawn with a ring from a Tab or an arrow until the
+next press (decision 199). On the web with the accessibility layer on, a click on anything
+tappable reaches the app as an accessibility tap with no press, as the
+popovers found (`lib/core/widgets/pointer_anchor.dart:62`), so nothing puts
+the ring away: a button clicked after a Tab reached it keeps its ring. The
+ring is where the focus is, so it is late in going, never in the wrong
+place.
+
+### On the web, Tab never leaves the app for the browser's own controls
+
+**Low; open, found 19 October 2026.** At a page's last control Tab wraps to
+its first, and Shift+Tab the other way, so Tab alone never reaches the
+address bar or the browser's tabs from the app. `WidgetsApp` gives its
+own navigator the web's route edge, which hands the key at a page's end to
+the browser, but an app routed by go_router uses go_router's navigator
+instead, built with Flutter's default edge: that passes the end to the scope
+above the route, and the view's scope wraps. Seen in a browser on the wasm
+build: thirty Tabs on About, and twelve on the sign-in page, which has none
+of the desk's keys, all kept the browser's focus in the view; a throwaway
+widget test under the app's router showed the same. It was so before the desk's keys,
+which add no focus of their own (decision 199). A scope with the web's edge
+between the view and the router would hand the end on; it would be a change
+of its own.
 
 ### A page copied whole runs its words together
 
@@ -613,7 +641,7 @@ address, or gone to from a crumb, has nothing under it and so no back arrow.
 A click on a fill-up in the fuel log opened that way opened its form, and
 under the dialog's barrier the top bar showed a back arrow, the title moved
 right to make room, until the form closed. The bar offers the arrow when
-`Navigator.of(context).canPop()` (`lib/core/widgets/page_scaffold.dart:130`),
+`Navigator.of(context).canPop()` (`lib/core/widgets/page_scaffold.dart:135`),
 which counts the dialog, a route on the same navigator. The scaffold builds
 again as the dialog opens because it reads its address through
 `GoRouterState.of`, which depends on the page's route and so hears it stop
@@ -1379,13 +1407,13 @@ the page and the path it was given.
 ### The bottom tab under "My cars" said "Vehicles"
 
 **Low, fixed 16 October 2026; since drivers arrived in 0080.** A driver's list
-is titled "My cars" (`lib/features/vehicles/screens/vehicles_screen.dart:96`)
+is titled "My cars" (`lib/features/vehicles/screens/vehicles_screen.dart:97`)
 while the tab that opened it kept the everyday label: both navigation widgets
 take one-word labels by test, which "My cars", "Moja vozila" and "Le mie
 auto" are not, so the word was the owner's to choose. On 20 September the
 owner chose "Cars", "Auti" and "Auto", for a driver only. The bottom bar and
 the sidebar read the role and take that label for the cars tab
-(`lib/core/widgets/garage_bottom_nav.dart:63`,
+(`lib/core/widgets/garage_bottom_nav.dart:64`,
 `lib/core/widgets/garage_sidebar.dart:85`); everybody else keeps
 "Vehicles". `test/core/widgets/garage_bottom_nav_test.dart` holds the new
 label to one word in every language with the others, and asks for both
@@ -1630,7 +1658,7 @@ console's "Hand over" button took the row and the car's name was left with
 none, one letter per line (v1.6.22, the first night); the paused webhook's
 Resume button had the same shape since v1.6.20. No test saw it because the
 screen-test harness ran with Material's default theme. Fixed in v1.6.23:
-`GarageTheme.inlineButton` (`lib/core/theme/garage_theme.dart:67`) for a
+`GarageTheme.inlineButton` (`lib/core/theme/garage_theme.dart:104`) for a
 button that sits beside something, applied at the six sites, and the harness
 now carries the app's theme (`test/support/pump_screen.dart:276`), so a
 button placed that way again fails its test with "BoxConstraints forces an
@@ -3991,7 +4019,7 @@ and an identical one arrived. The five tab routes were immune only because
 `_tabPage` gives them a fading page of their own.
 
 Fixed in the theme rather than route by route
-(`lib/core/theme/garage_theme.dart:283`), because the same slide was on all ten
+(`lib/core/theme/garage_theme.dart:344`), because the same slide was on all ten
 pushed screens that draw a sidebar, not only the four in the sidebar itself.
 Phone-width windows keep the platform transition and its back gesture.
 

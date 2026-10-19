@@ -46,7 +46,7 @@ screen asks first: `canAddVehicleProvider`
 through `Household.canAddVehicleAt` (`lib/domain/entities/household.dart:88`),
 and the Add button shows the cap sentence, or the "plan ended on" sentence for
 a lapsed company garage, instead of a form the database would refuse
-(`lib/features/vehicles/screens/vehicles_screen.dart:42`).
+(`lib/features/vehicles/screens/vehicles_screen.dart:43`).
 
 **Nobody puts their own garage on the plan.** `authenticated` holds `update`
 on every household column but `plan` and `plan_until`
@@ -132,8 +132,8 @@ last case leaves a garage of drivers with no admin; it is recorded in
 rather than refused.
 
 **"My cars"** is the vehicles screen wearing a driver's presentation
-(`lib/features/vehicles/screens/vehicles_screen.dart:78`), under a tab that
-reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:63`, and in the sidebar
+(`lib/features/vehicles/screens/vehicles_screen.dart:79`), under a tab that
+reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:64`, and in the sidebar
 `lib/core/widgets/garage_sidebar.dart:85` and a desk page's crumbs
 `lib/core/widgets/page_header.dart:49`): the title, no Add vehicle button,
 no archived section, an empty state that names the administrator as the one

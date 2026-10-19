@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/web/update_notice.dart';
 import 'package:garage/core/widgets/adaptive.dart';
 import 'package:garage/core/widgets/app_frame.dart';
+import 'package:garage/core/widgets/page_scaffold.dart';
 
 import '../../support/pump_screen.dart';
 
@@ -70,5 +71,40 @@ void main() {
     expect(GarageBreakpoints.isWide(tester.element(find.text('page'))), isTrue);
     expect(tester.state(find.byType(UpdateNotice)), same(notice));
     expect(asks, 1);
+  });
+
+  testWidgets('a page pushed over another is still on top after the window '
+      'crosses the breakpoint and back', (tester) async {
+    // The router keeps its pages across the line and back, the frame above
+    // it keeping one shape at every width. go_router holds its navigator by
+    // a global key, which would carry it even into a second shape; what a
+    // second shape loses is what sits between, the notice in the test above.
+    await pumpDesktop(
+      tester,
+      const GaragePageScaffold(title: 'Statistics', body: Text('under')),
+      initialLocation: '/stats',
+    );
+    await tester.pumpAndSettle();
+    tester
+        .state<NavigatorState>(find.byType(Navigator).first)
+        .push(
+          MaterialPageRoute<void>(
+            builder: (context) => const GaragePageScaffold(
+              title: 'Calculator',
+              body: Text('on top'),
+            ),
+          ),
+        );
+    await tester.pumpAndSettle();
+    final navigator = tester.state(find.byType(Navigator).first);
+
+    for (final size in const [Size(400, 900), desktopSurface]) {
+      tester.view.physicalSize = size;
+      await tester.pumpAndSettle();
+
+      expect(find.text('on top'), findsOneWidget, reason: 'at $size');
+      expect(find.text('under'), findsNothing, reason: 'at $size');
+    }
+    expect(tester.state(find.byType(Navigator).first), same(navigator));
   });
 }

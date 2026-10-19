@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/clock.dart';
 import 'package:garage/core/errors/app_failure.dart';
@@ -635,5 +636,30 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.text('Moja vozila'), findsOneWidget);
     });
+  });
+
+  testWidgets('on a desk, / puts the cursor in the search', (tester) async {
+    await pumpVehicles(
+      tester,
+      vehicles: [
+        testVehicle('v1', nickname: 'Golf'),
+        testVehicle('v2', nickname: 'Passat'),
+        testVehicle('v3', nickname: 'Astra'),
+        testVehicle('v4', nickname: 'Clio'),
+      ],
+      surface: desktopSurface,
+    );
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.slash, character: '/');
+    await tester.pumpAndSettle();
+
+    final search = tester.widget<EditableText>(
+      find.descendant(
+        of: find.byType(TextField),
+        matching: find.byType(EditableText),
+      ),
+    );
+    expect(search.focusNode.hasPrimaryFocus, isTrue);
   });
 }

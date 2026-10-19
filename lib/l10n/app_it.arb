@@ -1623,5 +1623,10 @@
   "dateOutOfRange": "Scegli una data dal {first} al {last}",
   "dateRangeStart": "Data di inizio",
   "dateRangeEnd": "Data di fine",
-  "dateFieldLabel": "Data"
+  "dateFieldLabel": "Data",
+  "shortcutsTitle": "Scorciatoie da tastiera",
+  "shortcutsSearch": "Cerca in questa pagina",
+  "shortcutsQuickAdd": "Aggiungi un rifornimento, un intervento o un costo",
+  "shortcutsHelp": "Mostra questo elenco",
+  "shortcutsClose": "Chiudi una finestra o un menu"
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/widgets/adaptive.dart';
 import 'package:garage/domain/entities/cost_entry.dart';
@@ -731,5 +732,21 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('on a desk, / puts the cursor in the search', (tester) async {
+    await pumpTimeline(tester, items: [item()], surface: desktopSurface);
+    await tester.pumpAndSettle();
+
+    await tester.sendKeyEvent(LogicalKeyboardKey.slash, character: '/');
+    await tester.pumpAndSettle();
+
+    final search = tester.widget<EditableText>(
+      find.descendant(
+        of: find.byKey(const Key('timeline-search')),
+        matching: find.byType(EditableText),
+      ),
+    );
+    expect(search.focusNode.hasPrimaryFocus, isTrue);
   });
 }

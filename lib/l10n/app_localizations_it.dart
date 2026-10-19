@@ -5260,4 +5260,20 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get dateFieldLabel => 'Data';
+
+  @override
+  String get shortcutsTitle => 'Scorciatoie da tastiera';
+
+  @override
+  String get shortcutsSearch => 'Cerca in questa pagina';
+
+  @override
+  String get shortcutsQuickAdd =>
+      'Aggiungi un rifornimento, un intervento o un costo';
+
+  @override
+  String get shortcutsHelp => 'Mostra questo elenco';
+
+  @override
+  String get shortcutsClose => 'Chiudi una finestra o un menu';
 }

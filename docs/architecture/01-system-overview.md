@@ -99,11 +99,12 @@ Within a feature the split is always the same, for example `lib/features/fuel/`:
 Every page then sits inside `GarageAppFrame`
 (`lib/core/widgets/app_frame.dart`), which `MaterialApp.router`'s `builder`
 puts around it: the desk's theme on a wide window (`GarageTheme.desktop`,
-decision 198), snackbars sized to the window and, on a wide one, floated into
-its bottom right corner, the new-version notice the web build shows, and the
-record of the last press, which a choice on a desk hangs from
-(`PointerAnchor`, decision 199): kept at every width and on Android too, it
-adds nothing to the tree, and nothing on a phone reads it.
+decision 198), with a ring round the button the keyboard reached
+(`FocusRings`, decision 199), snackbars sized to the window and, on a wide
+one, floated into its bottom right corner, the new-version notice the web
+build shows, and the record of the last press, which a choice on a desk
+hangs from (`PointerAnchor`, decision 199): kept at every width and on
+Android too, it adds nothing to the tree, and nothing on a phone reads it.
 `test/support/pump_screen.dart` builds the same frame, so a screen test sees
 what the app puts around a page, a phone-sized one included: its snackbars
 float, as a phone's do, and one pumped at a desk's size (`pumpDesktop`) gets
@@ -212,7 +213,7 @@ instead of playing a directional push, which read as "forward" whichever way the
 user moved (`lib/core/router/app_router.dart:250`).
 
 Pushed pages pick their transition from the window rather than the platform.
-`_WindowAwarePageTransitions` (`lib/core/theme/garage_theme.dart:283`) wraps each
+`_WindowAwarePageTransitions` (`lib/core/theme/garage_theme.dart:344`) wraps each
 of Flutter's platform defaults: below the wide breakpoint the platform's own push
 transition and back gesture are kept, and above it every route cross-fades. The
 reason is the shell — the sidebar is drawn *inside* each page rather than around

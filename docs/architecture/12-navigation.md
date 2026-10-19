@@ -21,7 +21,7 @@ On a wide window the tabs lead a sidebar instead, `GarageSidebar` (see
 [The desktop sidebar](#the-desktop-sidebar)); a pushed screen keeps the sidebar
 rather than swapping it for a back button, because a browser window that loses
 its navigation on every push leaves the back button as the only way out
-(`lib/core/widgets/page_scaffold.dart:91`). The page's title moves from an app
+(`lib/core/widgets/page_scaffold.dart:92`). The page's title moves from an app
 bar into a top bar across the content pane, with a breadcrumb (see
 [The top bar](#the-top-bar)).
 
@@ -101,8 +101,8 @@ an admin of a fleet opens the app for it more often than for the garage's own
 screen. The console is a pushed page with its own tab strip, not a sixth tab:
 Material caps the bar at five, and the fleet is one thing, however many views
 it has. A driver's Vehicles tab is titled "My cars" on its own page
-(`lib/features/vehicles/screens/vehicles_screen.dart:96`) and labelled "Cars"
-in the bar (`lib/core/widgets/garage_bottom_nav.dart:63`) and the sidebar
+(`lib/features/vehicles/screens/vehicles_screen.dart:97`) and labelled "Cars"
+in the bar (`lib/core/widgets/garage_bottom_nav.dart:64`) and the sidebar
 (`lib/core/widgets/garage_sidebar.dart:85`): the bar takes one-word labels by
 test, so the tab could not carry the title's two words, and the owner chose the
 word (decision 194).
@@ -495,8 +495,8 @@ Where it hangs from is settled as it opens
    little of it.
 4. **Nothing**, and then it is centred over the page's content pane, the
    `PopoverPane` (`lib/core/widgets/anchored_popover.dart:91`) both scaffolds
-   put beside the sidebar (`lib/core/widgets/page_scaffold.dart:100`,
-   `lib/core/widgets/garage_bottom_nav.dart:169`). On a page without one, or
+   put beside the sidebar (`lib/core/widgets/page_scaffold.dart:102`,
+   `lib/core/widgets/garage_bottom_nav.dart:171`). On a page without one, or
    from a dialog, which sits in the middle itself, it is centred in the
    window.
 
@@ -615,8 +615,8 @@ into each other.
 
 On a wide window a page names itself in a top bar, `PageHeader`
 (`lib/core/widgets/page_header.dart:125`), where a phone has its app bar. Both
-scaffolds draw it (`lib/core/widgets/page_scaffold.dart:106`,
-`lib/core/widgets/garage_bottom_nav.dart:178`) across the content pane beside
+scaffolds draw it (`lib/core/widgets/page_scaffold.dart:108`,
+`lib/core/widgets/garage_bottom_nav.dart:180`) across the content pane beside
 the sidebar, above a rule; the content keeps its own column under it. The
 title used to be a heading held to that column, with the page's actions at the
 column's end. The bar belongs to the page, not to its text, as a tab strip
@@ -662,7 +662,7 @@ one: Vehicles, Garage (`/household`), Company and API access (`/api-access`). A 
 pages, `/vehicles/<id>/fuel` and the rest, name Vehicles and then the car; the
 car's own page names only Vehicles, its title being the car, and a new car is
 not a car. The car's name is `vehicleProvider`'s, which the scaffold reads
-(`lib/core/widgets/page_scaffold.dart:115`); until there is one, while the car
+(`lib/core/widgets/page_scaffold.dart:118`); until there is one, while the car
 loads or for a car the startup fetch does not know, the crumbs stop at
 Vehicles rather than read "Vehicles › Vehicles". A driver's Vehicles reads
 "Cars", as the sidebar's link does (decision 194). A tab, any other section,
@@ -743,8 +743,8 @@ or under, such an address.
 **The browser's tab** is named after the page on top, "Statistics · Garage",
 by `PageTitle` (`lib/core/widgets/page_title.dart:20`); the garage's own
 screen, called what the app is called, is named once. Both scaffolds wrap
-their page in it (`lib/core/widgets/page_scaffold.dart:68`,
-`lib/core/widgets/garage_bottom_nav.dart:137`), and a screen outside them wraps
+their page in it (`lib/core/widgets/page_scaffold.dart:69`,
+`lib/core/widgets/garage_bottom_nav.dart:138`), and a screen outside them wraps
 itself; `test/ci/page_addresses_test.dart:31` fails one that does neither. A
 page says its name when it comes on top (`lib/core/widgets/page_title.dart:56`),
 so closing Calculator over Statistics names Statistics again, and a page
@@ -760,9 +760,9 @@ paints its bar in. Off the web nothing is named.
 In a browser at a wide window a page's text can be selected and copied, as a
 web page's can (decision 199). Both scaffolds put `SelectablePage`
 (`lib/core/widgets/selectable_page.dart:20`) around a page's content under
-its top bar (`lib/core/widgets/page_scaffold.dart:146`, and
-`lib/core/widgets/garage_bottom_nav.dart:173` and
-`lib/core/widgets/garage_bottom_nav.dart:194` for a tab), so the sidebar,
+its top bar (`lib/core/widgets/page_scaffold.dart:151`, and
+`lib/core/widgets/garage_bottom_nav.dart:175` and
+`lib/core/widgets/garage_bottom_nav.dart:198` for a tab), so the sidebar,
 the bar and a tab strip stay controls and only the page is text. A mouse
 dragged across a figure selects it. A click on the page's text takes the
 keyboard, as a click in a browser does, and the system's keys select the
@@ -818,3 +818,101 @@ web build; each row's screen test drags a mouse across its figure
 `test/features/vehicles/vehicle_detail_screen_test.dart:2623`,
 `test/features/trips/trip_log_screen_test.dart:161`), aimed at the
 characters with `mouseDragAcross` (`test/support/selection.dart:14`).
+
+## Keys on a desk
+
+On a wide window every page in the two scaffolds answers three keys
+(decision 199): `/` puts the cursor in the page's search, `n` opens the
+quick-add, and `?` lists the keys. Escape is the framework's own, as it was:
+it closes a dialog, a popover, a menu and the list. `DesktopShortcuts`
+(`lib/core/widgets/desktop_shortcuts.dart:98`) holds them, and both
+scaffolds put it around the page in the shape only a wide window has
+(`lib/core/widgets/page_scaffold.dart:96`,
+`lib/core/widgets/garage_bottom_nav.dart:163`), so a phone has none of them.
+That shape is built again when a window is resized across 900 pixels (open
+in known-bugs); the keys are there or not by the build alone, so they add
+nothing to that. They act only while their page is on top
+(`lib/core/widgets/desktop_shortcuts.dart:139`): a dialog, an entry form, a
+popover or a menu is a route over the page, and a key pressed in one is not
+the page's, so `n` in an open quick-add does not open a second.
+
+**Nothing has to hold the focus for them.** The page's `DesktopShortcuts`
+is told of every key that nothing with the focus took, as a late handler of
+the focus manager (`lib/core/widgets/desktop_shortcuts.dart:120`). So the
+keys work wherever the focus is on the page, on the route itself after a
+click away from a field included, and they add no focus of their own: Tab
+goes from the page to a notice's action and back, and at a page's end it
+goes where the route sends it. Told of a key first, as a keyboard handler
+is, they would also act on one a control on the page takes. Two sets of
+them under one route, a page built inside a page, act once on a key
+(`lib/core/widgets/desktop_shortcuts.dart:138`).
+
+**A key typed into a field is the field's.** None of them acts while the
+focus is in an `EditableText` (`lib/core/widgets/desktop_shortcuts.dart:176`),
+and the key goes on to the field, so a `/` typed in a note stays a `/`. None
+takes a key held with Ctrl, ⌘ or Alt, so ⌘A and ⌘C, Ctrl elsewhere, stay the
+selection's (above). With Caps Lock on, `n` types N and is still `n`
+(`lib/core/widgets/desktop_shortcuts.dart:145`). The keys work with the
+page's text clicked too: the selection holds the focus then, and it is no
+field. A key they act on they keep, so the browser does not type it as well.
+
+**`/`** finds the search of the page on top. A field is found by being
+built inside a `SearchShortcutTarget`
+(`lib/core/widgets/desktop_shortcuts.dart:31`), which hands it its focus;
+Vehicles' (`lib/features/vehicles/screens/vehicles_screen.dart:127`), shown
+from four cars up, and the timeline's
+(`lib/features/timeline/screens/timeline_screen.dart:213`) are. A page under
+the one on top stays built, and its search with it, so only a field whose
+route is the current one counts
+(`lib/core/widgets/desktop_shortcuts.dart:20`): `/` on a car's page does not
+send the cursor into Vehicles' search under it. On a page with no search the
+key goes on.
+
+**`n`** opens the quick-add as a press of the top bar's Add does: hung from
+Add, which stands for it ([a choice on a desk](#a-choice-on-a-desk), step
+2), below it and ending where it ends. On a page with no Add, a tab without
+a top bar, it hangs from the focused control, or is centred over the pane.
+It is offered only with cars to add to, read without an error
+(`lib/core/widgets/desktop_shortcuts.dart:165`): while the garage's cars
+are still being read, when the read failed, or with no car at all, the key
+goes on, rather than throw the read's error from a keypress. The shortcuts
+watch the cars for that, as Add does
+(`lib/core/widgets/desktop_shortcuts.dart:187`): on a page with no Add
+nothing else may have read them.
+
+**`?`** opens a notice listing the four keys (`showShortcutsList`,
+`lib/core/widgets/desktop_shortcuts.dart:193`).
+
+**A ring shows where the keyboard is.** On a desk the button with the
+focus after a Tab or an arrow is drawn with a ring, two pixels of the accent
+two pixels clear of the button, so it shows round a filled button in the
+same amber (`lib/core/theme/garage_theme.dart:67`). A click puts it away, as
+a browser rings the focus a key moved and not the focus a click gave.
+`FocusRings` (`lib/core/widgets/focus_rings.dart:15`) says which: rings from
+a Tab or an arrow (`lib/core/widgets/focus_rings.dart:48`) until the next
+press, and the frame draws the desk's theme with them or without
+(`lib/core/widgets/app_frame.dart:50`). The arrows move the focus in a menu,
+and between controls off the web; in a browser they scroll the page, and the
+ring shows where the focus was left. Flutter's own highlight mode cannot
+tell a key from a click, a mouse leaving it where the keyboard put it, so a
+button clicked after a Tab reached it would keep its ring. Filled,
+outlined, text and icon buttons have the ring. A field has the border it
+shows while typed in, which a click gives it too; a link in the sidebar, a
+crumb, a row and a segmented button keep the tint Flutter gives what has
+the focus after a key. On the web with the accessibility layer on, a click
+reaches the app as no press at all
+([a choice on a desk](#a-choice-on-a-desk), step 1), so there a click
+leaves the ring a Tab drew.
+
+**Tab at a page's end** wraps to the page's start and never leaves the
+view for the browser's own controls. go_router builds its navigator with
+Flutter's default edge for a route, which hands the end to the scope above,
+and the view's scope wraps; `WidgetsApp` gives its own navigator the web's
+edge, but an app routed by go_router does not use that navigator. It was so
+before the keys, and they do not change it.
+
+`test/core/widgets/desktop_shortcuts_test.dart:65` presses the keys, with
+the page's text clicked in a browser too
+(`test/core/widgets/desktop_shortcuts_test.dart:354`), and Tab past them
+(`test/core/widgets/desktop_shortcuts_test.dart:416`);
+`test/core/widgets/focus_rings_test.dart:64` draws the ring.

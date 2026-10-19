@@ -8840,6 +8840,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Date'**
   String get dateFieldLabel;
+
+  /// No description provided for @shortcutsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keyboard shortcuts'**
+  String get shortcutsTitle;
+
+  /// No description provided for @shortcutsSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search this page'**
+  String get shortcutsSearch;
+
+  /// No description provided for @shortcutsQuickAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a fill-up, a service or a cost'**
+  String get shortcutsQuickAdd;
+
+  /// No description provided for @shortcutsHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Show this list'**
+  String get shortcutsHelp;
+
+  /// No description provided for @shortcutsClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close a dialog or a menu'**
+  String get shortcutsClose;
 }
 
 class _AppLocalizationsDelegate

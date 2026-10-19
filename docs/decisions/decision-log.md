@@ -352,7 +352,7 @@ as the more expensive lie.
 ## 18. The window picks the page transition, not the platform
 
 **August 2026.** `_WindowAwarePageTransitions`
-(`lib/core/theme/garage_theme.dart:283`) wraps every platform default in the
+(`lib/core/theme/garage_theme.dart:344`) wraps every platform default in the
 `PageTransitionsTheme`. Below the wide breakpoint a push keeps the platform's
 transition and its back gesture; above it, every route cross-fades.
 
@@ -5657,7 +5657,7 @@ decision, because it moves where everything on the car lives.
   (`lib/features/vehicles/screens/vehicle_detail_screen.dart:898`) and a
   floating "Log a fill-up" like every other tab. Timeline fuel rows carry the
   economy under the cost
-  (`lib/features/timeline/screens/timeline_screen.dart:320`), and the tour's
+  (`lib/features/timeline/screens/timeline_screen.dart:324`), and the tour's
   "Fuel log" row opens the log instead of the dashboard
   (`lib/features/settings/screens/features_screen.dart:51`).
 - **A drive starts from the car.** "Start a drive" was More › Trips › the
@@ -7878,3 +7878,50 @@ together, Flutter joining one piece of text straight to the next, so a page
 copied whole is one run of words, read in rows across its columns; a figure
 dragged across copies as itself. The browser's own find still does not
 reach the words, which Flutter draws; a selection changes nothing there.
+
+**The keyboard.** On a desk `/` puts the cursor in the page's search, `n`
+opens the quick-add and `?` lists the keys; Escape closes a dialog, a
+popover or a menu, as it already did (`DesktopShortcuts`,
+`lib/core/widgets/desktop_shortcuts.dart:98`). They are the wide window's:
+the scaffolds put them inside the shape a phone never builds, so a phone has
+none. A key typed into a field is the field's: none of them acts while the
+focus is in an `EditableText`, so the key passes on, in a field on the page
+as in an entry form or a popover, and none takes a key held with Ctrl, ⌘ or
+Alt, so selecting and copying the page's text stay the selection's. With
+Caps Lock on, `n` types N and is still `n`. `/` reaches the search of the
+page on top only: Vehicles stays built under a car's page, its search with
+it, so a search field is built inside a `SearchShortcutTarget` and counts
+while its route is the current one. `n` hangs the quick-add from the top
+bar's Add, as Add's own press does, and on a page with no Add from the
+focused control or the middle of the pane. It passes on with no cars read,
+a read that failed or no car at all, rather than throw the read's error
+from a keypress; Add hides itself for no cars, but still shows when a
+refresh has failed with the old cars held, and there `n` passes on.
+
+The keys are a late handler of the focus manager, owned by the page: told
+of every key that nothing with the focus took, acting only while the page's
+route is on top, and keeping a key they act on, so the browser does not
+type it as well. Nothing on the page has to hold the focus for them, and
+they add no focus to it. Three other ways do not do. A focus round the page
+holding `Shortcuts` loses the keys after a click away from a field, which
+drops the focus to the route above it. A focus scope round the page keeps
+them, and keeps Tab in too: a notice's action at the foot of the page cannot
+be reached, Tab from it goes nowhere, and at a route's edge that leaves the
+view, as the web's own navigator's does, Tab cannot leave. A keyboard
+handler, told of a key before the focus is, acts on a key a control on the
+page also takes, and both act.
+
+**Focus you can see.** On a desk the button with the focus after a Tab or
+an arrow is drawn with a ring, two pixels of the accent two pixels clear of
+it, and a click puts the ring away, as a browser rings the focus a key moved and not
+the focus a click gave (`FocusRings`, `lib/core/widgets/focus_rings.dart:15`).
+Flutter's own highlight mode would not do: a mouse leaves it where the
+keyboard put it, so a button clicked after a Tab reached it would keep its
+ring. The frame draws the desk's theme with the rings or without, and the
+ring is the theme's, on every filled, outlined, text and icon button.
+*Cost:* the theme is built again whenever the hands move between the
+keyboard and the mouse, a key that moves the focus after a click or a click
+after one, as a switch between light and dark builds it; nothing changes
+shape, so nothing is lost. *Cost:* only a button rings. A link in the
+sidebar, a crumb, a row and a segmented button keep the tint Flutter gives
+what has the focus after a key, and a field its border.

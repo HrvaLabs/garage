@@ -11,6 +11,7 @@ import '../../../core/widgets/adaptive.dart';
 import '../../../core/widgets/empty_state_art.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/confirm_delete.dart';
+import '../../../core/widgets/desktop_shortcuts.dart';
 import '../../../core/widgets/garage_bottom_nav.dart';
 import '../../../core/widgets/primary_action.dart';
 import '../../../core/widgets/vehicle_photo.dart';
@@ -123,13 +124,16 @@ class _VehiclesScreenState extends ConsumerState<VehiclesScreen> {
           if (showSearch)
             Padding(
               padding: const EdgeInsets.all(GarageTokens.space4),
-              child: TextField(
-                decoration: InputDecoration(
-                  labelText: l10n.vehicleSearch,
-                  prefixIcon: const Icon(Icons.search),
+              child: SearchShortcutTarget(
+                builder: (context, focusNode) => TextField(
+                  focusNode: focusNode,
+                  decoration: InputDecoration(
+                    labelText: l10n.vehicleSearch,
+                    prefixIcon: const Icon(Icons.search),
+                  ),
+                  onChanged: (value) =>
+                      setState(() => _query = value.toLowerCase()),
                 ),
-                onChanged: (value) =>
-                    setState(() => _query = value.toLowerCase()),
               ),
             ),
           Expanded(

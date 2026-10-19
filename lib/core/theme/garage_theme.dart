@@ -33,10 +33,17 @@ abstract final class GarageTheme {
   /// picks by platform at any width, so there the change is the type, the
   /// ripple, the scrollbar and the cards; a tablet held sideways gets the
   /// density too.
-  static ThemeData desktop(ThemeData theme) {
+  ///
+  /// With [focusRings], which the frame passes from a Tab or an arrow until
+  /// the next press (`FocusRings`), a button that has the focus is drawn
+  /// with a ring: two pixels of the accent, two pixels clear of the button,
+  /// as a browser rings a control the keyboard reached (decision 199). A
+  /// field keeps the border it shows while it is typed in, which a click
+  /// gives it too.
+  static ThemeData desktop(ThemeData theme, {bool focusRings = false}) {
     final tokens = theme.extension<GarageTokens>() ?? GarageTokens.light;
     final text = theme.textTheme;
-    return theme.copyWith(
+    final desk = theme.copyWith(
       visualDensity: VisualDensity.compact,
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
       splashFactory: NoSplash.splashFactory,
@@ -54,7 +61,37 @@ abstract final class GarageTheme {
         thumbVisibility: const WidgetStatePropertyAll(true),
       ),
     );
+    if (!focusRings) {
+      return desk;
+    }
+    final ring = BorderSide(
+      color: tokens.accent,
+      width: _ringWidth,
+      strokeAlign: BorderSide.strokeAlignOutside + 2 * _ringGap / _ringWidth,
+    );
+    ButtonStyle ringed(ButtonStyle? style) => (style ?? const ButtonStyle())
+        .copyWith(side: _FocusRing(ring, style?.side));
+    return desk.copyWith(
+      filledButtonTheme: FilledButtonThemeData(
+        style: ringed(theme.filledButtonTheme.style),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: ringed(theme.outlinedButtonTheme.style),
+      ),
+      textButtonTheme: TextButtonThemeData(
+        style: ringed(theme.textButtonTheme.style),
+      ),
+      iconButtonTheme: IconButtonThemeData(
+        style: ringed(theme.iconButtonTheme.style),
+      ),
+    );
   }
+
+  static const double _ringWidth = 2;
+
+  /// Between a button and its ring, so the ring shows round a filled button
+  /// in the accent too.
+  static const double _ringGap = 2;
 
   /// A button that sits beside other things rather than under a form.
   ///
@@ -255,6 +292,30 @@ abstract final class GarageTheme {
       letterSpacing: 1.5,
     );
   }
+}
+
+/// A button's edge: [ring] while it has the focus, [otherwise] the edge it
+/// had.
+///
+/// Compared by value, so the desk's theme built again with the same rings is
+/// the same theme, and nothing under it builds again for it.
+@immutable
+class _FocusRing implements WidgetStateProperty<BorderSide?> {
+  const _FocusRing(this.ring, this.otherwise);
+
+  final BorderSide ring;
+  final WidgetStateProperty<BorderSide?>? otherwise;
+
+  @override
+  BorderSide? resolve(Set<WidgetState> states) =>
+      states.contains(WidgetState.focused) ? ring : otherwise?.resolve(states);
+
+  @override
+  bool operator ==(Object other) =>
+      other is _FocusRing && other.ring == ring && other.otherwise == otherwise;
+
+  @override
+  int get hashCode => Object.hash(ring, otherwise);
 }
 
 /// Every platform's default transition, each wrapped so it only applies where
