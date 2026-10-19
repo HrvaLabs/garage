@@ -7448,3 +7448,29 @@ the sidebar read the role the way the vehicles screen does.
 "Vehicles" until the startup fetch says who they are, as the title already
 did ("The role flips from member to driver when the first bootstrap fetch
 lands" in known-bugs).
+
+## 195. A backup with no signal waits; it is not made from copies
+
+**17 October 2026.** Since the read cache (decision 182), every list a backup
+reads answers with its last good copy when there is no signal, where it used
+to fail. The automatic backup was written for the failure: the next
+foreground tries again and the folder is not blamed (decision 190). It went
+on writing files of copies instead, dated today, and a manual backup saved
+one. Restore is additive, so such a file, restored later, brings back every
+entry deleted since the copies were taken. The known-bugs entry named two
+fixes, refusing the file or stamping the oldest copy's time into it so a
+restore could say what it was restoring. `buildBackup` now refuses: it fails
+as a connection failure when any of its reads was served from a copy,
+counted by the cache (`copiesServed`) rather than read off the banner's
+marks, which another screen may have left and which a list served again from
+the same copy does not change.
+
+**Why not the stamp.** It changes the file's format and needs a restore that
+reads it and asks, for a file nobody should restore; and the automatic backup
+already knows what to do with a connection failure. Refused, it tries again
+on the next foreground with a signal; a manual one says there is no
+connection.
+
+**Cost.** A phone offline for days writes no automatic backup for those
+days, and the settings row keeps the date of the last good one without
+saying why. That file is still the newest true one.

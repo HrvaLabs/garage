@@ -5,6 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/errors/app_failure.dart';
 import 'package:garage/core/errors/failure_log.dart';
 import 'package:garage/core/files/backup_folder.dart';
+import 'package:garage/core/sync/read_cache.dart';
+import 'package:garage/core/sync/read_cache_providers.dart';
+import 'package:garage/core/sync/read_cache_store.dart';
 import 'package:garage/domain/entities/fuel_entry.dart';
 import 'package:garage/domain/entities/household.dart';
 import 'package:garage/features/costs/providers/cost_providers.dart';
@@ -26,6 +29,7 @@ import 'package:garage/features/observations/providers/observation_providers.dar
 
 import 'backup_restore_test.dart'
     show
+        CachedFuel,
         FakeCosts,
         FakeFuel,
         FakeIncome,
@@ -80,9 +84,11 @@ List<Override> overridesFor(
   RecordingFolder folder, {
   bool hasVehicle = true,
   FakeFuel? fuel,
+  ReadCache? cache,
 }) {
   final vehicles = FakeVehicles(hasVehicle ? [golf()] : []);
   return [
+    if (cache != null) readCacheProvider.overrideWithValue(cache),
     vehicleRepositoryProvider.overrideWithValue(vehicles),
     fuelRepositoryProvider.overrideWithValue(fuel ?? FakeFuel([fill()])),
     costRepositoryProvider.overrideWithValue(FakeCosts()),
@@ -185,11 +191,17 @@ void main() {
     Future<void> Function(WidgetRef ref) run, {
     bool hasVehicle = true,
     FakeFuel? fuel,
+    ReadCache? cache,
   }) {
     return withRef(
       tester,
       [
-        ...overridesFor(folder, hasVehicle: hasVehicle, fuel: fuel),
+        ...overridesFor(
+          folder,
+          hasVehicle: hasVehicle,
+          fuel: fuel,
+          cache: cache,
+        ),
         backupFolderPickerProvider.overrideWithValue(
           () async => 'content://tree/backups',
         ),
@@ -365,6 +377,40 @@ void main() {
 
         expect(recordedFailures, isNotEmpty);
         expect(await ref.read(autoBackupFailedProvider.future), isFalse);
+      });
+    });
+
+    testWidgets('is not built from saved copies when there is no signal', (
+      tester,
+    ) async {
+      // The lists are read through the cache, which answers with its last
+      // good copy rather than failing. Restore is additive, so a file of
+      // copies would bring back every entry deleted since they were taken:
+      // nothing is written, and the next foreground with a signal writes the
+      // real one.
+      final folder = RecordingFolder();
+      final cache = ReadCache(
+        store: InMemoryReadCacheStore(),
+        userId: () => 'u1',
+      );
+      final fuel = CachedFuel(cache);
+      await withFolder(tester, folder, fuel: fuel, cache: cache, (ref) async {
+        await fuel.forVehicle('v1');
+        fuel.offline = true;
+
+        expect(
+          await runAutoBackupIfDue(ref, now: DateTime(2026, 8, 22, 9)),
+          isFalse,
+        );
+        expect(folder.written, isEmpty);
+        expect(recordedFailures, isNotEmpty);
+        expect(await ref.read(autoBackupFailedProvider.future), isFalse);
+
+        fuel.offline = false;
+        expect(
+          await runAutoBackupIfDue(ref, now: DateTime(2026, 8, 22, 18)),
+          isTrue,
+        );
       });
     });
 

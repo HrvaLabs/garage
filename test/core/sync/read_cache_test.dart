@@ -134,6 +134,21 @@ void main() {
       );
     });
 
+    test('counts each copy it serves, the same list twice included', () async {
+      // The backup compares this before and after its reads. The marks cannot
+      // tell it: a list served again from the same copy leaves them as they
+      // were.
+      await cache.rows('fuel/v1', () async => rowsOf('f1'));
+      expect(cache.copiesServed, 0);
+
+      await cache.rows('fuel/v1', () async => throw offline);
+      final marks = cache.stale.value.byKey;
+      await cache.rows('fuel/v1', () async => throw offline);
+
+      expect(cache.copiesServed, 2);
+      expect(cache.stale.value.byKey, marks);
+    });
+
     test('the oldest stale copy is the one the banner names', () async {
       await cache.rows('fuel/v1', () async => rowsOf('f1'));
       now = now.add(const Duration(days: 1));

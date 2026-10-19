@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/clock.dart';
 import '../../../core/errors/app_failure.dart';
+import '../../../core/sync/read_cache_providers.dart';
 import '../../../domain/entities/reminder_rule.dart';
 import '../../../domain/entities/vehicle.dart';
 import '../../../domain/entities/tyre_set.dart';
@@ -25,10 +26,18 @@ import '../../household/providers/household_providers.dart';
 /// Archived vehicles included: a car that has left the household is exactly
 /// the history somebody would be upset to lose, and leaving it out of a file
 /// called "everything" would be a lie.
+///
+/// Throws a connection failure when any list came from its saved copy. With
+/// no signal the reads do not fail, they answer with the last good rows, and
+/// [restoreBackup] is additive: a file of copies would bring back everything
+/// deleted since they were taken. The automatic backup then tries again on
+/// the next foreground, as it always meant to.
 Future<String> buildBackup({
   required WidgetRef ref,
   required String householdName,
 }) async {
+  final cache = ref.read(readCacheProvider);
+  final copiesBefore = cache.copiesServed;
   final vehicles = await ref.read(allVehiclesProvider.future);
   final contents = <VehicleBackup>[];
 
@@ -60,6 +69,12 @@ Future<String> buildBackup({
     );
   }
 
+  if (cache.copiesServed != copiesBefore) {
+    throw const AppFailure(
+      kind: AppFailureKind.network,
+      debugMessage: 'backup: a list came from its saved copy',
+    );
+  }
   return GarageBackup.encode(contents, householdName: householdName);
 }
 

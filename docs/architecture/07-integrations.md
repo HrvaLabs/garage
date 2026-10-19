@@ -304,7 +304,7 @@ so the writer stays a writer of rows — and a private garage gets the column
 blank rather than a different file shape; the importer ignores a column it
 does not know, so an exported file still imports. On the plan the data
 screen offers a per-driver export above the export row
-(`lib/features/settings/screens/data_screen.dart:533`), which keeps only the
+(`lib/features/settings/screens/data_screen.dart:557`), which keeps only the
 entries that were that person's by the same resolution and never filters
 tyres, documents or `vehicles.csv`; the logbook report asks the same
 question after its period. Neither asks a driver, whose rows are their own.
@@ -343,7 +343,7 @@ into a different household carries ids that mean nothing there.
 
 The backup carries the six entry kinds, the vehicles, the **reminder rules**,
 and the **tyre sets with their tread history**
-(`lib/features/settings/data/backup_action.dart:23`). The last two are there
+(`lib/features/settings/data/backup_action.dart:24`). The last two are there
 because their loss is the kind a restore cannot show: the log comes back and
 the notifications never do, and a tread reading cannot be measured again after
 the fact. Photo attachments are the one omission — files in storage, not rows.

@@ -59,6 +59,16 @@ class ReadCache {
 
   final ValueNotifier<StaleReads> stale = ValueNotifier(const StaleReads({}));
 
+  /// How many reads have been answered with a copy since the app started.
+  ///
+  /// The backup's seam (`buildBackup`): a file built from copies, restored
+  /// later, would bring back whatever was deleted since they were taken, so
+  /// it compares this before and after its reads. [stale] cannot say it: a
+  /// copy served again for a list already marked leaves the marks as they
+  /// were, and a mark left by another screen is not the backup's.
+  int get copiesServed => _copiesServed;
+  int _copiesServed = 0;
+
   /// What [fetch] returns, kept as the copy for [key]; the copy instead when
   /// [fetch] fails for want of a connection.
   ///
@@ -87,6 +97,7 @@ class ReadCache {
       if (copy == null) {
         rethrow;
       }
+      _copiesServed++;
       _mark(key, copy.storedAt);
       return copy.rows;
     }

@@ -317,15 +317,29 @@ class DataScreen extends ConsumerWidget {
 
   Future<void> _backup(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
-    final backup = await _backupFile(ref);
-    if (backup == null || !context.mounted) {
+    final ({Uint8List bytes, String fileName})? backup;
+    final bool saved;
+    try {
+      backup = await _backupFile(ref);
+      if (backup == null || !context.mounted) {
+        return;
+      }
+      saved = await ref.read(fileSaverProvider)(
+        fileName: backup.fileName,
+        bytes: backup.bytes,
+        mimeType: 'application/json',
+      );
+    } catch (error) {
+      // As the CSV export: a read that fails, or a garage read from its
+      // copies with no signal, was an unhandled future and a tap that seemed
+      // to do nothing.
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(failureMessage(l10n, AppFailure.from(error)))),
+        );
+      }
       return;
     }
-    final saved = await ref.read(fileSaverProvider)(
-      fileName: backup.fileName,
-      bytes: backup.bytes,
-      mimeType: 'application/json',
-    );
     if (!context.mounted || !saved) {
       return;
     }
@@ -336,7 +350,17 @@ class DataScreen extends ConsumerWidget {
 
   Future<void> _shareBackup(BuildContext context, WidgetRef ref) async {
     final l10n = AppLocalizations.of(context)!;
-    final backup = await _backupFile(ref);
+    final ({Uint8List bytes, String fileName})? backup;
+    try {
+      backup = await _backupFile(ref);
+    } catch (error) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(failureMessage(l10n, AppFailure.from(error)))),
+        );
+      }
+      return;
+    }
     if (backup == null) {
       return;
     }

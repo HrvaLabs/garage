@@ -172,7 +172,9 @@ What a queued entry gets is still a **merge into the read**, deduped on its
 own id — a cached read now as much as a fresh one, since the queue decorator
 wraps the repository the cache lives in. Sign-out and account deletion clear
 the copies with the startup cache. Decision 182 records what this reverses of
-decision 115.
+decision 115. The cache also counts the copies it serves (`copiesServed`,
+`lib/core/sync/read_cache.dart:69`), which is how a backup knows it would be
+made from them.
 
 **Photos** are kept in the app's own directory and uploaded after their entry.
 `QueuedFileStore` is a seam (`lib/core/sync/queued_files.dart`) with a
@@ -267,7 +269,11 @@ the check or the write fails, cleared once the check passes again, by
 choosing a folder or by stopping, and the row then says the last backup failed
 and to choose the folder again. Building the backup is not the folder's fault
 — offline it fails and the next foreground retries — so it is logged and
-nothing more. Decision 190.
+nothing more. Decision 190. It fails because `buildBackup` refuses a garage
+read from saved copies (`lib/features/settings/data/backup_action.dart:72`,
+decision 195): since the read cache the reads themselves no longer fail with
+no signal, and a file of copies, restored, would bring back what was deleted
+since.
 
 ## Sharp edges
 

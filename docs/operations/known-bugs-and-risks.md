@@ -472,7 +472,7 @@ builds is the fix if one ever happens.
 
 ### A slow read that fails can mark a list stale after a fast one succeeded
 
-**Low.** `ReadCache.rows` (`lib/core/sync/read_cache.dart:70`) has no per-key
+**Low.** `ReadCache.rows` (`lib/core/sync/read_cache.dart:80`) has no per-key
 guard against two fetches of the same list in flight at once. Tap Retry twice
 as the signal comes back and the first fetch can still be timing out when the
 second has landed: the second keeps its rows and unmarks the key, then the
@@ -500,26 +500,11 @@ started with a signal is not shown as in progress without one. A draft is
 rewritten as the car moves, so a copy would be stale by the time it served; a
 single-row shape of the cache is what it would take, if real use asks.
 
-### A backup built offline is built from copies
-
-**Low.** `buildBackup` reads each list from the repositories
-(`lib/features/settings/data/backup_action.dart:39`), which is the read the
-cache sits in, so with no signal the file is the cached rows, and nothing in
-it says so: neither the export from More → Your data
-(`lib/features/settings/screens/data_screen.dart:311`) nor the automatic one
-(`lib/features/settings/providers/auto_backup_providers.dart:145`), which
-runs on its own schedule and does not ask. Restore is additive
-(`lib/features/settings/data/backup_action.dart:82`), so restoring such a
-file re-creates every entry deleted since the copies were taken. The fix is
-to refuse the file when `readCacheProvider.stale.value.any`
-(`lib/core/sync/read_cache.dart:24`) after the reads, or to stamp the oldest
-copy's time into it so a restore can say what it is restoring.
-
 ### Stale marks survive a server-side sign-out
 
 **Low.** `ReadCache.stale` is keyed by list, not by user
 (`lib/core/sync/read_cache.dart:60`), and only `forget()` clears it
-(`lib/core/sync/read_cache.dart:100`), which the controller calls on a
+(`lib/core/sync/read_cache.dart:111`), which the controller calls on a
 sign-out the person asks for
 (`lib/features/auth/providers/auth_providers.dart:138`) and on account
 deletion. A session ended remotely, a refresh token refused or the account
@@ -530,7 +515,7 @@ naming a copy it was never served, until the next resume or replay clears
 every mark (`lib/core/sync/sync_providers.dart:144`) or a fetch of the same
 key succeeds, which a different garage's keys never will. The copies
 themselves are keyed by user and stay unread. The fix is `unmarkAll()`
-(`lib/core/sync/read_cache.dart:121`) when the signed-in user changes.
+(`lib/core/sync/read_cache.dart:132`) when the signed-in user changes.
 
 ### The preferences file grows with the cache
 
@@ -543,13 +528,13 @@ of one list rewrites a garage's every copy, and `SharedPreferences.getInstance()
 carries the lot across the platform channel at its first use, which is
 startup. A browser's storage for the whole origin is a few megabytes, so a
 handful of full keys is the ceiling there, and a write past it is caught and
-recorded (`lib/core/sync/read_cache.dart:146`). The spec named a file store
+recorded (`lib/core/sync/read_cache.dart:157`). The spec named a file store
 behind the same `ReadCacheStore` interface as the replacement, on the
 conditional-import pattern of `queued_files.dart`.
 
 Fix later, in the same place: a key over the limit is dropped and a failure
 recorded on **every** successful fetch of that list
-(`lib/core/sync/read_cache.dart:133`), where the spec said once; a `Set` of
+(`lib/core/sync/read_cache.dart:144`), where the spec said once; a `Set` of
 reported keys would silence the repeats.
 
 ### The dashboard logs a "setState during build" from its reminder listeners
@@ -1047,6 +1032,27 @@ several releases later.
 
 ## Recently fixed, worth remembering
 
+### A backup made with no signal was made from copies
+
+**Low, fixed 17 October 2026; since the read cache in September.** With no
+signal every list a backup reads answers with its last good copy rather than
+failing, so a manual backup saved, and the automatic one wrote, a file of
+copies dated today; restore is additive, so restoring such a file brings back
+whatever was deleted since the copies were taken. The automatic backup had
+been written for the failure, and the architecture doc still said "offline
+it fails". `buildBackup` now counts the copies the cache serves during its
+reads (`lib/core/sync/read_cache.dart:69`) and fails as a connection failure
+when there were any (`lib/features/settings/data/backup_action.dart:72`): the
+automatic one tries again on the next foreground and does not blame the
+folder, and a manual one says there is no connection. Refused rather than
+stamped, decision 195. The manual save and share had no catch at all, so a
+failed read was an unhandled future and a tap that did nothing; they now say
+what failed, as the CSV export does
+(`lib/features/settings/screens/data_screen.dart:333`).
+`test/features/settings/auto_backup_test.dart:383` and
+`test/features/settings/export_saving_test.dart:340` build both with no signal
+over a real cache.
+
 ### A problem noted after midnight was filed under the day before
 
 **Low, fixed 17 October 2026; since observations arrived.** A new problem
@@ -1364,7 +1370,7 @@ free garage's sixth car lived in the `vehicles` insert policy
 — `/vehicles/new` typed into the address bar, a backup restored, a Fuelio
 import — showed "you do not have access" for a garage that was merely full.
 Worse, a restore creates cars one by one and asked nothing first
-(`lib/features/settings/data/backup_action.dart:91`): a six-car backup
+(`lib/features/settings/data/backup_action.dart:106`): a six-car backup
 restored into a fresh free garage, which is the reinstall, got five cars and
 none of their entries before the sixth was refused. Two fixes. A `before
 insert` trigger on `vehicles`
@@ -1381,7 +1387,7 @@ anything (`test/features/settings/backup_restore_test.dart`, the group
 car only into a garage with no cars at all, where the count is zero, and
 the car is its first write, so the trigger's `P0008` arrives before anything
 partial. The data screen shows a refused restore as a sentence
-(`lib/features/settings/screens/data_screen.dart:393`), which it did not
+(`lib/features/settings/screens/data_screen.dart:417`), which it did not
 before: a failure part-way used to be an unhandled exception and silence.
 
 ### A driver's edit of somebody else's entry closed as saved and changed nothing
@@ -1460,7 +1466,7 @@ stand-in yet and will show the same shape if it ever fails under load.
 ### Offline, a list showed its copy only after about seven seconds
 
 **Was Medium.** The copy is served when the fetch fails
-(`lib/core/sync/read_cache.dart:74`), and postgrest 2.8.0 took its time
+(`lib/core/sync/read_cache.dart:84`), and postgrest 2.8.0 took its time
 failing: it retried every GET that threw three times, pausing 1, 2 and 4
 seconds between attempts, so a screen opened with no signal showed a spinner
 for seven seconds and then the copy, and every list on it paid the wait on its
@@ -3670,7 +3676,7 @@ after a restore and the notifications simply never do. Tread readings are worse
 still, being the one thing nobody can measure again afterwards.
 
 Both are now in the file and in the restore, additively as everything else is
-(`lib/features/settings/data/backup_action.dart:80`). Tyres restore in two
+(`lib/features/settings/data/backup_action.dart:95`). Tyres restore in two
 steps because a set has no id until it is created; a set already there is left
 alone and only gains readings it lacks.
 

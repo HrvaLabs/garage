@@ -1,8 +1,9 @@
 Correzioni dei primi giorni:
 • Un veicolo archiviato non riceve più promemoria
-• L'intervento di un autista ora chiude il promemoria una tantum
-• Un incidente registrato senza segnale parte appena torna il segnale
+• Un intervento dell'autista chiude il promemoria una tantum
+• Un incidente registrato offline parte appena c'è segnale
 • Per un autista la scheda dei veicoli ora si chiama Auto
-• Un problema segnalato dopo mezzanotte porta la data di quel giorno
-• Un indirizzo che non porta da nessuna parte ora lo dice in italiano
-• I vecchi promemoria impostati dal telefono da solo non arrivano più
+• Un problema segnalato dopo mezzanotte ha la data giusta
+• Il backup aspetta il segnale invece di salvare dati vecchi
+• Un indirizzo inesistente ora lo dice in italiano
+• I vecchi promemoria del telefono non arrivano più

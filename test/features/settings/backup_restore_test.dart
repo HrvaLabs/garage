@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/errors/app_failure.dart';
+import 'package:garage/core/sync/read_cache.dart';
 import 'package:garage/domain/entities/cost_entry.dart';
 import 'package:garage/domain/entities/fuel_entry.dart';
 import 'package:garage/domain/entities/household.dart';
@@ -124,6 +125,29 @@ class FakeFuel implements FuelRepository {
 
   @override
   Future<void> delete(String id) async {}
+}
+
+/// A fuel log read the way the Supabase one is, through the read cache: with
+/// no signal it answers with the copy its last good read kept, rather than
+/// failing.
+class CachedFuel extends FakeFuel {
+  CachedFuel(this.cache) : super([fill()]);
+
+  final ReadCache cache;
+  bool offline = false;
+
+  @override
+  Future<List<FuelEntry>> forVehicle(String vehicleId) async {
+    await cache.rows('fuel:$vehicleId', () async {
+      if (offline) {
+        throw const AppFailure(kind: AppFailureKind.network);
+      }
+      return [
+        for (final entry in entries) {'id': entry.id},
+      ];
+    });
+    return entries;
+  }
 }
 
 class FakeCosts implements CostRepository {

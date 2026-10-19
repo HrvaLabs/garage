@@ -10,6 +10,9 @@ import 'package:file_selector/file_selector.dart';
 import 'package:garage/core/errors/app_failure.dart';
 import 'package:garage/core/files/file_picker.dart';
 import 'package:garage/core/files/file_saver.dart';
+import 'package:garage/core/sync/read_cache.dart';
+import 'package:garage/core/sync/read_cache_providers.dart';
+import 'package:garage/core/sync/read_cache_store.dart';
 import 'package:garage/domain/entities/vehicle.dart';
 import 'package:garage/domain/export/garage_backup.dart';
 import 'package:garage/features/vehicles/data/vehicle_repository.dart';
@@ -43,6 +46,7 @@ import 'package:garage/features/trips/providers/route_providers.dart';
 import '../../support/fake_repositories.dart';
 import 'backup_restore_test.dart'
     show
+        CachedFuel,
         FakeCosts,
         FakeFuel,
         FakeIncome,
@@ -102,6 +106,9 @@ Future<RecordingFileSaver> pumpData(
 
   /// The vehicle store, for a test about a restore the store refuses.
   VehicleRepository? vehicleRepository,
+
+  /// The fuel log, for a test about a backup built with no signal.
+  FakeFuel? fuel,
 }) async {
   final saver = RecordingFileSaver();
   await pumpScreen(
@@ -124,7 +131,7 @@ Future<RecordingFileSaver> pumpData(
       vehicleRepositoryProvider.overrideWithValue(
         vehicleRepository ?? FakeVehicles([testVehicle('v1')]),
       ),
-      fuelRepositoryProvider.overrideWithValue(FakeFuel([fill()])),
+      fuelRepositoryProvider.overrideWithValue(fuel ?? FakeFuel([fill()])),
       costRepositoryProvider.overrideWithValue(FakeCosts()),
       odometerRepositoryProvider.overrideWithValue(FakeOdometer()),
       tripRepositoryProvider.overrideWithValue(FakeTrips()),
@@ -313,6 +320,60 @@ void main() {
       expect(contentOf('v1-odometer.csv'), contains('odometer_km'));
       expect(contentOf('v1-tyres.csv'), contains('front_left_mm'));
       expect(contentOf('vehicles.csv'), contains('plate'));
+    });
+  });
+
+  group('a backup with no signal', () {
+    // Every list read answers with its last good copy rather than failing,
+    // and a restore is additive: a file of copies would bring back whatever
+    // was deleted since they were taken.
+    Future<CachedFuel> offline() async {
+      final cache = ReadCache(
+        store: InMemoryReadCacheStore(),
+        userId: () => 'u1',
+      );
+      final fuel = CachedFuel(cache);
+      await fuel.forVehicle('v1');
+      return fuel..offline = true;
+    }
+
+    testWidgets('is not saved from copies, and says why', (tester) async {
+      final fuel = await offline();
+      final saver = await pumpData(
+        tester,
+        fuel: fuel,
+        overrides: [readCacheProvider.overrideWithValue(fuel.cache)],
+      );
+
+      await tapRow(tester, 'Back up everything');
+
+      expect(saver.saved, isEmpty);
+      expect(
+        find.text('No connection. Check your network and retry.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('is not shared from copies either', (tester) async {
+      final fuel = await offline();
+      await pumpData(
+        tester,
+        fuel: fuel,
+        overrides: [readCacheProvider.overrideWithValue(fuel.cache)],
+      );
+
+      await tester.scrollUntilVisible(
+        find.byKey(const Key('settings-backup-share')),
+        200,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(find.byKey(const Key('settings-backup-share')));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.text('No connection. Check your network and retry.'),
+        findsOneWidget,
+      );
     });
   });
 
