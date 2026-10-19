@@ -361,7 +361,7 @@ the platform push animated it: opening Statistics on the web slid the whole
 window in from the right and dragged the sidebar behind it out to the left, and
 the reader saw one sidebar leave and an identical one arrive. Tab switches were
 already immune because they build their own fading page
-(`lib/core/router/app_router.dart:225`); the ten pushed screens that also draw a
+(`lib/core/router/app_router.dart:229`); the ten pushed screens that also draw a
 sidebar were not.
 
 **Why not a shell route.** The correct fix is a `ShellRoute` holding the sidebar
@@ -6619,7 +6619,7 @@ delete.
 - The three figures open where each is explained: the cars, statistics on its
   costs tab, and statistics
   (`lib/features/dashboard/widgets/household_metrics_strip.dart:56`).
-  `/stats?tab=costs` opens on costs (`lib/core/router/app_router.dart:121`).
+  `/stats?tab=costs` opens on costs (`lib/core/router/app_router.dart:125`).
 - A car out on loan says so on its dashboard card and in the car list
   (`lib/features/vehicles/widgets/on_loan_badge.dart:15`), from one query for
   every car in the garage

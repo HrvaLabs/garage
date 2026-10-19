@@ -48,6 +48,7 @@ import '../../features/vehicles/screens/vehicles_screen.dart';
 import '../../domain/auth/email_link.dart';
 import '../supabase/supabase_client_provider.dart';
 import 'app_redirect.dart';
+import 'not_found_screen.dart';
 import '../theme/garage_tokens.dart';
 
 /// Root navigator handle, for the rare UI that must show above whatever route
@@ -68,6 +69,9 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       pendingInvite: ref.read(pendingInviteProvider),
     ),
     routes: garageRoutes(),
+    // The app's own page, in the app's language, rather than go_router's
+    // "Page Not Found" over the raw exception.
+    errorBuilder: (_, state) => NotFoundScreen(path: state.uri.path),
   );
 });
 

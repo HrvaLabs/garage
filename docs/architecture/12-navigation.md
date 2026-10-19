@@ -25,7 +25,7 @@ way out (`lib/core/widgets/page_scaffold.dart:64`).
 ## Tabs cross-fade; pushed pages slide
 
 The five tabs are peers, so moving between them has no direction. `_tabPage`
-(`lib/core/router/app_router.dart:225`) wraps a tab's screen in a
+(`lib/core/router/app_router.dart:229`) wraps a tab's screen in a
 `CustomTransitionPage` that fades, and a directional push transition between
 peers reads as "forward" no matter which way the user actually moved.
 
@@ -463,6 +463,15 @@ screen uses — and nothing else relates them, so
 `ConfirmationURL`, if the path prefix stops matching the route, if the two
 templates swap `type=email` and `type=recovery`, or if the ampersand is left
 bare in what is, after all, an HTML attribute.
+
+**An address nothing matches** opens the app's own page,
+`NotFoundScreen` (`lib/core/router/not_found_screen.dart:14`), in the app's
+language and with a button to the dashboard, as the router's `errorBuilder`
+(`lib/core/router/app_router.dart:74`). go_router's default said "Page Not
+Found" over the raw exception, in English, and it was what the launcher
+shortcuts opened until decision 190. The page records the path, never the
+query, as a failure, so Diagnostics can name the address. The gates still run
+first: somebody signed out is sent to sign in, wherever they were going.
 
 ## The desktop sidebar
 

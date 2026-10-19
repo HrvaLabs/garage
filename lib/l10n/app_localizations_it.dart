@@ -4108,6 +4108,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get syncKindIncident => 'Incidente';
 
   @override
+  String get notFoundTitle => 'Qui non c\'è niente';
+
+  @override
+  String get notFoundMessage =>
+      'Questo indirizzo non porta da nessuna parte nell\'app. Forse è scritto male o viene da una versione precedente.';
+
+  @override
+  String get notFoundHome => 'Vai al cruscotto';
+
+  @override
   String get observationsTitle => 'Problemi';
 
   @override

@@ -4038,6 +4038,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncKindIncident => 'Incident';
 
   @override
+  String get notFoundTitle => 'Nothing here';
+
+  @override
+  String get notFoundMessage =>
+      'This address does not lead anywhere in the app. It may have been mistyped, or come from an older version.';
+
+  @override
+  String get notFoundHome => 'Go to the dashboard';
+
+  @override
   String get observationsTitle => 'Problems';
 
   @override

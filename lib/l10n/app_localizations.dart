@@ -6975,6 +6975,24 @@ abstract class AppLocalizations {
   /// **'Incident'**
   String get syncKindIncident;
 
+  /// The title of the page an address no route matches opens: a mistyped web address, an old link, a broken shortcut.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing here'**
+  String get notFoundTitle;
+
+  /// No description provided for @notFoundMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This address does not lead anywhere in the app. It may have been mistyped, or come from an older version.'**
+  String get notFoundMessage;
+
+  /// No description provided for @notFoundHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to the dashboard'**
+  String get notFoundHome;
+
   /// No description provided for @observationsTitle.
   ///
   /// In en, this message translates to:

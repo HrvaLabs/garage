@@ -194,7 +194,7 @@ without a router.
 
 Tab destinations are peers rather than a hierarchy, so switching them cross-fades
 instead of playing a directional push, which read as "forward" whichever way the
-user moved (`lib/core/router/app_router.dart:225`).
+user moved (`lib/core/router/app_router.dart:229`).
 
 Pushed pages pick their transition from the window rather than the platform.
 `_WindowAwarePageTransitions` (`lib/core/theme/garage_theme.dart:228`) wraps each
@@ -207,7 +207,7 @@ behind it out.
 ## Sharp edges
 
 - **Route order is load bearing.** `/vehicles/new` is declared before
-  `/vehicles/:id` (`lib/core/router/app_router.dart:98`), because otherwise "new"
+  `/vehicles/:id` (`lib/core/router/app_router.dart:102`), because otherwise "new"
   is matched as a vehicle id. Adding a literal route under a parameterised one has
   to go above it.
 - **The two targets do not authenticate the same way.** Google sign-in on Android

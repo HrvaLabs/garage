@@ -309,17 +309,6 @@ read the same way until October 2026 and no longer reaches the server; see
 "Deleting an entry saved with no signal said it was not allowed" under
 Recently fixed.
 
-### An address no route matches shows go_router's own page, in English
-
-**Low; found 4 October 2026.** `GoRouter` is built with no `errorBuilder`
-(`lib/core/router/app_router.dart:60`), so a location nothing matches renders
-the package's default screen: "Page Not Found" and the raw
-`GoException: no routes for location: …`, in English whatever the app's
-language, which breaks the rule that a screen never shows a raw message. The
-launcher shortcuts were the way in (Recently fixed, below); a mistyped web
-address or an old link still is. A localized page, or a redirect home, would
-close it.
-
 ### A change with no signal to an entry whose timed-out save had landed is lost
 
 **Low; found 4 October 2026.** A save that times out is queued, and may still
@@ -1056,6 +1045,23 @@ several releases later.
 ---
 
 ## Recently fixed, worth remembering
+
+### An address no route matched showed go_router's own page, in English
+
+**Low, fixed 16 October 2026; found 4 October.** `GoRouter` was built with no
+`errorBuilder`, so a location nothing matched rendered the package's default
+screen: "Page Not Found" over the raw `GoException: no routes for location:
+…`, in English whatever the app's language, which broke the rule that a
+screen never shows a raw message. The launcher shortcuts were the way in
+(below); a mistyped web address or an old link still was. Such an address now
+opens `NotFoundScreen` (`lib/core/router/not_found_screen.dart:14`, wired at
+`lib/core/router/app_router.dart:74`): the app's title and sentence, and a
+button to the dashboard. It records `no page at <path>` as a failure, the
+path and never the query, which can carry a token, so Diagnostics names the
+address a report is about. The gates run first, as for any address: a visitor
+who is not signed in is sent to sign in. `test/core/router/not_found_screen_test.dart`
+opens the app's own router at an unknown address, with a query, and checks
+the page and the path it was given.
 
 ### The bottom tab under "My cars" said "Vehicles"
 
@@ -2924,7 +2930,7 @@ stale until something else refreshes it. Affects the entry sheets and the
 ### Tapping "More" slid a page in over its own navigation bar
 **Was Low**, and purely visual. The bottom nav's five destinations are peers,
 so four of them were registered with `_tabPage` and cross-fade
-(`lib/core/router/app_router.dart:225`). `/more` was added later with a plain
+(`lib/core/router/app_router.dart:229`). `/more` was added later with a plain
 `builder:` and so fell back to the platform push transition — the animation a
 *detail* page gets. Tapping it slid a new page in sideways over the very
 navigation bar it was launched from, while every other tab dissolved in place.
@@ -4537,7 +4543,7 @@ cache is no use to a phone that opens on the sign-in gate. It does not.
 with no expiry check (`supabase_auth.dart` line 108, into `setInitialSession`,
 `gotrue_client.dart` lines 1138 to 1155 of gotrue 2.26.0), so after an hour
 away `currentUser` is not null, the router treats the person as signed in
-(`lib/core/router/app_router.dart:63`), the startup cache is read under their
+(`lib/core/router/app_router.dart:64`), the startup cache is read under their
 id and the read cache has its user key. `recoverSession` then tries a refresh
 without holding startup up; offline it fails with
 `AuthRetryableFetchException` after up to about ten seconds of retries

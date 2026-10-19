@@ -2,5 +2,6 @@ Correzioni dei primi giorni:
 • Una voce salvata senza segnale si può modificare o eliminare prima dell'invio, invece di dire che non hai il permesso
 • Un veicolo archiviato non riceve più promemoria
 • Un intervento registrato da un autista ora chiude il suo promemoria una tantum
-• Un incidente registrato senza segnale resta sul telefono e viene inviato quando avrai segnale
+• Un incidente registrato senza segnale resta sul telefono e parte appena torna il segnale
 • Per un autista la scheda dei veicoli ora si chiama Auto
+• Un indirizzo che non porta da nessuna parte ora lo dice in italiano

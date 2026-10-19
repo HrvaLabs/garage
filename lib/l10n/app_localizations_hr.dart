@@ -4110,6 +4110,16 @@ class AppLocalizationsHr extends AppLocalizations {
   String get syncKindIncident => 'Nezgoda';
 
   @override
+  String get notFoundTitle => 'Ovdje nema ničega';
+
+  @override
+  String get notFoundMessage =>
+      'Ova adresa ne vodi nikamo u aplikaciji. Možda je krivo upisana ili dolazi iz starije verzije.';
+
+  @override
+  String get notFoundHome => 'Otvori pregled';
+
+  @override
   String get observationsTitle => 'Problemi';
 
   @override
