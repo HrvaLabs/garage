@@ -139,11 +139,10 @@ void main() {
       assignments: log,
     );
 
-    expect(
-      lines.map((l) => '${l.driverId}:${l.month.month}:${l.total}'),
-      ['marko:9:12.0', 'ana:8:25.0'],
-      reason: 'newest month first; paid, card and unrecorded left out',
-    );
+    expect(lines.map((l) => '${l.driverId}:${l.month.month}:${l.total}'), [
+      'marko:9:12.0',
+      'ana:8:25.0',
+    ], reason: 'newest month first; paid, card and unrecorded left out');
     expect(lines.last.entries.map((e) => e.id), ['c1', 'c2']);
   });
 

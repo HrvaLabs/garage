@@ -66,30 +66,26 @@ final _applePlatforms = TargetPlatformVariant(<TargetPlatform>{
 
 void main() {
   group('page transitions', () {
-    testWidgets(
-      'a pushed page slides in over a phone-width window',
-      (tester) async {
-        final offsets = await _midPush(tester, surface: const Size(400, 900));
+    testWidgets('a pushed page slides in over a phone-width window', (
+      tester,
+    ) async {
+      final offsets = await _midPush(tester, surface: const Size(400, 900));
 
-        expect(offsets.above, greaterThan(0));
-        expect(offsets.below, lessThan(0));
-      },
-      variant: _applePlatforms,
-    );
+      expect(offsets.above, greaterThan(0));
+      expect(offsets.below, lessThan(0));
+    }, variant: _applePlatforms);
 
-    testWidgets(
-      'a pushed page does not slide a desktop-width window',
-      (tester) async {
-        final offsets = await _midPush(tester, surface: const Size(1400, 900));
+    testWidgets('a pushed page does not slide a desktop-width window', (
+      tester,
+    ) async {
+      final offsets = await _midPush(tester, surface: const Size(1400, 900));
 
-        // The sidebar is drawn inside every page, so a page that slides in
-        // slides a sidebar in with it and drags the identical one behind it
-        // out — which is what opening Statistics looked like.
-        expect(offsets.above, 0);
-        expect(offsets.below, 0);
-      },
-      variant: TargetPlatformVariant.all(),
-    );
+      // The sidebar is drawn inside every page, so a page that slides in
+      // slides a sidebar in with it and drags the identical one behind it
+      // out — which is what opening Statistics looked like.
+      expect(offsets.above, 0);
+      expect(offsets.below, 0);
+    }, variant: TargetPlatformVariant.all());
 
     testWidgets(
       'a pushed page leaves a tab page below it where it is on a desktop-width '

@@ -3484,7 +3484,9 @@ Flutter was newest that morning. A formatter change in a later SDK reported
 formats clean locally — a red build with no commit behind it. All three jobs
 now pin the same version the release builds with
 (`.github/workflows/ci.yml:45`), and a test fails if any Flutter setup step
-anywhere loses its pin.
+anywhere loses its pin. Cloudflare's build from Git clones its own
+(`scripts/cf-build.sh:10`), which no test read until the move to 3.47.7 on
+16 October 2026; the same test checks it now.
 
 **A key the suite needs and the job never passed.** The account-deletion cases
 in `test_rls/rls_test.dart:64` need `SUPABASE_SERVICE_ROLE_KEY`, because they do
@@ -4354,6 +4356,28 @@ app sold in Croatian" in this file is unchanged. Decision 154.
 ---
 
 ## Non-issues (checked, turned out fine)
+
+### Moving to Flutter 3.47.7: five files rewritten, two first runs failed
+
+**Checked 16 October 2026.** Its `flutter analyze` adds `build/**`,
+`android/**`, `ios/**` and `web/**` to the analyzer's `exclude` on the first
+run ("Upgrading analysis_options.yaml to exclude build and platform
+directories"). No Dart file lives under any of them, through symlinks either,
+and the analysis is clean with or without the list; it is committed so that a
+local run stops rewriting a tracked file. Its formatter reflows a call whose
+closure or list argument is followed by a named one, which reformatted three
+tests, and `pubspec.lock` moved to the versions this SDK pins. None of it
+changes what the app does.
+
+The first `flutter test` and the first web build on the new SDK each failed
+once on a Mac and passed when run again. The test assets came out with a
+Vulkan-only `ink_sparkle.frag` ("Found stages: Vulkan"), which failed 72 widget
+tests until `build/unit_test_assets` was moved aside and rebuilt: Flutter's
+tool retries `impellerc` without SkSL when the first attempt fails, and says so
+only in its own log. The web build stopped with "Failed to compile application
+for the Web" and built from scratch on the next try. Why the first attempts
+failed was not found; after an upgrade, a local run that fails like this is
+worth one rebuild before anything else.
 
 ### "Failed host lookup" in Diagnostics
 

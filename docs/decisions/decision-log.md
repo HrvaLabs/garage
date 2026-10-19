@@ -5734,7 +5734,7 @@ says where the release went, and nothing is guessed.
 percentage in a tag would open it. The share is raised in the Console anyway,
 so the tag only has to pick where it starts, and the one thing that must not
 drift is the runbook promising a different share from the one uploaded.
-`test/ci/deploy_workflow_test.dart:350` fails when they disagree.
+`test/ci/deploy_workflow_test.dart:358` fails when they disagree.
 
 **That test runs the step rather than reading it.** Every other check in the
 file treats a workflow as text. This one lifts the `run:` block out and

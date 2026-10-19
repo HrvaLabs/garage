@@ -7,7 +7,7 @@
 # Supabase values come from Build variables (SUPABASE_URL, SUPABASE_ANON_KEY).
 set -euo pipefail
 
-FLUTTER_VERSION="3.44.6"
+FLUTTER_VERSION="3.47.7"
 FLUTTER_DIR="$HOME/flutter"
 
 if [ ! -x "$FLUTTER_DIR/bin/flutter" ]; then

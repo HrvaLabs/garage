@@ -51,11 +51,19 @@ void main() {
       );
     }
 
+    // Cloudflare's build from Git clones its own Flutter, so that is a pin too.
+    final cloudflare = RegExp(
+      r'^FLUTTER_VERSION="([^"]+)"',
+      multiLine: true,
+    ).firstMatch(File('scripts/cf-build.sh').readAsStringSync());
     expect(
-      pins,
-      hasLength(1),
-      reason: 'workflows disagree on a version: $pins',
+      cloudflare,
+      isNotNull,
+      reason: 'scripts/cf-build.sh pins no Flutter',
     );
+    pins.add(cloudflare!.group(1)!);
+
+    expect(pins, hasLength(1), reason: 'the pins disagree: $pins');
   });
 
   test('the tenancy job hands the suite every key it asks for', () {

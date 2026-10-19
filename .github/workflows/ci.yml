@@ -42,7 +42,7 @@ jobs:
           # shipped most recently, so a formatter change in a new SDK failed a
           # tree nobody had touched — and the suite that decides whether code
           # may ship was not running on the SDK that ships it.
-          flutter-version: '3.44.6'
+          flutter-version: '3.47.7'
           channel: stable
           cache: true
 
@@ -92,7 +92,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.44.6'
+          flutter-version: '3.47.7'
           channel: stable
           cache: true
 
@@ -178,7 +178,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.44.6'
+          flutter-version: '3.47.7'
           channel: stable
           cache: true
 
@@ -256,7 +256,7 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.44.6'
+          flutter-version: '3.47.7'
           channel: stable
           cache: true
 

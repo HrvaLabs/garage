@@ -57,18 +57,14 @@ void main() {
         'service_oil_change': DeadlineKind.service,
       },
     );
-    expect(
-      deadlines.map((d) => d.dueOn).toList(),
-      [
-        DateTime.utc(2026, 10, 3),
-        DateTime.utc(2026, 10, 20),
-        DateTime.utc(2026, 11, 1),
-        DateTime.utc(2026, 11, 15),
-        DateTime.utc(2026, 12, 1),
-        DateTime.utc(2027, 1, 1),
-      ],
-      reason: 'soonest first across the fleet',
-    );
+    expect(deadlines.map((d) => d.dueOn).toList(), [
+      DateTime.utc(2026, 10, 3),
+      DateTime.utc(2026, 10, 20),
+      DateTime.utc(2026, 11, 1),
+      DateTime.utc(2026, 11, 15),
+      DateTime.utc(2026, 12, 1),
+      DateTime.utc(2027, 1, 1),
+    ], reason: 'soonest first across the fleet');
   });
 
   test(
