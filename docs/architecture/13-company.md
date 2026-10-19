@@ -10,8 +10,8 @@ product reasoning is item 15 of [the roadmap](../roadmap.md); the trade-offs
 are decision 184.
 
 > Jump to [Sharp edges](#sharp-edges): a second handover on the same day is
-> refused, a driver's "today" is UTC's, an incident logged with no signal is
-> lost rather than queued, and a departed driver's name cannot be read back.
+> refused, a driver's "today" is UTC's, and a departed driver's name cannot be
+> read back.
 
 ## The garage is the company
 
@@ -383,7 +383,9 @@ under each row, a sheet (`lib/features/incidents/widgets/incident_sheet.dart:30`
 a menu per row for close, reopen, edit and delete. A driver reports on an
 assigned car through their own menu; admins manage all. Realtime carries the
 table (`lib/core/sync/realtime_sync.dart:62`): a dent reported from the
-driver's phone is what the admin's console is looking at.
+driver's phone is what the admin's console is looking at. A report made with
+no signal waits on the phone like every other entry
+(`lib/core/sync/queueing_repositories.dart:559`) and goes when there is one.
 
 **Settling has one owner.** Two statuses are open — `open` and `at_insurer`,
 somebody is still waiting — and three are the ways a report stops being
@@ -392,7 +394,7 @@ off the status, and `resolvedOn` says since when. The sheet moves a report
 between the open statuses and never writes `resolvedOn`; settling is the
 card's act, `IncidentController.close(incident, status:)`, which writes the
 word and the day together, and `reopen` clears both
-(`lib/features/incidents/providers/incident_providers.dart:70`). So choosing
+(`lib/features/incidents/providers/incident_providers.dart:76`). So choosing
 "With the insurer" leaves the incident open, a settled report shows its
 status as text rather than offering to change it, and a settled report never
 carries an open status nor an open one a day.
@@ -559,10 +561,6 @@ resolve against.
   `current_date` (`supabase/migrations/0080_company.sql:711`), so a handover
   dated today reaches the phone once it is today in UTC — two hours late in
   Zagreb's summer.
-- **Incidents are not queued offline.** Unlike an observation, a report made
-  with no signal fails rather than waits
-  (`lib/features/incidents/providers/incident_providers.dart:18`); a
-  `PendingWriteKind` and a sender are the cost of changing that.
 - **A departed driver's name cannot be read back.** The profiles policy hides
   a profile once its owner is no longer a co-member, so every reader prints a
   former member as such, through `memberNameOf`.

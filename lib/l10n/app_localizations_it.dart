@@ -4105,6 +4105,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get syncKindObservation => 'Annotazione';
 
   @override
+  String get syncKindIncident => 'Incidente';
+
+  @override
   String get observationsTitle => 'Problemi';
 
   @override

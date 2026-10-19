@@ -130,6 +130,7 @@ void main() {
         'cost',
         'service',
         'observation',
+        'incident',
         'attachment',
       });
     });

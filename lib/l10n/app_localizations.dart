@@ -6969,6 +6969,12 @@ abstract class AppLocalizations {
   /// **'Something noticed'**
   String get syncKindObservation;
 
+  /// No description provided for @syncKindIncident.
+  ///
+  /// In en, this message translates to:
+  /// **'Incident'**
+  String get syncKindIncident;
+
   /// No description provided for @observationsTitle.
   ///
   /// In en, this message translates to:

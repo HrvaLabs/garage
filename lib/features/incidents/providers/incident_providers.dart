@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/clock.dart';
 import '../../../core/errors/app_failure.dart';
 import '../../../core/supabase/supabase_client_provider.dart';
+import '../../../core/sync/queueing_repositories.dart';
 import '../../../core/sync/read_cache_providers.dart';
+import '../../../core/sync/sync_providers.dart';
 import '../../../domain/entities/attachment.dart';
 import '../../../domain/entities/incident.dart';
 import '../../attachments/providers/attachment_providers.dart';
@@ -11,14 +13,18 @@ import '../../vehicles/providers/vehicle_providers.dart';
 import '../data/incident_repository.dart';
 import '../data/supabase_incident_repository.dart';
 
-/// Not wrapped in the offline queue, unlike an observation: a queued write
-/// needs a `PendingWriteKind`, a sender and a row in the retry screen, and
-/// an incident is reported from the office or the depot far more often than
-/// from a car park with no signal. Recorded as a known gap.
+/// Wrapped in the offline queue, like an observation: a report is made where
+/// the car is, and a car park or a roadside is where the signal is not. See
+/// [QueueingIncidentRepository].
 final incidentRepositoryProvider = Provider<IncidentRepository>((ref) {
-  return SupabaseIncidentRepository(
-    ref.watch(supabaseClientProvider),
-    cache: ref.watch(readCacheProvider),
+  return QueueingIncidentRepository(
+    inner: SupabaseIncidentRepository(
+      ref.watch(supabaseClientProvider),
+      cache: ref.watch(readCacheProvider),
+    ),
+    queue: ref.watch(pendingWriteStoreProvider),
+    now: () => DateTime.now().toUtc(),
+    userId: () => ref.read(currentUserIdProvider),
   );
 });
 

@@ -124,16 +124,6 @@ their own window with a `confirmed_at` of their choosing. The sign-off is
 still the right person's, which is what the guard is for; the date is not
 evidence when the driver is also the one who keeps the log.
 
-### An incident logged with no signal is lost
-
-**Medium for a driver in a car park, recorded rather than done.** Unlike an
-observation, the incident repository is not wrapped in the offline queue
-(`lib/features/incidents/providers/incident_providers.dart:18`): it needs a
-`PendingWriteKind`, a sender in `lib/core/sync/sync_providers.dart` and a
-row in the retry screen. The sheet reports the failure and keeps what was
-typed. Left because a report is usually filed from the depot, and the photo
-that goes with it needs the signal anyway.
-
 ### The tyres, documents and parts screens still offer a driver their add buttons
 
 **Low.** The policies refuse the insert and every sheet shows the permission
@@ -344,7 +334,7 @@ close it.
 
 **Low; found 4 October 2026.** A save that times out is queued, and may still
 have reached the server. Changing the entry asks the server as well as the
-queue (`lib/core/sync/queueing_repositories.dart:232`), but with no signal
+queue (`lib/core/sync/queueing_repositories.dart:235`), but with no signal
 the server cannot answer: a delete then removes only the queued copy and the
 row comes back on the next fetch, and an edit rides the queued insert, which
 the replay finds already there and drops with the edit inside it. It takes a
@@ -557,7 +547,7 @@ signed out elsewhere, goes through neither, and the one `ReadCache` lives as
 long as the app (`lib/core/sync/read_cache_providers.dart:14`), so another
 account signing in on that phone is shown the first account's marks: a banner
 naming a copy it was never served, until the next resume or replay clears
-every mark (`lib/core/sync/sync_providers.dart:138`) or a fetch of the same
+every mark (`lib/core/sync/sync_providers.dart:144`) or a fetch of the same
 key succeeds, which a different garage's keys never will. The copies
 themselves are keyed by user and stay unread. The fix is `unmarkAll()`
 (`lib/core/sync/read_cache.dart:121`) when the signed-in user changes.
@@ -1077,6 +1067,26 @@ several releases later.
 
 ## Recently fixed, worth remembering
 
+### An incident logged with no signal was lost
+
+**Medium for a driver in a car park, fixed 16 October 2026; since incidents
+arrived in 0080.** Every other entry a driver makes waits on the phone when
+the network cannot take it; the incident repository was left out on purpose
+(decision 184), on the guess that a report is filed from the depot. The sheet
+said the save failed and kept what was typed, while the photo of the dent,
+attached first, already waited for a signal on its own. The repository is now
+wrapped like an observation's (`lib/core/sync/queueing_repositories.dart:559`,
+`lib/features/incidents/providers/incident_providers.dart:19`): a report that
+gets no answer is kept under its own kind
+(`lib/core/sync/pending_write.dart:24`), shows on the car's card and in the
+console's list on that phone, is listed under More → Waiting to sync, and is
+sent by the replay through the Supabase repository
+(`lib/core/sync/sync_providers.dart:85`). Settling, reopening or deleting it
+before it is sent changes the queued report, as for every other entry.
+`test/features/incidents/incident_offline_test.dart` makes the report through
+the controller over a server that cannot be reached and then can, and reads
+the insert the replay sends. Decision 193.
+
 ### A driver's service left its one-off reminder open
 
 **Medium for a driver on a car with one-off reminders, fixed 16 October 2026;
@@ -1164,7 +1174,7 @@ nothing, and `refusedIfNone` reported a refusal: one phone logged
 `fuel_entries delete of 27068c84… touched no row: filtered by policy` four
 times in twelve seconds, after seven network failures on the same delete. The
 entry stayed, and was sent on the next replay. `deleteEntry` and
-`updateEntry` (`lib/core/sync/queueing_repositories.dart:232`, `:258`) now
+`updateEntry` (`lib/core/sync/queueing_repositories.dart:235`, `:258`) now
 change the queued insert, still asking the server in case a timed-out insert
 had landed, inside `betweenReplays` (`lib/core/sync/replay.dart:53`) so a
 replay in flight cannot land the entry after it was deleted; the entry's

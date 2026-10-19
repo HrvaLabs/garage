@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../features/fuel/data/supabase_fuel_repository.dart';
 import '../../features/fuel/providers/fuel_providers.dart';
 import '../../features/costs/data/supabase_cost_repository.dart';
+import '../../features/incidents/data/supabase_incident_repository.dart';
 import '../../features/maintenance/data/supabase_maintenance_repository.dart';
 import '../../features/observations/data/supabase_observation_repository.dart';
 import '../../features/trips/data/supabase_trip_repository.dart';
@@ -81,6 +82,11 @@ final pendingWriteSenderProvider =
               client,
               cache: ref.read(readCacheProvider),
             ).add(observationFromRow(write.row));
+          case PendingWriteKind.incident:
+            await SupabaseIncidentRepository(
+              client,
+              cache: ref.read(readCacheProvider),
+            ).add(incidentFromRow(write.row));
           case PendingWriteKind.attachment:
             final kept = write.attachment;
             final files = ref.read(queuedFileStoreProvider);

@@ -51,6 +51,7 @@ class PendingSyncScreen extends ConsumerWidget {
                     PendingWriteKind.service => Icons.build_outlined,
                     PendingWriteKind.observation =>
                       Icons.report_problem_outlined,
+                    PendingWriteKind.incident => Icons.report_outlined,
                   }),
                   title: Text(switch (write.kind) {
                     PendingWriteKind.fuel => l10n.syncKindFuel,
@@ -60,6 +61,7 @@ class PendingSyncScreen extends ConsumerWidget {
                     PendingWriteKind.cost => l10n.syncKindCost,
                     PendingWriteKind.service => l10n.syncKindService,
                     PendingWriteKind.observation => l10n.syncKindObservation,
+                    PendingWriteKind.incident => l10n.syncKindIncident,
                   }),
                   subtitle: Text(
                     l10n.syncQueuedAt(

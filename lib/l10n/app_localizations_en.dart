@@ -4035,6 +4035,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get syncKindObservation => 'Something noticed';
 
   @override
+  String get syncKindIncident => 'Incident';
+
+  @override
   String get observationsTitle => 'Problems';
 
   @override

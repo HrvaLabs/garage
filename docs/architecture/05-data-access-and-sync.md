@@ -72,6 +72,7 @@ migrations that have added to the publication since:
 | `vehicle_documents` | `vehicleDocumentsProvider(vehicleId)` |
 | `odometer_entries`, `trip_entries`, `income_entries` | the provider for each kind |
 | `observations` | `observationsProvider(vehicleId)` |
+| `incidents` | `incidentsProvider(vehicleId)` and the console's fleet list |
 | `routes` | `routesProvider` (household-wide, like invites and API keys) |
 | `invites`, `api_keys`, `webhooks`, `vehicle_transfers` | their own providers |
 | `vehicle_guest_passes` | `vehicleGuestPassesProvider(vehicleId)`, and the holder's own list |
@@ -93,20 +94,22 @@ Every write used to go straight to Supabase, and a fill-up is typed at a pump �
 which is exactly where a phone has one bar and a canopy overhead. A failed
 write showed a message and kept the sheet open; nothing was kept.
 
-`QueueingFuelRepository` and `QueueingOdometerRepository`
-(`lib/core/sync/queueing_repositories.dart`) wrap the Supabase repositories.
+Decorators in `lib/core/sync/queueing_repositories.dart` wrap the Supabase
+repositories of every entry logged away from a good connection: fill-ups and
+readings first, then journeys, costs, services and observations, and since
+October 2026 incidents (decision 193).
 **Nothing above the data layer knows.** Screens already read providers over a
 repository *interface*, so the sheets did not change: the entry saves, the
 sheet closes, and it is right to.
 
-**Only two failures queue** (`lib/core/sync/pending_write.dart:164`): `network`
+**Only two failures queue** (`lib/core/sync/pending_write.dart:168`): `network`
 and `timeout`. Everything else is the server answering — a refusal, a bad
 value — and queueing those would turn a message somebody could act on into an
 entry that never arrives. `timeout` queues even though the write may have
 landed, which is safe for the same reason the whole design is: the entry
 carries its own id, minted by the sheet, so a replay is the same row.
 
-**What comes back off the queue** (`:178`):
+**What comes back off the queue** (`:182`):
 
 | Result | Meaning |
 |---|---|
@@ -129,7 +132,7 @@ decorators' `update` and `delete` used to go straight to Supabase, where the
 row did not exist yet, and `refusedIfNone` reported the zero rows as a
 refusal — "not allowed" for the fill-up the person had just typed, which then
 sent itself anyway. Now `deleteEntry` and `updateEntry`
-(`lib/core/sync/queueing_repositories.dart:232`, `:258`) look in the queue
+(`lib/core/sync/queueing_repositories.dart:235`, `:261`) look in the queue
 first: a delete drops the queued insert, an edit rewrites it and keeps its
 author, `created_at` and place in line. The server is still asked, because a
 save that timed out is queued too and may have landed after the app stopped

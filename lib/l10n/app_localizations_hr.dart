@@ -4107,6 +4107,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get syncKindObservation => 'Zapažanje';
 
   @override
+  String get syncKindIncident => 'Nezgoda';
+
+  @override
   String get observationsTitle => 'Problemi';
 
   @override

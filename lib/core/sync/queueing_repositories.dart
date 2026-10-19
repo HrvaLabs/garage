@@ -1,5 +1,6 @@
 import '../../domain/entities/cost_entry.dart';
 import '../../domain/entities/fuel_entry.dart';
+import '../../domain/entities/incident.dart';
 import '../../domain/entities/observation.dart';
 import '../../domain/entities/reminder_rule.dart';
 import '../../domain/entities/service_entry.dart';
@@ -10,6 +11,8 @@ import '../../features/costs/data/cost_repository.dart';
 import '../../features/costs/data/supabase_cost_repository.dart';
 import '../../features/fuel/data/fuel_repository.dart';
 import '../../features/fuel/data/supabase_fuel_repository.dart';
+import '../../features/incidents/data/incident_repository.dart';
+import '../../features/incidents/data/supabase_incident_repository.dart';
 import '../../features/odometer/data/odometer_repository.dart';
 import '../../features/maintenance/data/maintenance_repository.dart';
 import '../../features/maintenance/data/supabase_maintenance_repository.dart';
@@ -539,6 +542,84 @@ class QueueingObservationRepository implements ObservationRepository {
     vehicleId: observation.vehicleId,
     row: observationToRow(observation),
     server: () => inner.update(observation),
+  );
+
+  @override
+  Future<void> delete(String id) =>
+      deleteEntry(queue, id, server: () => inner.delete(id));
+}
+
+/// A report of damage, a fault, a fine or an accident, kept when the network
+/// could not take it.
+///
+/// Filed where it happened as often as from the depot: the driver standing by
+/// a scraped bumper in a car park is the one who knows what happened, and the
+/// photo they took there already waits for a signal on its own
+/// (`QueueingAttachmentRepository`). The report it belongs to used to fail.
+class QueueingIncidentRepository implements IncidentRepository {
+  QueueingIncidentRepository({
+    required this.inner,
+    required this.queue,
+    required this.now,
+    required this.userId,
+  });
+
+  final IncidentRepository inner;
+  final PendingWriteStore queue;
+  final DateTime Function() now;
+  final String? Function() userId;
+
+  @override
+  Future<void> add(Incident incident) async {
+    try {
+      await inner.add(incident);
+    } on AppFailure catch (failure) {
+      if (!shouldQueue(failure)) {
+        rethrow;
+      }
+      await queue.put(
+        PendingWrite(
+          id: incident.id,
+          kind: PendingWriteKind.incident,
+          vehicleId: incident.vehicleId,
+          row: rowForQueue(
+            incidentToRow(incident),
+            id: incident.id,
+            vehicleId: incident.vehicleId,
+            userId: userId(),
+            at: now(),
+          ),
+          queuedAt: now(),
+        ),
+      );
+    }
+  }
+
+  @override
+  Future<List<Incident>> forVehicle(String vehicleId) async {
+    final stored = await inner.forVehicle(vehicleId);
+    final pending = await pendingEntries(
+      queue: queue,
+      kind: PendingWriteKind.incident,
+      vehicleId: vehicleId,
+      known: {for (final incident in stored) incident.id},
+      read: incidentFromRow,
+    );
+    if (pending.isEmpty) {
+      return stored;
+    }
+    // Newest first, as the server orders them.
+    return [...stored, ...pending]
+      ..sort((a, b) => b.happenedOn.compareTo(a.happenedOn));
+  }
+
+  @override
+  Future<void> update(Incident incident) => updateEntry(
+    queue,
+    id: incident.id,
+    vehicleId: incident.vehicleId,
+    row: incidentToRow(incident),
+    server: () => inner.update(incident),
   );
 
   @override

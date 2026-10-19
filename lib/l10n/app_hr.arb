@@ -1831,6 +1831,7 @@
   "syncKindCost": "Trošak",
   "syncKindService": "Servis",
   "syncKindObservation": "Zapažanje",
+  "syncKindIncident": "Nezgoda",
   "observationsTitle": "Problemi",
   "observationsHint": "Nešto primijećeno, a još neriješeno. Bilješka sebi i onome tko sljedeći radi na autu.",
   "observationsEmpty": "Nema bilješki. Sve neobično (lupanje, lampica, zvuk nakon rupe) ide ovdje.",

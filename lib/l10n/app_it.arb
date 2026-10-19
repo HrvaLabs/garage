@@ -1172,6 +1172,7 @@
   "syncKindCost": "Spesa",
   "syncKindService": "Intervento",
   "syncKindObservation": "Annotazione",
+  "syncKindIncident": "Incidente",
   "observationsTitle": "Problemi",
   "observationsHint": "Qualcosa che hai notato e non hai ancora sistemato. È un appunto per te e per chi metterà mano all'auto la prossima volta.",
   "observationsEmpty": "Niente da segnalare. Qualsiasi cosa strana (un rumore, una spia accesa, un ticchettio comparso dopo una buca) va qui.",

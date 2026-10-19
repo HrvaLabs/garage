@@ -79,12 +79,14 @@ void main() {
         pendingWrites: await storeWith([
           waiting('a'),
           waiting('b', kind: PendingWriteKind.odometer),
+          waiting('c', kind: PendingWriteKind.incident),
         ]),
       );
       await tester.pumpAndSettle();
 
       expect(find.text('Fill-up'), findsOneWidget);
       expect(find.text('Odometer reading'), findsOneWidget);
+      expect(find.text('Incident'), findsOneWidget);
       expect(find.byKey(const Key('pending-a')), findsOneWidget);
     });
 

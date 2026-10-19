@@ -19,6 +19,10 @@ enum PendingWriteKind {
   service('service'),
   observation('observation'),
 
+  /// A dent, a fault, a fine: reported where it happened, which is a car park
+  /// or a roadside as often as the depot.
+  incident('incident'),
+
   /// A photo waiting to go up. Queued in its own right rather than hung off an
   /// entry, because a receipt can be attached to a fill-up that saved
   /// perfectly well an hour earlier.

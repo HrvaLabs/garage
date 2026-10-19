@@ -7408,3 +7408,28 @@ driver's update, on a table indexed by car; the update is one per saved
 service. The cost sheet still leaves a driver's paid vignette with an
 overdue reminder; giving drivers the insert would close that, and is a wider
 grant than this decision makes.
+
+## 193. An incident waits for a signal like every other entry
+
+**16 October 2026.** Decision 184 left incidents out of the offline queue: a
+`PendingWriteKind` and a sender were the cost, a report was expected to be
+filed from the depot, and nobody had asked. The guess was the wrong way
+round for the case that matters. The driver standing by a scraped bumper in a
+car park is the one who knows what happened, the photo they take there
+already waited for a signal on its own, and the report it belonged to failed
+with "no connection" and had to be typed again later from memory.
+
+So the incident repository is wrapped the way the observation's is: a
+report that gets no answer is kept under its own kind, merged into the car's
+list and the console's on that phone, listed under Waiting to sync, and sent
+by the replay through the Supabase repository; settling, reopening or
+deleting one before it is sent changes it in the queue (decision 190). Nothing
+above the provider changed, and the sheet closes as saved, as every other
+entry's does when it is queued.
+
+**Cost.** A report the policy refuses on replay is dropped and counted, as any
+entry is: a driver whose window ended before the signal came back, or a
+borrower on a pass who reported with no signal (online, their save is refused
+at once, since a refusal is never queued). Only the retry screen says how
+many were dropped; a replay at launch or on resume drops them without a word,
+which is the queue's behaviour for every kind and is not changed here.
