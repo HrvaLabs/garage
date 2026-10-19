@@ -2649,6 +2649,9 @@ class AppLocalizationsHr extends AppLocalizations {
   String get quickAddPickVehicle => 'Koje vozilo?';
 
   @override
+  String get quickAddNew => 'Dodaj';
+
+  @override
   String get settingsPumpAutofill => 'Popuni postaju i cijenu umjesto mene';
 
   @override

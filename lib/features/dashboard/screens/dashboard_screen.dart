@@ -33,16 +33,10 @@ import '../../maintenance/service_type_labels.dart' as service_labels;
 import '../../../domain/maintenance/reminder_projection.dart';
 import '../../timeline/providers/timeline_providers.dart';
 import '../../timeline/open_timeline_entry.dart';
-import '../../fuel/widgets/fuel_entry_sheet.dart';
 import '../../maintenance/widgets/reminder_rule_sheet.dart';
-import '../../maintenance/widgets/service_entry_sheet.dart';
-import '../../costs/widgets/cost_entry_sheet.dart';
-import '../../income/widgets/income_entry_sheet.dart';
-import '../../odometer/widgets/odometer_entry_sheet.dart';
-import '../../trips/widgets/drive_card.dart';
-import '../../trips/widgets/trip_entry_sheet.dart';
 import '../../settings/data/fuelio_import_action.dart';
 import '../../settings/data/sample_data_action.dart';
+import '../quick_add.dart';
 import '../widgets/bundle_card.dart';
 import '../providers/what_next_providers.dart';
 import '../widgets/household_metrics_strip.dart';
@@ -179,7 +173,7 @@ class DashboardScreen extends ConsumerWidget {
           ? null
           : FloatingActionButton(
               key: const Key('dashboard-add'),
-              onPressed: () => _showQuickAdd(context, ref),
+              onPressed: () => showQuickAdd(context, ref),
               child: const Icon(Icons.add),
             ),
       body: AsyncValueView<List<Vehicle>>(
@@ -432,20 +426,20 @@ class DashboardScreen extends ConsumerWidget {
                               // The sheet, like the same icon on the
                               // checklist: "pump = log a fill" broke on the
                               // second use when this one opened the log.
-                              onPressed: () => _runQuickAction(
+                              onPressed: () => runQuickAction(
                                 context,
                                 ref,
-                                _QuickAction.fuel,
+                                QuickAction.fuel,
                                 vehicle.id,
                               ),
                             ),
                             IconButton(
                               tooltip: l10n.maintenanceLogService,
                               icon: const Icon(Icons.build_outlined),
-                              onPressed: () => _runQuickAction(
+                              onPressed: () => runQuickAction(
                                 context,
                                 ref,
-                                _QuickAction.service,
+                                QuickAction.service,
                                 vehicle.id,
                               ),
                             ),
@@ -695,176 +689,6 @@ class _RecentActivityCard extends ConsumerWidget {
   }
 }
 
-/// Offers everything a household records, and asks which car only when there
-/// is more than one: a single-car household should never be made to answer a
-/// question with one possible answer.
-///
-/// Ordered by how often it is used, not by how the schema is arranged: fuel is
-/// weekly, a service is a few times a year, and selling the car happens once.
-Future<void> _showQuickAdd(BuildContext context, WidgetRef ref) async {
-  final l10n = AppLocalizations.of(context)!;
-  // Active cars only, and this is the whole reason to say so: an archived
-  // vehicle has left the household, so it is not something anybody is filling
-  // up. Reading the full list made the + button ask "which car?" in a garage
-  // with one car and one sold one, and offered the sold one as an answer —
-  // while the vehicle row's own shortcut, four hundred lines down, had always
-  // read the active list. The button that decides whether to show this sheet
-  // reads the active list too, so an all-archived garage never gets here.
-  final vehicles = await ref.read(vehiclesProvider.future);
-  if (vehicles.isEmpty || !context.mounted) {
-    return;
-  }
-  // A rule and money in are the garage's, not a driver's to log: both
-  // inserts are refused, so neither row is offered.
-  final driver = ref.read(isDriverProvider);
-
-  final action = await showAdaptiveChoice<_QuickAction>(
-    context,
-    (context) => SafeArea(
-      child: Padding(
-        // Room under the last row: "More", and Income once it is open, sat
-        // on the edge of the screen.
-        padding: const EdgeInsets.only(bottom: GarageTokens.space4),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // The three things that cost money, as tiles: they are what the
-            // button is pressed for nine times in ten. Seven equal rows made
-            // someone read past Income and Add reminder to find Fuel up.
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                GarageTokens.space4,
-                GarageTokens.space4,
-                GarageTokens.space4,
-                GarageTokens.space2,
-              ),
-              child: Row(
-                spacing: GarageTokens.space3,
-                children: [
-                  _QuickTile(
-                    icon: Icons.local_gas_station_outlined,
-                    label: l10n.quickAddFuel,
-                    onTap: () => Navigator.of(context).pop(_QuickAction.fuel),
-                  ),
-                  _QuickTile(
-                    icon: Icons.build_outlined,
-                    label: l10n.quickAddService,
-                    onTap: () =>
-                        Navigator.of(context).pop(_QuickAction.service),
-                  ),
-                  _QuickTile(
-                    icon: Icons.receipt_long_outlined,
-                    label: l10n.quickAddCost,
-                    onTap: () => Navigator.of(context).pop(_QuickAction.cost),
-                  ),
-                ],
-              ),
-            ),
-            ExpansionTile(
-              key: const Key('quick-add-more'),
-              title: Text(l10n.quickAddMore),
-              shape: const Border(),
-              collapsedShape: const Border(),
-              children: [
-                // Then the ones with nothing to pay: a reading and a trip are what
-                // you log when there was no transaction to log.
-                ListTile(
-                  leading: const Icon(Icons.speed_outlined),
-                  title: Text(l10n.quickAddOdometer),
-                  onTap: () => Navigator.of(context).pop(_QuickAction.odometer),
-                ),
-                // Starting a drive is the act done getting into the car,
-                // and it was five taps away under More (decision 156).
-                ListTile(
-                  leading: const Icon(Icons.play_arrow_outlined),
-                  title: Text(l10n.tripDriveStart),
-                  onTap: () => Navigator.of(context).pop(_QuickAction.drive),
-                ),
-                ListTile(
-                  leading: const Icon(Icons.route_outlined),
-                  title: Text(l10n.tripAdd),
-                  onTap: () => Navigator.of(context).pop(_QuickAction.trip),
-                ),
-                // The interval, which reminders and the whole planner are built on,
-                // was six taps deep and absent from here entirely — so the one thing
-                // that makes the app work was the hardest thing in it to reach.
-                if (!driver) ...[
-                  ListTile(
-                    leading: const Icon(Icons.event_repeat_outlined),
-                    title: Text(l10n.quickAddInterval),
-                    onTap: () =>
-                        Navigator.of(context).pop(_QuickAction.interval),
-                  ),
-                  ListTile(
-                    leading: const Icon(Icons.savings_outlined),
-                    title: Text(l10n.quickAddIncome),
-                    onTap: () => Navigator.of(context).pop(_QuickAction.income),
-                  ),
-                ],
-              ],
-            ),
-          ],
-        ),
-      ),
-    ),
-  );
-  if (action == null || !context.mounted) {
-    return;
-  }
-
-  var vehicleId = vehicles.first.id;
-  if (vehicles.length > 1) {
-    final picked = await showVehiclePicker(context, vehicles);
-    if (picked == null || !context.mounted) {
-      return;
-    }
-    vehicleId = picked;
-  }
-
-  await _runQuickAction(context, ref, action, vehicleId);
-}
-
-/// Opens the sheet for [action] against [vehicleId].
-///
-/// Split out of the quick-add flow because the empty-state card needs the same
-/// two of these without the sheet that asks which action and which vehicle.
-Future<void> _runQuickAction(
-  BuildContext context,
-  WidgetRef ref,
-  _QuickAction action,
-  String vehicleId,
-) async {
-  switch (action) {
-    case _QuickAction.fuel:
-      await showFuelEntrySheet(context, vehicleId);
-    case _QuickAction.service:
-      await showServiceEntrySheet(context, vehicleId);
-    case _QuickAction.cost:
-      await showCostEntrySheet(context, vehicleId);
-    case _QuickAction.odometer:
-      await showOdometerEntrySheet(context, vehicleId);
-    case _QuickAction.drive:
-      await showStartDriveSheet(context, ref, vehicleId);
-    case _QuickAction.trip:
-      await showTripEntrySheet(context, vehicleId);
-    case _QuickAction.income:
-      await showIncomeEntrySheet(context, vehicleId);
-    case _QuickAction.interval:
-      await showReminderRuleSheet(context, vehicleId);
-  }
-}
-
-enum _QuickAction {
-  fuel,
-  service,
-  cost,
-  odometer,
-  drive,
-  trip,
-  income,
-  interval,
-}
-
 /// What a garage with nothing in it can actually do next.
 ///
 /// This was a three-step checklist, and it was mostly scenery: only the first
@@ -913,7 +737,7 @@ class _GettingStarted extends ConsumerWidget {
                 _Step(
                   label: l10n.gettingStartedFuel,
                   icon: Icons.local_gas_station_outlined,
-                  onTap: () => _firstEntry(context, ref, _QuickAction.fuel),
+                  onTap: () => _firstEntry(context, ref, QuickAction.fuel),
                 ),
               // The *interval* sheet, not the service sheet. This step says
               // "set what it needs, and when", and pointing it at the
@@ -1027,13 +851,13 @@ class _GettingStarted extends ConsumerWidget {
   Future<void> _firstEntry(
     BuildContext context,
     WidgetRef ref,
-    _QuickAction action,
+    QuickAction action,
   ) async {
     final vehicleId = await _which(context, ref);
     if (vehicleId == null || !context.mounted) {
       return;
     }
-    await _runQuickAction(context, ref, action, vehicleId);
+    await runQuickAction(context, ref, action, vehicleId);
   }
 
   Future<String?> _which(BuildContext context, WidgetRef ref) async {
@@ -1072,46 +896,6 @@ Future<void> _chooseImport(BuildContext context, WidgetRef ref) async {
     await importFuelioWithFeedback(context, ref);
   } else {
     context.push('/import');
-  }
-}
-
-class _QuickTile extends StatelessWidget {
-  const _QuickTile({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: Card(
-        child: InkWell(
-          onTap: onTap,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(
-              vertical: GarageTokens.space4,
-              horizontal: GarageTokens.space2,
-            ),
-            child: Column(
-              children: [
-                Icon(icon, color: context.tokens.accent),
-                const SizedBox(height: GarageTokens.space2),
-                Text(
-                  label,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.labelLarge,
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
   }
 }
 

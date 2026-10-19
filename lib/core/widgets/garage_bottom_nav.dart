@@ -4,6 +4,7 @@ import 'package:garage/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/company/providers/company_providers.dart';
+import '../../features/dashboard/widgets/quick_add_button.dart';
 import 'adaptive.dart';
 import 'garage_sidebar.dart';
 import 'page_header.dart';
@@ -161,7 +162,11 @@ class GarageTabScaffold extends StatelessWidget {
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        PageHeader(title: title!, actions: actions),
+                        PageHeader(
+                          title: title!,
+                          actions: actions,
+                          trailing: const [QuickAddButton()],
+                        ),
                         const Divider(height: 1),
                         Expanded(
                           child: AdaptiveContent(

@@ -2600,6 +2600,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickAddPickVehicle => 'Which vehicle?';
 
   @override
+  String get quickAddNew => 'Add';
+
+  @override
   String get settingsPumpAutofill => 'Fill in the station and price for me';
 
   @override

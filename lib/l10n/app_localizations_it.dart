@@ -2651,6 +2651,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get quickAddPickVehicle => 'Quale veicolo?';
 
   @override
+  String get quickAddNew => 'Aggiungi';
+
+  @override
   String get settingsPumpAutofill => 'Compila tu distributore e prezzo';
 
   @override

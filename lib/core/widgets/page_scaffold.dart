@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:garage/l10n/app_localizations.dart';
 
 import '../../features/company/providers/company_providers.dart';
+import '../../features/dashboard/widgets/quick_add_button.dart';
 import '../../features/vehicles/providers/vehicle_providers.dart';
 import '../router/page_location.dart';
 import 'adaptive.dart';
@@ -108,6 +109,7 @@ class GaragePageScaffold extends ConsumerWidget {
                           driver: ref.watch(isDriverProvider),
                         ),
                     actions: actions,
+                    trailing: const [QuickAddButton()],
                     // Only offered when there is something to go back to; a
                     // page opened directly by URL on the web has an empty
                     // stack.

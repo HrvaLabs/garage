@@ -1518,6 +1518,27 @@ void main() {
     expect(find.text('Add reminder'), findsOneWidget);
   });
 
+  testWidgets('a phone\'s quick-add tiles are the theme\'s cards', (
+    tester,
+  ) async {
+    // A desk outlines the three itself, its theme having made every card a
+    // row with a rule under it; a phone's are left exactly as they were.
+    await pumpDashboard(tester, vehicles: [testVehicle('v1')]);
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('dashboard-add')));
+    await tester.pumpAndSettle();
+
+    for (final label in ['Fill-up', 'Service', 'Cost']) {
+      final tile = tester.widget<Card>(
+        find.ancestor(of: find.text(label), matching: find.byType(Card)),
+      );
+      expect(tile.shape, isNull, reason: label);
+      expect(tile.color, isNull, reason: label);
+      expect(tile.clipBehavior, isNull, reason: label);
+    }
+  });
+
   group('a driver\'s dashboard', () {
     const company = Household(id: 'h1', name: 'Prijevoz', plan: 'company');
 

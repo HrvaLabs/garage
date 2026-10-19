@@ -1438,6 +1438,7 @@
   "quickAddService": "Service",
   "quickAddCost": "Cost",
   "quickAddPickVehicle": "Which vehicle?",
+  "quickAddNew": "Add",
   "settingsPumpAutofill": "Fill in the station and price for me",
   "settingsDataBringIn": "Bring data in",
   "settingsDataTakeOut": "Take data out",

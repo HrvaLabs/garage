@@ -1179,7 +1179,7 @@ take one-word labels by test, which "My cars", "Moja vozila" and "Le mie
 auto" are not, so the word was the owner's to choose. On 20 September the
 owner chose "Cars", "Auti" and "Auto", for a driver only. The bottom bar and
 the sidebar read the role and take that label for the cars tab
-(`lib/core/widgets/garage_bottom_nav.dart:58`,
+(`lib/core/widgets/garage_bottom_nav.dart:59`,
 `lib/core/widgets/garage_sidebar.dart:84`); everybody else keeps
 "Vehicles". `test/core/widgets/garage_bottom_nav_test.dart` holds the new
 label to one word in every language with the others, and asks for both
@@ -1940,14 +1940,14 @@ each was a promise that had stopped describing it.
   `supabase/migrations/0066_guest_briefing.sql:16`: the odometer, when the
   insurance, green card and roadworthiness run out, the text of every open
   problem, and the tyres. A sensible decision that three sentences predated.
-  `guestLendIntro` (`lib/l10n/app_en.arb:2001`), `PRIVACY.md`,
+  `guestLendIntro` (`lib/l10n/app_en.arb:2067`), `PRIVACY.md`,
   `web/privacy.html` and `web/features.html` now say so.
 - **The About screen and the features page said deleting an account takes
   every record with it** (`lib/l10n/app_en.arb:1284`). In a garage other people
   are still in, the entries stay, without the author's name, which is what
   `supabase/migrations/0033_account_deletion_unblocked.sql:16` decided and the
   policy already said. And the features tour still promised "how far the tank
-  still goes" (`lib/l10n/app_en.arb:1479`), the count-down decision 152 removed
+  still goes" (`lib/l10n/app_en.arb:1481`), the count-down decision 152 removed
   because it was wrong.
 
 **What found them.** Checking every sentence of a store listing and a terms

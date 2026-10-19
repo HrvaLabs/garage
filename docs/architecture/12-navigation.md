@@ -21,7 +21,7 @@ On a wide window the tabs lead a sidebar instead, `GarageSidebar` (see
 [The desktop sidebar](#the-desktop-sidebar)); a pushed screen keeps the sidebar
 rather than swapping it for a back button, because a browser window that loses
 its navigation on every push leaves the back button as the only way out
-(`lib/core/widgets/page_scaffold.dart:79`). The page's title moves from an app
+(`lib/core/widgets/page_scaffold.dart:80`). The page's title moves from an app
 bar into a top bar across the content pane, with a breadcrumb (see
 [The top bar](#the-top-bar)).
 
@@ -102,7 +102,7 @@ screen. The console is a pushed page with its own tab strip, not a sixth tab:
 Material caps the bar at five, and the fleet is one thing, however many views
 it has. A driver's Vehicles tab is titled "My cars" on its own page
 (`lib/features/vehicles/screens/vehicles_screen.dart:95`) and labelled "Cars"
-in the bar (`lib/core/widgets/garage_bottom_nav.dart:58`) and the sidebar
+in the bar (`lib/core/widgets/garage_bottom_nav.dart:59`) and the sidebar
 (`lib/core/widgets/garage_sidebar.dart:84`): the bar takes one-word labels by
 test, so the tab could not carry the title's two words, and the owner chose the
 word (decision 194).
@@ -519,8 +519,8 @@ into each other.
 
 On a wide window a page names itself in a top bar, `PageHeader`
 (`lib/core/widgets/page_header.dart:114`), where a phone has its app bar. Both
-scaffolds draw it (`lib/core/widgets/page_scaffold.dart:98`,
-`lib/core/widgets/garage_bottom_nav.dart:164`) across the content pane beside
+scaffolds draw it (`lib/core/widgets/page_scaffold.dart:99`,
+`lib/core/widgets/garage_bottom_nav.dart:165`) across the content pane beside
 the sidebar, above a rule; the content keeps its own column under it. The
 title used to be a heading held to that column, with the page's actions at the
 column's end. The bar belongs to the page, not to its text, as a tab strip
@@ -531,6 +531,17 @@ there is somewhere to go back to: a page opened by its address has an empty
 stack. Left to right: the back arrow, the crumbs over the title, the page's
 own actions, and a slot (`trailing`) for what a page offers beyond them.
 
+On every page that slot holds the quick-add, `QuickAddButton`
+(`lib/features/dashboard/widgets/quick_add_button.dart:13`): a button labelled
+Add that opens what the dashboard's + opens (`showQuickAdd`,
+`lib/features/dashboard/quick_add.dart:26`), so a fill-up, a service or a cost
+is logged from Statistics or the console without going back to the dashboard.
+Like the +, it is hidden while the garage has no car, there being nothing to
+log against. A phone keeps it on the dashboard only. On a desk the dialog's
+three tiles keep the outline a card has on a phone
+(`lib/features/dashboard/quick_add.dart:209`), which the desk's theme takes
+from every other card (decision 198).
+
 The crumbs say where a pushed page sits, read from its address by
 `pageLocation`, as the sidebar reads which link to light. `sectionCrumbs`
 (`lib/core/widgets/page_header.dart:37`) names the section of any page below
@@ -538,7 +549,7 @@ one: Vehicles, Garage (`/household`), Company and API access (`/api`). A car's
 pages, `/vehicles/<id>/fuel` and the rest, name Vehicles and then the car; the
 car's own page names only Vehicles, its title being the car, and a new car is
 not a car. The car's name is `vehicleProvider`'s, which the scaffold reads
-(`lib/core/widgets/page_scaffold.dart:107`); until there is one, while the car
+(`lib/core/widgets/page_scaffold.dart:108`); until there is one, while the car
 loads or for a car the startup fetch does not know, the crumbs stop at
 Vehicles rather than read "Vehicles › Vehicles". A driver's Vehicles reads
 "Cars", as the sidebar's link does (decision 194). A tab, any other section,

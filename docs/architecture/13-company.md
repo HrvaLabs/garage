@@ -133,16 +133,16 @@ rather than refused.
 
 **"My cars"** is the vehicles screen wearing a driver's presentation
 (`lib/features/vehicles/screens/vehicles_screen.dart:77`), under a tab that
-reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:58`, and in the sidebar
+reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:59`, and in the sidebar
 `lib/core/widgets/garage_sidebar.dart:84` and a desk page's crumbs
 `lib/core/widgets/page_header.dart:49`): the title, no Add button, no
 archived section, an empty state that names the administrator as the one who
 hands a car over, and two cards above the grid. The dashboard
 says the same to a driver with no car yet
-(`lib/features/dashboard/screens/dashboard_screen.dart:213`) in place of the
+(`lib/features/dashboard/screens/dashboard_screen.dart:207`) in place of the
 "add your first vehicle" card, whose every way in is refused for a driver,
 and its quick-add sheet and "What next" card offer no reminder and no income
-(`lib/features/dashboard/screens/dashboard_screen.dart:719`). The first is a
+(`lib/features/dashboard/quick_add.dart:41`). The first is a
 one-time notice saying what the administrator sees — every entry on a company
 car, and which car was theirs on which day — with the sentence that the app
 records the places you type and never where the phone is

@@ -5663,7 +5663,7 @@ decision, because it moves where everything on the car lives.
   a reading" (`lib/features/vehicles/screens/vehicle_detail_screen.dart:396`),
   hidden while a drive is out, when the in-progress card with "Finish drive"
   takes its place above the tabs; and the "+" sheet offers "Start a drive"
-  before "Log a trip" (`lib/features/dashboard/screens/dashboard_screen.dart:781`).
+  before "Log a trip" (`lib/features/dashboard/quick_add.dart:102`).
 - **What the vehicle costs sits on Costs.** The running-cost card leads the
   Costs tab, where the question is asked; Economy is about fuel again.
 - **The third tab is "Services".** It holds services and odometer readings,
@@ -6617,7 +6617,7 @@ delete.
 
 - A row under "Recent activity" opens its entry as the Timeline does
   (`lib/features/timeline/open_timeline_entry.dart:22`,
-  `lib/features/dashboard/screens/dashboard_screen.dart:616`), and the heading
+  `lib/features/dashboard/screens/dashboard_screen.dart:610`), and the heading
   opens the Timeline.
 - The three figures open where each is explained: the cars, statistics on its
   costs tab, and statistics
@@ -7585,10 +7585,10 @@ console's car rows carry their 32-pixel Hand over, and a long list shows its
 scrollbar. A text field is 48 pixels, as it already was in a desktop
 browser. *Trade-off:* a card that was a panel rather than a row loses its
 box too. The dashboard's "What next", "Due soonest" and recent activity, and
-every panel on Statistics, read as sections with a rule under each, and the
-quick-add dialog's three tiles read as underlined labels until one is
-hovered. Those screens are to become tables and panes, so neither gets a
-special case here.
+every panel on Statistics, read as sections with a rule under each. Those
+screens are to become tables and panes, so they get no special case here.
+The quick-add dialog's three tiles, which read as underlined labels until one
+was hovered, are the one kind of card that does (below).
 
 **Notices in the corner.** `WindowSnackBars` stays the host every notice goes
 through; on a wide window it floats them 400 pixels wide in the bottom right
@@ -7638,3 +7638,15 @@ what the address says. A car's maintenance opened from the planner names
 Vehicles and the car, not the planner, which only back returns to; and an
 address nothing matches, under a car, is crumbed as that car's page, as the
 sidebar lights Vehicles for it.
+
+**The quick-add in every top bar.** The bar's slot holds the quick-add on
+every page: Add, opening what the dashboard's + opens, so a fill-up, a
+service or a cost is logged from Statistics or the console without going
+back to the dashboard. It is hidden while the garage has no car, as the + is,
+and a phone keeps the + on the dashboard alone. The dialog's three tiles keep
+the outline a card has on a phone: flattened, as the theme flattens every
+card, they read as three underlined labels side by side, a tab strip, until
+one was hovered, and a choice to press has to look like one
+(`lib/features/dashboard/quick_add.dart`). *Cost:* one kind of card the
+desk's theme does not reach, outlined by the tile itself rather than by the
+theme.

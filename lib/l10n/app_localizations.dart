@@ -4600,6 +4600,12 @@ abstract class AppLocalizations {
   /// **'Which vehicle?'**
   String get quickAddPickVehicle;
 
+  /// No description provided for @quickAddNew.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get quickAddNew;
+
   /// No description provided for @settingsPumpAutofill.
   ///
   /// In en, this message translates to:
