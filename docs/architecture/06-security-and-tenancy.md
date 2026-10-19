@@ -206,8 +206,9 @@ the assigned car and everything on it; insert on the entry tables, incidents
 and attachments; update and delete on the driver's own rows; select on the
 garage, its people and its names for attribution
 (`supabase/migrations/0080_company.sql:1544`); read-only on the car's papers,
-tyres, parts, intervals and the garage's routes and service types; nothing on
-invites, keys, hooks, transfers, passes or income. Storage follows: a driver
+tyres, parts, intervals and the garage's routes and service types, but for
+completing a one-off interval that a service of the driver's own covers
+(below); nothing on invites, keys, hooks, transfers, passes or income. Storage follows: a driver
 reads and uploads under an assigned car's prefix and deletes only an object
 whose `owner_id` is theirs (`supabase/migrations/0080_company.sql:1488`), so
 taking down an abandoned receipt cannot take down the one the admin attached
@@ -225,9 +226,17 @@ and the suite makes that write as the app makes it
 code: a table with no driver write policy answers a driver's update or delete
 with the same zero rows (`test_rls/rls_test.dart:7213`), so the repositories
 behind the papers, tyres, parts, routes and rules read back too — all but
-the one-off rules a driver's service entry completes, which runs after the
-entry has landed and is left silent on purpose
-([known-bugs](../operations/known-bugs-and-risks.md#a-drivers-service-entry-leaves-its-one-off-reminder-open)).
+`completeOneTimeRules`, which runs after a service entry has landed and is
+left silent on purpose. Since 0081 it lands for a driver: an update policy
+reaches an open one-off rule on an assigned car whose type a service of the
+driver's own, logged since the rule was set, covers
+(`supabase/migrations/0081_driver_completes_one_off_reminders.sql:17`), and a
+guard trigger lets a driver change `active` and nothing else
+(`supabase/migrations/0081_driver_completes_one_off_reminders.sql:42`), since
+a policy sees the new row and not what changed. A call with no such service
+behind it, the cost sheet's before it writes next year's reminder, is still
+filtered, so the old reminder is not closed with nothing to replace it
+(decision 192).
 
 Two things a policy cannot do went into functions. `hand_over_vehicle()`
 (`supabase/migrations/0080_company.sql:807`) is definer because a handover

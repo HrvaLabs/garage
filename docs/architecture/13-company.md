@@ -599,16 +599,20 @@ resolve against.
   Decision 186; the cost is in
   [known-bugs](../operations/known-bugs-and-risks.md#an-empty-answer-to-a-filtered-entry-write-reads-as-a-refusal):
   a row deleted from another phone a moment earlier reads the same way.
-- **A driver's service entry leaves its one-off reminder open.** The
+- **A driver's write on what they only read is refused, not silent.** The
   tables with no driver write policy — papers, tyres, parts, routes,
   intervals — answer an update or a delete with zero rows and 204 exactly as
   the per-author policy does, only an insert being a real `42501`, so every
   write a driver's screens offer on them reads its row back as the entries
   do. The one exception is on purpose: `completeOneTimeRules` runs after the
   service entry has landed, and a refusal there would report a failure over
-  an entry that was saved, so the rule stays open until an admin logs or
-  completes it. A driver update policy on `reminder_rules` is the fix; in
-  [known-bugs](../operations/known-bugs-and-risks.md#a-drivers-service-entry-leaves-its-one-off-reminder-open).
+  an entry that was saved. Since 0081 a driver's own service completes the
+  one-off rule it covers
+  (`supabase/migrations/0081_driver_completes_one_off_reminders.sql:17`); a
+  call with no such service behind it, the cost sheet's when a vignette or a
+  registration is paid, is filtered and leaves the old reminder open for the
+  admin, because the next year's reminder it would write is refused to a
+  driver (decision 192).
 - **The plan is set by SQL until billing ships** (Stage 3). `update
   households set plan = 'company' where id = …` as the service role.
 - **A receipt reminder needs push configured.** Without the Vault secrets the

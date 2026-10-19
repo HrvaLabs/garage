@@ -7689,6 +7689,203 @@ void main() {
         expect((after['cost'] as num).toDouble(), 30);
       });
 
+      group('the one-off reminder a service covers', () {
+        // Saving a service completes the one-off rules for the types it
+        // covers (`completeOneTimeRules`), once the entry has landed. A driver
+        // holds no write on the car's intervals, so before 0081 that update
+        // was filtered to nothing and the reminder stayed open. The policy
+        // reaches an open one-off rule on the assigned car whose type a
+        // service of the driver's own, logged since the rule was set, covers:
+        // the cost sheet makes the same call before writing next year's
+        // reminder, which a driver may not, and closing the old one there
+        // would leave the garage with neither.
+
+        /// A one-off rule the admin sets on [car], the Golf by default.
+        Future<String> oneOff(
+          String key, {
+          String? car,
+          bool active = true,
+        }) async {
+          final row = await alice
+              .from('reminder_rules')
+              .insert({
+                'vehicle_id': car ?? aliceVehicle,
+                'service_type_key': key,
+                'one_time': true,
+                'due_date': '2027-03-01',
+                'active': active,
+              })
+              .select('id')
+              .single();
+          addTearDown(
+            () => admin.from('reminder_rules').delete().eq('id', row['id']),
+          );
+          return row['id'] as String;
+        }
+
+        /// A service [who] logs on the Golf covering [keys].
+        Future<void> logs(SupabaseClient who, List<String> keys) async {
+          final row = await who
+              .from('service_entries')
+              .insert({
+                'vehicle_id': aliceVehicle,
+                'entry_date': '2026-09-12',
+                'odometer_km': 60170,
+                'service_type_keys': keys,
+                'created_by': who.auth.currentUser!.id,
+              })
+              .select('id')
+              .single();
+          addTearDown(
+            () => admin.from('service_entries').delete().eq('id', row['id']),
+          );
+        }
+
+        /// The update `completeOneTimeRules` makes, as the app makes it: no
+        /// read-back, so a filtered one is no error.
+        Future<void> complete(
+          SupabaseClient who,
+          List<String> keys, {
+          String? car,
+        }) async {
+          await who
+              .from('reminder_rules')
+              .update({'active': false})
+              .eq('vehicle_id', car ?? aliceVehicle)
+              .eq('one_time', true)
+              .eq('active', true)
+              .inFilter('service_type_key', keys);
+        }
+
+        Future<bool> isActive(String id) async {
+          final row = await admin
+              .from('reminder_rules')
+              .select('active')
+              .eq('id', id)
+              .single();
+          return row['active'] as bool;
+        }
+
+        test('a service of the driver\'s own completes it', () async {
+          final rule = await oneOff('service_brake_fluid');
+          await logs(dana, ['service_brake_fluid']);
+
+          await complete(dana, ['service_brake_fluid']);
+
+          expect(await isActive(rule), isFalse);
+        });
+
+        test(
+          'not one the service missed, set after it, or on the other car',
+          () async {
+            final missed = await oneOff('service_air_filter');
+            final elsewhere = await oneOff(
+              'service_cabin_filter',
+              car: otherCar,
+            );
+            await logs(dana, ['service_cabin_filter']);
+            final later = await oneOff('service_cabin_filter');
+
+            await complete(dana, [
+              'service_air_filter',
+              'service_cabin_filter',
+            ]);
+            await complete(dana, ['service_cabin_filter'], car: otherCar);
+
+            expect(await isActive(missed), isTrue, reason: 'not covered');
+            expect(await isActive(later), isTrue, reason: 'set since');
+            expect(await isActive(elsewhere), isTrue, reason: 'not theirs');
+          },
+        );
+
+        test('not on a service somebody else logged', () async {
+          // The cost sheet's path: no service of the driver's names the type,
+          // so the reminder stays open for the admin, as it always did.
+          final rule = await oneOff('service_battery');
+          await logs(alice, ['service_battery']);
+
+          await complete(dana, ['service_battery']);
+
+          expect(await isActive(rule), isTrue);
+        });
+
+        test('nor a recurring rule, nor one already closed', () async {
+          final recurring = await alice
+              .from('reminder_rules')
+              .insert({
+                'vehicle_id': aliceVehicle,
+                'service_type_key': 'service_timing_belt',
+                'interval_km': 120000,
+              })
+              .select('id')
+              .single();
+          addTearDown(
+            () =>
+                admin.from('reminder_rules').delete().eq('id', recurring['id']),
+          );
+          final closed = await oneOff('service_timing_belt', active: false);
+          await logs(dana, ['service_timing_belt']);
+
+          await dana
+              .from('reminder_rules')
+              .update({'active': false})
+              .eq('id', recurring['id']);
+          await dana
+              .from('reminder_rules')
+              .update({'active': true})
+              .eq('id', closed);
+
+          expect(await isActive(recurring['id'] as String), isTrue);
+          expect(await isActive(closed), isFalse);
+        });
+
+        test('and changes nothing else on the way', () async {
+          final rule = await oneOff('service_spark_plugs');
+          await logs(dana, ['service_spark_plugs']);
+
+          await expectLater(
+            dana
+                .from('reminder_rules')
+                .update({'active': false, 'due_date': '2030-01-01'})
+                .eq('id', rule),
+            refusedWith('42501'),
+          );
+
+          expect(await isActive(rule), isTrue);
+        });
+
+        test('an admin still edits and completes as before', () async {
+          final rule = await oneOff('service_brake_pads');
+
+          await alice
+              .from('reminder_rules')
+              .update({'due_date': '2027-04-01'})
+              .eq('id', rule);
+          await complete(alice, ['service_brake_pads']);
+
+          final row = await admin
+              .from('reminder_rules')
+              .select('active, due_date')
+              .eq('id', rule)
+              .single();
+          expect(row['active'], isFalse);
+          expect(row['due_date'], '2027-04-01');
+        });
+
+        test(
+          'a driver with no car today, and a stranger, close nothing',
+          () async {
+            final rule = await oneOff('service_wheel_alignment');
+            await logs(dana, ['service_wheel_alignment']);
+
+            await complete(dino, ['service_wheel_alignment']);
+            await complete(carol, ['service_wheel_alignment']);
+
+            expect(await isActive(rule), isTrue);
+          },
+        );
+      });
+
       test('a reading, a drive, a problem, and a receipt', () async {
         final reading = await dana
             .from('odometer_entries')

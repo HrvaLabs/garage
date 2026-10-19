@@ -7362,3 +7362,49 @@ root's no-JavaScript fallback leads to the showcase and Play instead of
 leaving a permanent loading screen. Solo owners and shared garages both remain
 explicit. No analytics, dependencies or claims about search ranking are
 introduced.
+
+## 192. A driver's service completes the one-off reminder it covers
+
+**16 October 2026.** Decided by the owner on 20 September: a driver may
+complete a one-off reminder on a car handed to them, through an additive
+update policy on `reminder_rules` in 0081, not a check in the app. Saving a
+service completes the one-off rules for the types it covers, and a driver's
+update had been filtered to nothing since 0080, so a service a driver logged
+left its reminder open until an admin logged the service again or completed
+it by hand.
+
+**Scoped to a service of their own, logged since the rule was set.** The plain
+policy — an open one-off rule on an assigned car — was the decision, and
+reading every caller of the update found what it would have broken. The cost
+sheet makes the same call when a vignette or a registration is paid, to close
+the old reminder, and then inserts next year's, which a driver is refused.
+Under the plain policy a driver paying the vignette would close the old
+reminder and fail to write the new one in silence, and the garage would hear
+nothing next year; today the old one stays open, overdue, which at least sends
+somebody to look. So the policy also asks for a service by the caller on that
+car, created no earlier than the rule, whose types include the rule's. The
+service sheet's call always has one, since it runs after the entry has landed;
+the cost sheet's has none, and is filtered as before. "No earlier than the
+rule" keeps a service done before a reminder existed from answering it.
+
+**A guard for what a policy cannot see.** A policy checks the row as it ends
+up, not what changed, so the update that closes a rule could also have moved
+its date or its type. A `before update` trigger lets a driver change `active`
+and nothing else, comparing the row as JSON without that column, and refuses
+with `42501`; members, the admin among them, pass straight through, and so
+does a write with no caller, the server's.
+`with check` still holds the result to a closed one-off rule on an assigned
+car, so a driver can neither reopen a rule nor touch a recurring one.
+
+**Why the server and not the app.** The app has made this update since
+one-off rules existed, so the policy fixes every installed version on the day
+it is applied, and an app check could only have hidden the problem. The
+`completeOneTimeRules` call stays silent rather than reading its row back:
+zero rows is the right answer whenever nothing was due, and a refusal there
+would report a failure over an entry that was saved (decision 186).
+
+**Cost.** A subquery on `service_entries` for each candidate row of a
+driver's update, on a table indexed by car; the update is one per saved
+service. The cost sheet still leaves a driver's paid vignette with an
+overdue reminder; giving drivers the insert would close that, and is a wider
+grant than this decision makes.

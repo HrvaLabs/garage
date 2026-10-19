@@ -352,42 +352,6 @@ time-out that committed and then a change made offline, together. An upsert
 on replay would save the edit; nothing short of a remembered delete saves the
 delete.
 
-### A driver's service entry leaves its one-off reminder open
-
-**Medium for a driver on a car with one-off reminders, else none.** Saving
-a service entry completes the one-off rules for the types it covers,
-`completeOneTimeRules`
-(`lib/features/maintenance/data/supabase_maintenance_repository.dart:131`),
-after the entry has landed. A driver reads the assigned car's intervals and
-holds no write on them, so the update is filtered to zero rows and answered
-without an error: the entry is saved, the reminder stays open, and the
-sheet, rightly, says the entry was saved. Deliberately not read back, unlike
-every other write on these tables: the entry is inserted first, and a
-refusal here would report a failure over an entry that was in fact saved.
-The reminder stays until an admin logs the service or completes it from
-the car's Upkeep tab. The fix is a driver update policy on `reminder_rules`
-in a later migration — scoped to `active` on a one-off rule of the assigned
-car — not a check in the app.
-
-The rest of what a driver's screens offer on the tables with no driver
-write policy — a tyre set's edit, fit, retire and delete, a paper's delete,
-a part's edit and delete, a route's rename and delete, a reminder rule's
-edit and delete — reads its row back like the entry tables and refuses on
-none (`lib/features/tyres/data/supabase_tyre_repository.dart:87`,
-`lib/features/documents/data/supabase_document_repository.dart:63`,
-`lib/features/parts/data/supabase_vehicle_part_repository.dart:41`,
-`lib/features/trips/data/supabase_route_repository.dart:59`,
-`lib/features/maintenance/data/supabase_maintenance_repository.dart:85`);
-the RLS suite makes the app's write on three of them
-(`test_rls/rls_test.dart:7213`). A paper's edit and a one-off rule's are
-upserts, which Postgres checks against the insert policy and refuses out
-loud; inserts there were always a loud `42501`
-(`test_rls/rls_test.dart:7136`). Only an insert has a new row for a
-`with check` clause to fail on — a table with no policy for the command
-filters every row, checked on the local stack against `vehicle_documents`
-as an assigned driver: `update` and `delete` both `0 rows`, `insert`
-`42501`.
-
 ### The observation sheet dates a new note by the UTC instant
 
 **Low, pre-existing.** A new observation defaults its day to
@@ -1113,6 +1077,53 @@ several releases later.
 
 ## Recently fixed, worth remembering
 
+### A driver's service left its one-off reminder open
+
+**Medium for a driver on a car with one-off reminders, fixed 16 October 2026;
+since drivers arrived in 0080.** Saving a service completes the one-off rules
+for the types it covers, `completeOneTimeRules`
+(`lib/features/maintenance/data/supabase_maintenance_repository.dart:123`),
+after the entry has landed. A driver held no write on `reminder_rules`, so
+the update was filtered to zero rows and answered without an error: the
+entry was saved and the reminder stayed open until an admin logged the same
+service or completed it by hand. It is deliberately not read back: a refusal
+there would report a failure over an entry that was saved.
+
+Migration 0081 gives a driver an update policy that reaches an open one-off
+rule on a car they have today, when a service of their own, logged since the
+rule was set, covers its type
+(`supabase/migrations/0081_driver_completes_one_off_reminders.sql:17`), and a
+guard that lets a driver change `active` and nothing else
+(`supabase/migrations/0081_driver_completes_one_off_reminders.sql:42`). The
+app is unchanged: the update every version in the field already makes now
+lands. A call with no such service behind it is still filtered, on purpose:
+the cost sheet makes the same one when a vignette or a registration is paid
+and then writes next year's reminder, an insert a driver is refused, and
+closing the old one there would leave the garage with neither. The live suite
+makes the app's update as the driver, on a rule the service missed, one set
+after it, one on the other car, a recurring one, a closed one, with a date
+changed on the way, and as the admin, a driver with no car and a stranger
+(`test_rls/rls_test.dart:7692`). Decision 192.
+
+The rest of what a driver's screens offer on the tables they only read — a
+tyre set's edit, fit, retire and delete, a paper's delete, a part's edit and
+delete, a route's rename and delete, a reminder rule's edit and delete —
+reads its row back like the entry tables and refuses on none
+(`lib/features/tyres/data/supabase_tyre_repository.dart:87`,
+`lib/features/documents/data/supabase_document_repository.dart:63`,
+`lib/features/parts/data/supabase_vehicle_part_repository.dart:41`,
+`lib/features/trips/data/supabase_route_repository.dart:59`,
+`lib/features/maintenance/data/supabase_maintenance_repository.dart:85`);
+the RLS suite makes the app's write on three of them
+(`test_rls/rls_test.dart:7213`). A paper's edit and a one-off rule's are
+upserts, which Postgres checks against the insert policy and refuses out
+loud; inserts there were always a loud `42501`
+(`test_rls/rls_test.dart:7136`). Only an insert has a new row for a
+`with check` clause to fail on — a table with no policy for the command
+filters every row, checked on the local stack against `vehicle_documents`
+as an assigned driver: `update` and `delete` both `0 rows`, `insert`
+`42501`.
+
 ### An archived car was still reminded of what was due
 
 **Medium, fixed 16 October 2026; since the daily run was written.** The run
@@ -1331,9 +1342,9 @@ expects the permission failure, and the RLS suite makes the app's write on a
 row somebody else wrote and on the driver's own
 (`test_rls/rls_test.dart:7426`). Inserts are left alone: a refused insert is
 a real `42501`. The tables a driver cannot write at all were left alone too,
-on the belief that they refuse the same way; they do not, and the open entry
-*A driver's service entry leaves its one-off reminder open* says what is
-left. The cost of the fix is the open entry *An empty answer to a filtered
+on the belief that they refuse the same way; they do not, and *A driver's
+service left its one-off reminder open*, above, says what was left and how
+it closed. The cost of the fix is the open entry *An empty answer to a filtered
 entry write reads as a refusal*: a row deleted from another phone a moment
 earlier now reads as a refusal rather than as gone, on fourteen tables — every
 one a driver can write — instead of one. Decision 186 records the choice.
