@@ -361,6 +361,16 @@ void main() {
         expect((await queue.all()).single.row[entry.column], 'Pump 4');
       });
 
+      test('and the insert is marked as carrying an edit', () async {
+        // For a replay that finds the insert already landed: the edit then
+        // has to be sent as one, or it goes with the duplicate.
+        expect((await queue.all()).single.edited, isFalse);
+
+        await entry.edit('Pump 4');
+
+        expect((await queue.all()).single.edited, isTrue);
+      });
+
       // A save that timed out is queued too, and may have reached the
       // server after the app stopped waiting. Changing only the queued copy
       // would leave a deleted entry on the server, or an edit that the

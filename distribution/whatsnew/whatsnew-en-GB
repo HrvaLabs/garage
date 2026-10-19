@@ -5,5 +5,5 @@ Fixes from the first days in production:
 • Drivers see a Cars tab, and no buttons they cannot use
 • A problem noted after midnight is dated that day
 • A backup now waits for a signal rather than saving old copies
-• An address that leads nowhere says so, with a way back
+• Edits made offline are no longer lost after a slow save
 • Old reminders the phone set for itself no longer arrive

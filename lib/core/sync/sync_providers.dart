@@ -53,40 +53,82 @@ final pendingWriteSenderProvider =
       return (write) async {
         switch (write.kind) {
           case PendingWriteKind.fuel:
-            await SupabaseFuelRepository(
+            final repository = SupabaseFuelRepository(
               client,
               cache: ref.read(readCacheProvider),
-            ).add(fuelEntryFromRow(write.row));
+            );
+            final entry = fuelEntryFromRow(write.row);
+            await _insertOrEdit(
+              write,
+              insert: () => repository.add(entry),
+              edit: () => repository.update(entry),
+            );
           case PendingWriteKind.odometer:
-            await SupabaseOdometerRepository(
+            final repository = SupabaseOdometerRepository(
               client,
               cache: ref.read(readCacheProvider),
-            ).add(odometerEntryFromRow(write.row));
+            );
+            final entry = odometerEntryFromRow(write.row);
+            await _insertOrEdit(
+              write,
+              insert: () => repository.add(entry),
+              edit: () => repository.update(entry),
+            );
           case PendingWriteKind.trip:
-            await SupabaseTripRepository(
+            final repository = SupabaseTripRepository(
               client,
               cache: ref.read(readCacheProvider),
-            ).add(tripEntryFromRow(write.row));
+            );
+            final entry = tripEntryFromRow(write.row);
+            await _insertOrEdit(
+              write,
+              insert: () => repository.add(entry),
+              edit: () => repository.update(entry),
+            );
           case PendingWriteKind.cost:
-            await SupabaseCostRepository(
+            final repository = SupabaseCostRepository(
               client,
               cache: ref.read(readCacheProvider),
-            ).add(costEntryFromRow(write.row));
+            );
+            final entry = costEntryFromRow(write.row);
+            await _insertOrEdit(
+              write,
+              insert: () => repository.add(entry),
+              edit: () => repository.update(entry),
+            );
           case PendingWriteKind.service:
-            await SupabaseMaintenanceRepository(
+            final repository = SupabaseMaintenanceRepository(
               client,
               cache: ref.read(readCacheProvider),
-            ).addServiceEntry(serviceEntryFromRow(write.row));
+            );
+            final entry = serviceEntryFromRow(write.row);
+            await _insertOrEdit(
+              write,
+              insert: () => repository.addServiceEntry(entry),
+              edit: () => repository.updateServiceEntry(entry),
+            );
           case PendingWriteKind.observation:
-            await SupabaseObservationRepository(
+            final repository = SupabaseObservationRepository(
               client,
               cache: ref.read(readCacheProvider),
-            ).add(observationFromRow(write.row));
+            );
+            final entry = observationFromRow(write.row);
+            await _insertOrEdit(
+              write,
+              insert: () => repository.add(entry),
+              edit: () => repository.update(entry),
+            );
           case PendingWriteKind.incident:
-            await SupabaseIncidentRepository(
+            final repository = SupabaseIncidentRepository(
               client,
               cache: ref.read(readCacheProvider),
-            ).add(incidentFromRow(write.row));
+            );
+            final entry = incidentFromRow(write.row);
+            await _insertOrEdit(
+              write,
+              insert: () => repository.add(entry),
+              edit: () => repository.update(entry),
+            );
           case PendingWriteKind.attachment:
             final kept = write.attachment;
             final files = ref.read(queuedFileStoreProvider);
@@ -111,6 +153,30 @@ final pendingWriteSenderProvider =
         }
       };
     });
+
+/// Sends a queued insert, and the edit it carries when the insert had
+/// already landed.
+///
+/// A save that timed out is queued and may have reached the server anyway;
+/// an edit made with no signal then rides the queued insert, which the
+/// replay finds there and is refused as a duplicate. Marked
+/// [PendingWrite.edited], the write is sent again as the edit it carries.
+/// Unmarked, a duplicate is only the earlier attempt arriving, and sending
+/// it again would be a second write of the same row.
+Future<void> _insertOrEdit(
+  PendingWrite write, {
+  required Future<void> Function() insert,
+  required Future<void> Function() edit,
+}) async {
+  try {
+    await insert();
+  } on AppFailure catch (failure) {
+    if (!write.edited || failure.kind != AppFailureKind.conflict) {
+      rethrow;
+    }
+    await edit();
+  }
+}
 
 final syncControllerProvider = AsyncNotifierProvider<SyncController, void>(
   SyncController.new,

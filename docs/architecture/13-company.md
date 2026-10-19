@@ -387,7 +387,7 @@ assigned car through their own menu; admins manage all. Realtime carries the
 table (`lib/core/sync/realtime_sync.dart:62`): a dent reported from the
 driver's phone is what the admin's console is looking at. A report made with
 no signal waits on the phone like every other entry
-(`lib/core/sync/queueing_repositories.dart:559`) and goes when there is one.
+(`lib/core/sync/queueing_repositories.dart:562`) and goes when there is one.
 
 **Settling has one owner.** Two statuses are open — `open` and `at_insurer`,
 somebody is still waiting — and three are the ways a report stops being

@@ -7474,3 +7474,26 @@ connection.
 **Cost.** A phone offline for days writes no automatic backup for those
 days, and the settings row keeps the date of the last good one without
 saying why. That file is still the newest true one.
+
+## 196. An edit to a queued entry is marked, and sent again only when its insert had landed
+
+**17 October 2026.** An edit to an entry still in the queue rewrites the
+queued insert (decision 153's "only `add`"), and a save that timed out may
+have landed anyway, so the replay could find the row there and drop the
+insert as a duplicate with the edit inside. The known-bugs entry suggested
+an upsert on replay. Instead the edit marks the queued write (`edited`), and
+only a marked write whose insert comes back a duplicate is sent again, as
+the repository's own `update`.
+
+**Why not the upsert.** An unmarked duplicate is the earlier attempt
+arriving, and the queued copy is then at best the row again and at worst
+older than a change made on another phone since; writing it back would undo
+that change. The upsert would also have been checked against the insert and
+the update policies at once (decision 99) on every replay, where the mark
+sends the update only when there is an edit to send, by the person who made
+it.
+
+**Cost.** One more field in a stored queue entry, read as false when a
+queue written before it is opened, and one more request for the rare write
+that is both edited and duplicated. A delete made the same way is still
+lost; that one needs a remembered delete.

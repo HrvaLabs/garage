@@ -286,6 +286,7 @@ Future<void> updateEntry(
         queuedAt: waiting.queuedAt,
         attempts: waiting.attempts,
         attachment: waiting.attachment,
+        edited: true,
       ),
     );
   });
@@ -301,9 +302,11 @@ Future<PendingWrite?> _queued(PendingWriteStore queue, String id) async =>
 /// there. No row is `refusedIfNone`'s permission failure; no connection
 /// leaves the queue to carry it. Anything else is the server answering.
 ///
-/// Offline, a change to an entry whose insert did land is lost: the delete
-/// leaves the row, and the edit goes with the insert the replay is refused.
-/// That needs a time-out and then no signal at the next change, together.
+/// Offline, a delete of an entry whose insert did land is lost: it leaves the
+/// row, which comes back on the next fetch. That needs a time-out and then no
+/// signal at the next change, together. An edit is not: it marks the queued
+/// insert, and the replay sends it as an edit when the insert is refused as
+/// a duplicate.
 Future<bool> _ifItLanded(Future<void> Function() server) async {
   try {
     await server();

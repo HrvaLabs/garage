@@ -102,7 +102,7 @@ October 2026 incidents (decision 193).
 repository *interface*, so the sheets did not change: the entry saves, the
 sheet closes, and it is right to.
 
-**Only two failures queue** (`lib/core/sync/pending_write.dart:168`): `network`
+**Only two failures queue** (`lib/core/sync/pending_write.dart:180`): `network`
 and `timeout`. Everything else is the server answering — a refusal, a bad
 value — and queueing those would turn a message somebody could act on into an
 entry that never arrives. `timeout` queues even though the write may have
@@ -137,7 +137,11 @@ first: a delete drops the queued insert, an edit rewrites it and keeps its
 author, `created_at` and place in line. The server is still asked, because a
 save that timed out is queued too and may have landed after the app stopped
 waiting; zero rows or no connection means it had not, and if it had, the edit
-is there and the queued insert goes. An entry that is not queued goes to the
+is there and the queued insert goes. With no connection it cannot tell, so
+the edit marks the queued insert, and a replay that finds the row there
+after all sends the marked write again as the edit it carries
+(`lib/core/sync/sync_providers.dart:166`, decision 196); a delete made the
+same way is still lost. An entry that is not queued goes to the
 server as before, and offline that still fails as it always did — decision
 153's "only `add`" stands. A queued entry is changed inside `betweenReplays`
 (`lib/core/sync/replay.dart:53`), which a replay takes too: a replay reads the

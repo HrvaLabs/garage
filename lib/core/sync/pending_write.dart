@@ -66,6 +66,7 @@ class PendingWrite {
     required this.queuedAt,
     this.attempts = 0,
     this.attachment,
+    this.edited = false,
   });
 
   /// The entry's own id, minted by the sheet. It is also the queue's dedupe
@@ -87,6 +88,13 @@ class PendingWrite {
   /// landed. Null on the web, which has nowhere private to put one.
   final PendingAttachment? attachment;
 
+  /// Whether the person changed the entry after it was queued. The change
+  /// rides the queued insert, and a save that timed out may have landed
+  /// anyway: a replay that then finds the row there sends the change as an
+  /// edit, where an unchanged entry's duplicate is just the earlier attempt
+  /// arriving.
+  final bool edited;
+
   bool get exhausted => attempts >= maxReplayAttempts;
 
   PendingWrite withAttempt() => PendingWrite(
@@ -97,6 +105,7 @@ class PendingWrite {
     queuedAt: queuedAt,
     attempts: attempts + 1,
     attachment: attachment,
+    edited: edited,
   );
 
   Map<String, dynamic> toJson() => {
@@ -107,6 +116,7 @@ class PendingWrite {
     'queuedAt': queuedAt.toIso8601String(),
     'attempts': attempts,
     'attachment': attachment?.toJson(),
+    'edited': edited,
   };
 
   /// Null when the stored row cannot be understood by this build. The caller
@@ -128,6 +138,8 @@ class PendingWrite {
         final Map<String, dynamic> it => PendingAttachment.fromJson(it),
         _ => null,
       },
+      // Absent from a queue written before edits were marked.
+      edited: json['edited'] as bool? ?? false,
     );
   }
 }

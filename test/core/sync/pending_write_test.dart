@@ -7,6 +7,7 @@ PendingWrite write({
   PendingWriteKind kind = PendingWriteKind.fuel,
   DateTime? queuedAt,
   int attempts = 0,
+  bool edited = false,
 }) {
   return PendingWrite(
     id: id,
@@ -15,6 +16,7 @@ PendingWrite write({
     row: {'id': id, 'vehicle_id': 'v1', 'odometer_km': 50000},
     queuedAt: queuedAt ?? DateTime.utc(2026, 9, 5, 12),
     attempts: attempts,
+    edited: edited,
   );
 }
 
@@ -116,6 +118,20 @@ void main() {
       expect(restored.row, original.row);
       expect(restored.queuedAt, original.queuedAt);
       expect(restored.attempts, 2);
+    });
+
+    test('so does an edit made while it waited', () {
+      expect(
+        PendingWrite.fromJson(write(edited: true).toJson())!.edited,
+        isTrue,
+      );
+      expect(write(edited: true).withAttempt().edited, isTrue);
+    });
+
+    test('a write stored before edits were marked reads as unedited', () {
+      final stored = write().toJson()..remove('edited');
+
+      expect(PendingWrite.fromJson(stored)!.edited, isFalse);
     });
 
     test('the stored kind is a key, not the enum name', () {

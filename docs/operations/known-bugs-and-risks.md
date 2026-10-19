@@ -270,17 +270,17 @@ read the same way until October 2026 and no longer reaches the server; see
 "Deleting an entry saved with no signal said it was not allowed" under
 Recently fixed.
 
-### A change with no signal to an entry whose timed-out save had landed is lost
+### A delete with no signal of an entry whose timed-out save had landed is undone
 
 **Low; found 4 October 2026.** A save that times out is queued, and may still
-have reached the server. Changing the entry asks the server as well as the
+have reached the server. Deleting the entry asks the server as well as the
 queue (`lib/core/sync/queueing_repositories.dart:235`), but with no signal
-the server cannot answer: a delete then removes only the queued copy and the
-row comes back on the next fetch, and an edit rides the queued insert, which
-the replay finds already there and drops with the edit inside it. It takes a
-time-out that committed and then a change made offline, together. An upsert
-on replay would save the edit; nothing short of a remembered delete saves the
-delete.
+the server cannot answer, so the delete removes only the queued copy and the
+row comes back on the next fetch. It takes a time-out that committed and then
+a delete made offline, together. Nothing short of a remembered delete saves
+it: a queued tombstone, which every list read would have to subtract. An edit
+made the same way was lost too until 17 October; see "An edit made with no
+signal was lost when the save it changed had landed" under Recently fixed.
 
 ### A corrupt receipt behind a good header still fails the pack at save
 
@@ -965,6 +965,24 @@ several releases later.
 
 ## Recently fixed, worth remembering
 
+### An edit made with no signal was lost when the save it changed had landed
+
+**Low, fixed 17 October 2026; found 4 October.** A save that times out is
+queued and may have reached the server anyway. An edit made with no signal
+then rode the queued insert, and the replay, finding the row already there,
+took the duplicate for the earlier attempt arriving and dropped the insert
+with the edit inside it. An edit now marks the queued insert
+(`lib/core/sync/queueing_repositories.dart:289`), and the replay sends a
+marked one again as the edit it carries when its insert is refused as a
+duplicate (`lib/core/sync/sync_providers.dart:166`); an unmarked duplicate
+is still the end of the matter. The edit is the same `update` the sheet
+makes online, under the same per-author policy the RLS suite covers for
+every kind a driver writes, by the author of the queued insert. A queue
+written before the mark reads as unedited. Decision 196.
+`test/core/sync/landed_insert_edit_test.dart:85` replays one against a
+server that already has the row, beside one nobody edited. The delete half
+is still open, above.
+
 ### The offline banner could name a copy nobody was being shown
 
 **Low, fixed 17 October 2026; since the read cache in September.** Two ways.
@@ -1140,13 +1158,13 @@ the network cannot take it; the incident repository was left out on purpose
 (decision 184), on the guess that a report is filed from the depot. The sheet
 said the save failed and kept what was typed, while the photo of the dent,
 attached first, already waited for a signal on its own. The repository is now
-wrapped like an observation's (`lib/core/sync/queueing_repositories.dart:559`,
+wrapped like an observation's (`lib/core/sync/queueing_repositories.dart:562`,
 `lib/features/incidents/providers/incident_providers.dart:19`): a report that
 gets no answer is kept under its own kind
 (`lib/core/sync/pending_write.dart:24`), shows on the car's card and in the
 console's list on that phone, is listed under More → Waiting to sync, and is
 sent by the replay through the Supabase repository
-(`lib/core/sync/sync_providers.dart:85`). Settling, reopening or deleting it
+(`lib/core/sync/sync_providers.dart:121`). Settling, reopening or deleting it
 before it is sent changes the queued report, as for every other entry.
 `test/features/incidents/incident_offline_test.dart` makes the report through
 the controller over a server that cannot be reached and then can, and reads
