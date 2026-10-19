@@ -52,6 +52,23 @@ card. Check with `adb shell pm get-app-links cc.hrva.garage` on a
 Play-installed phone; the fix, if needed, is a Cloudflare rule that skips the
 challenge for `/.well-known/*` and the public pages.
 
+### Headless Chrome stops drawing after a run of loads of the web build
+
+**Low for the next developer, unknown for people; found 18 October 2026.**
+Looking at the wasm build with agent-browser (headless Chrome for Testing 151
+on macOS, the build served by `scripts/serve_web.py`), the browser stops
+producing frames after a run of page loads: `requestAnimationFrame` never
+fires again in any tab, a fresh `about:blank` included, every Chrome process
+sits idle, and a screenshot never returns. Cold-loading five signed-in pages
+in turn, it stopped at the 19th load on the build with decision 198's theme
+and at the 18th on the build before it; with screenshots taken between
+clicks it stopped after a handful. SwiftShader in place of the GPU changed
+nothing, and the machine was heavily loaded at the time (a load average of
+about 20). So it is not the theme. Whether it is the renderer, headless
+Chrome or the load, and whether a person's Chrome ever does it, is not known.
+Until it is, a look that stops answering needs a new browser, not a fix to
+the page.
+
 ### A second handover on the same day is refused
 
 **Low.** `hand_over_vehicle()` closes the open window on the day before the
@@ -1389,7 +1406,7 @@ console's "Hand over" button took the row and the car's name was left with
 none, one letter per line (v1.6.22, the first night); the paused webhook's
 Resume button had the same shape since v1.6.20. No test saw it because the
 screen-test harness ran with Material's default theme. Fixed in v1.6.23:
-`GarageTheme.inlineButton` (`lib/core/theme/garage_theme.dart:24`) for a
+`GarageTheme.inlineButton` (`lib/core/theme/garage_theme.dart:67`) for a
 button that sits beside something, applied at the six sites, and the harness
 now carries the app's theme (`test/support/pump_screen.dart:273`), so a
 button placed that way again fails its test with "BoxConstraints forces an
@@ -3749,7 +3766,7 @@ and an identical one arrived. The five tab routes were immune only because
 `_tabPage` gives them a fading page of their own.
 
 Fixed in the theme rather than route by route
-(`lib/core/theme/garage_theme.dart:228`), because the same slide was on all ten
+(`lib/core/theme/garage_theme.dart:283`), because the same slide was on all ten
 pushed screens that draw a sidebar, not only the four in the sidebar itself.
 Phone-width windows keep the platform transition and its back gesture.
 

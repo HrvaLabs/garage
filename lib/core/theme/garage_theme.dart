@@ -13,6 +13,49 @@ abstract final class GarageTheme {
 
   static ThemeData dark() => _build(GarageTokens.dark, Brightness.dark);
 
+  /// A button in a desk's top bar: 48 before density, so compact density
+  /// brings it to the 40 of a filled or outlined button on a desk.
+  /// [inlineButton] is already 40, and density would take it to 32.
+  static const ButtonStyle toolbarButton = ButtonStyle(
+    minimumSize: WidgetStatePropertyAll(Size(0, 48)),
+  );
+
+  /// The same theme for a desk: a mouse and a keyboard, not a thumb.
+  ///
+  /// Compact density takes the 48-pixel buttons to 40 and tightens every
+  /// row; the body text drops from 16 to 14; the ripple, which on a monitor
+  /// reads as a phone app, gives way to hover and focus; the scrollbar stays
+  /// visible, as a browser's does; and a card becomes a flat row with a rule
+  /// under it. Chosen by the window in `GarageAppFrame`, never by platform, so
+  /// a phone keeps its touch targets (decision 198).
+  ///
+  /// A browser on a desktop system already had compact density, which Flutter
+  /// picks by platform at any width, so there the change is the type, the
+  /// ripple, the scrollbar and the cards; a tablet held sideways gets the
+  /// density too.
+  static ThemeData desktop(ThemeData theme) {
+    final tokens = theme.extension<GarageTokens>() ?? GarageTokens.light;
+    final text = theme.textTheme;
+    return theme.copyWith(
+      visualDensity: VisualDensity.compact,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      splashFactory: NoSplash.splashFactory,
+      textTheme: text.copyWith(
+        bodyLarge: text.bodyLarge?.copyWith(fontSize: 14),
+        bodyMedium: text.bodyMedium?.copyWith(fontSize: 13),
+        titleMedium: text.titleMedium?.copyWith(fontSize: 15),
+      ),
+      cardTheme: theme.cardTheme.copyWith(
+        color: Colors.transparent,
+        margin: EdgeInsets.zero,
+        shape: Border(bottom: BorderSide(color: tokens.border)),
+      ),
+      scrollbarTheme: theme.scrollbarTheme.copyWith(
+        thumbVisibility: const WidgetStatePropertyAll(true),
+      ),
+    );
+  }
+
   /// A button that sits beside other things rather than under a form.
   ///
   /// The theme makes every filled and outlined button as wide as its parent

@@ -98,10 +98,12 @@ Within a feature the split is always the same, for example `lib/features/fuel/`:
 
 Every page then sits inside `GarageAppFrame`
 (`lib/core/widgets/app_frame.dart`), which `MaterialApp.router`'s `builder`
-puts around it: snackbars sized to the window, and the new-version notice the
+puts around it: the desk's theme on a wide window (`GarageTheme.desktop`,
+decision 198), snackbars sized to the window, and the new-version notice the
 web build shows. `test/support/pump_screen.dart` builds the same frame, so a
 screen test sees what the app puts around a page, a phone-sized one included:
-its snackbars float, as a phone's do.
+its snackbars float, as a phone's do, and one pumped at a desk's size
+(`pumpDesktop`) gets the desk's theme.
 
 ### The first fetch
 
@@ -206,7 +208,7 @@ instead of playing a directional push, which read as "forward" whichever way the
 user moved (`lib/core/router/app_router.dart:229`).
 
 Pushed pages pick their transition from the window rather than the platform.
-`_WindowAwarePageTransitions` (`lib/core/theme/garage_theme.dart:228`) wraps each
+`_WindowAwarePageTransitions` (`lib/core/theme/garage_theme.dart:283`) wraps each
 of Flutter's platform defaults: below the wide breakpoint the platform's own push
 transition and back gesture are kept, and above it every route cross-fades. The
 reason is the shell — the sidebar is drawn *inside* each page rather than around

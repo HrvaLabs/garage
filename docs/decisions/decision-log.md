@@ -352,7 +352,7 @@ as the more expensive lie.
 ## 18. The window picks the page transition, not the platform
 
 **August 2026.** `_WindowAwarePageTransitions`
-(`lib/core/theme/garage_theme.dart:228`) wraps every platform default in the
+(`lib/core/theme/garage_theme.dart:283`) wraps every platform default in the
 `PageTransitionsTheme`. Below the wide breakpoint a push keeps the platform's
 transition and its back gesture; above it, every route cross-fades.
 
@@ -7518,3 +7518,71 @@ made for.
 is the point of it, and a refusal a joiner can meet when the plan has lapsed
 since the code was sent. The joiner is not told on the join screen which
 role a code makes; they find out from what the app shows them after.
+
+## 198. The desktop shell
+
+**17 October 2026, the owner's decisions of 20 and 27 September.**
+Everything a wide window gets that a phone does not is chosen once, by
+`GarageBreakpoints.isWide`, inside `GarageAppFrame` and the wide branches of
+the two scaffolds (`GarageTabScaffold` and `GaragePageScaffold`), which is the
+one rule that keeps the phone's code path untouched. This is the shell of the
+desktop web layer, and what it adds is recorded here.
+
+**One frame for the app and its tests.** Every page is drawn inside
+`GarageAppFrame` (`lib/core/widgets/app_frame.dart`), which
+`MaterialApp.router`'s `builder` in `lib/main.dart` puts around the router:
+the desk's theme on a wide window, snackbars sized to the window
+(`WindowSnackBars`) and the web build's new-version notice (`UpdateNotice`).
+`test/support/pump_screen.dart` builds the same frame around every screen
+under test, and `pumpDesktop` pumps one at a desk's size, 1440 by 900. Before
+the frame, the harness put the app's theme and nothing else around a page, so
+a change made around the pages, this theme included, could not fail a screen
+test. The frame keeps one shape on both sides of the breakpoint, the theme
+always there and only its data changing: a wrapper present on one side only
+would replace everything under it when a window is resized across the line,
+and the notice, started again, would tell a reader of a new version twice.
+
+**Density.** `GarageTheme.desktop` is the app theme at a mouse's size:
+compact density, a 14-pixel body instead of 16 (13 for `bodyMedium`, 15 for
+`titleMedium`), no ripple, which leaves hover and focus to answer the
+pointer, a scrollbar that stays visible, and a card drawn as a flat row with
+a rule under it. Under compact density, filled and outlined buttons go from
+48 pixels to 40, and a text button and `GarageTheme.inlineButton`, the button
+beside other things, from 40 to 32; rows get shorter.
+`GarageTheme.toolbarButton` is a top bar's button, 48 before density and so
+40 after it, the height of a filled button on a desk. A browser on a desktop
+system already had compact density, which Flutter picks by platform at every
+width, so there every control already had these sizes and what changes is
+the type, the ripple, the scrollbar and the cards; the theme makes density
+the window's choice, which is also what a screen test, run as Android, now
+sees. The scrollbar stays visible where one is drawn, which is everything
+that scrolls vertically in a desktop browser. A tablet draws none that reads
+the setting: Flutter's licence page builds its own only when it is narrower
+than 840 pixels, and no window with the desk's theme is, and a dropdown's
+menu kept its bar visible already. On a tablet the setting changes nothing.
+
+**A tablet held sideways is a desk.** `isWide` means 900 wide and 600 on the
+short side, and every wide branch already followed it: the rail, dialogs in
+place of sheets, the cross-faded push. The desk's theme follows it too, so an
+Android tablet or an iPad held sideways gets the desk's sizes and loses the
+ripple. That is the spec's choice, one breakpoint for everything wide; the
+pump, which outranks the desk (`PRODUCT.md`), is a phone's scene, and a phone
+keeps its 48. *Cost:* on a touch tablet, filled and outlined buttons go from
+48 to 40; a text button and `inlineButton`, 40 pixels to see with a padded
+48-pixel target, become 32 to see and 32 to touch, a target 16 pixels
+smaller, the console's Hand over and a webhook's Resume among them; and every
+other control loses its padded 48-pixel target, icon buttons, checkboxes and
+switches to 40 and a radio button to 32. The ripple that answers a tap goes
+too. Gating the density on the web alone would be a line or two in
+`GarageTheme.desktop`, should a tablet's owner mind.
+
+**Looked at in Chrome at 1440 by 900, signed in against the local stack.** A
+fill-up on the car's page is a 64-pixel row with a rule under it, the
+console's car rows carry their 32-pixel Hand over, and a long list shows its
+scrollbar. A text field is 48 pixels, as it already was in a desktop
+browser. *Trade-off:* a card that was a panel rather than a row loses its
+box too. The dashboard's "What next", "Due soonest" and recent activity, and
+every panel on Statistics, read as sections with a rule under each, and the
+quick-add dialog's three tiles read as underlined labels until one is
+hovered. Those screens are to become tables and panes, so neither gets a
+special case here.
