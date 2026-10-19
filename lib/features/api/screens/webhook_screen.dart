@@ -250,7 +250,7 @@ class _WebhookScreenState extends ConsumerState<WebhookScreen> {
       if (context.canPop()) {
         context.pop();
       } else {
-        context.go('/api');
+        context.go('/api-access');
       }
     }
   }

@@ -12,6 +12,7 @@ import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/failure_message.dart';
 import '../../../core/widgets/labeled_field.dart';
 import '../../../core/widgets/busy_label.dart';
+import '../../../core/widgets/page_title.dart';
 import '../providers/auth_providers.dart';
 
 class SignUpScreen extends ConsumerStatefulWidget {
@@ -66,7 +67,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         : null;
     final pendingEmail = ref.watch(pendingEmailConfirmationProvider);
 
-    return Scaffold(
+    final page = Scaffold(
       appBar: AppBar(title: Text(l10n.authSignUpTitle)),
       body: SafeArea(
         // Top-aligned: centred on a phone, the form floated in the lower
@@ -196,6 +197,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
         ),
       ),
     );
+    return PageTitle(title: l10n.authSignUpTitle, child: page);
   }
 }
 

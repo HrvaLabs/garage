@@ -73,7 +73,7 @@ but never an odometer reading has a real total and no distance, and zero would
 be a lie.
 
 The records cards multiply the per-day rate out to a month and a year
-(`lib/features/stats/screens/stats_screen.dart:40`): a year of 365.25 days, a
+(`lib/features/stats/screens/stats_screen.dart:41`): a year of 365.25 days, a
 month a twelfth of it. The year is the figure people quote and are asked for.
 Both are extrapolations — a period of three days still shows what a year at
 that rate would come to — and nothing on the card says so (decision 179).
@@ -161,7 +161,7 @@ The useful set genuinely differs by reader. Somebody running a company car wants
 cost per kilometre and does not care which station they used; somebody chasing
 economy is the other way round. Rather than guess, everything is on and anything
 can be switched off, from a sheet on the screen itself
-(`lib/features/stats/screens/stats_screen.dart:274`) rather than from Settings —
+(`lib/features/stats/screens/stats_screen.dart:275`) rather than from Settings —
 the person who wants a section gone is looking at it.
 
 `hiddenStatsSectionsProvider`
@@ -207,7 +207,7 @@ contradiction with the rows underneath it. Filtering to Fuel gives fuel totals.
 
 This is the fourth place money gets bucketed by time, and the only one in the
 domain layer — `_monthlySpend` in the stats screen
-(`lib/features/stats/screens/stats_screen.dart:901`) still hand-rolls its own
+(`lib/features/stats/screens/stats_screen.dart:902`) still hand-rolls its own
 per-month loop over fuel, services and costs, ignoring income. Worth collapsing
 into `balanceOf` the next time either is touched.
 

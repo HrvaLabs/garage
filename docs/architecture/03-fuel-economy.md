@@ -152,7 +152,7 @@ and its "worse than usual" note compare a charge with charges and a tank with
 tanks (`lib/features/fuel/widgets/fuel_entry_row.dart:91`); against each other,
 a plug-in hybrid's charges read "60% more than this car's usual". The vehicle
 page's gauge scale, its best-and-worst caption and its chart take the tanks of
-the car's own energy (`lib/features/vehicles/screens/vehicle_detail_screen.dart:750`),
+the car's own energy (`lib/features/vehicles/screens/vehicle_detail_screen.dart:751`),
 where the charges had been drawn and captioned as litres; the charges have
 their own figure in the split by fuel beneath. Petrol and LPG are compared
 with each other everywhere, being one unit.
@@ -204,7 +204,7 @@ the lowest consumption and so the longest range** — the two read in opposite
 directions, which is the one thing in that file worth reading twice.
 
 It shows on the statistics screen, under "On a full tank", for a chosen car or
-for a garage that has only one (`stats_screen.dart:182`). It is silent for a
+for a garage that has only one (`stats_screen.dart:183`). It is silent for a
 car with no tank capacity recorded, which is most of them, and for a garage of
 two with no filter set: a tank belongs to one vehicle, and averaging a diesel
 estate with a city runabout answers nobody's question.

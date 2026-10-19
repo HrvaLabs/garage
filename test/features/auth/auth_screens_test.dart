@@ -8,6 +8,7 @@ import 'package:garage/features/auth/screens/sign_in_screen.dart';
 import 'package:garage/features/auth/screens/sign_up_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show User;
 
+import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
 
 class RecordingAuthRepository implements AuthRepository {
@@ -543,5 +544,16 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Enter your name'), findsNothing);
+  });
+
+  testWidgets('on the web each form names the browser tab', (tester) async {
+    final browser = asTheWeb(tester);
+    await pumpSignIn(tester, RecordingAuthRepository());
+    await tester.pumpAndSettle();
+    expect(browser.titles.last, 'Sign in · Garage');
+
+    await pumpSignUp(tester, RecordingAuthRepository());
+    await tester.pumpAndSettle();
+    expect(browser.titles.last, 'Create account · Garage');
   });
 }

@@ -19,6 +19,7 @@ import '../../../core/widgets/cluster_readout.dart';
 import '../../../core/widgets/garage_tab_bar.dart';
 import '../../../core/widgets/pick_one.dart';
 import '../../../core/widgets/primary_action.dart';
+import '../../../core/widgets/routed_tabs.dart';
 import '../../../domain/fuel/energy_type.dart';
 import '../../../domain/fuel/fuel_economy.dart';
 import '../../company/providers/company_providers.dart';
@@ -356,8 +357,8 @@ class VehicleDetailScreen extends ConsumerWidget {
     // from their own private garage, a driver was handed the owner's menu.
     final driver = ref.watch(isDriverForVehicleProvider(vehicleId));
 
-    return DefaultTabController(
-      length: 4,
+    return RoutedTabs(
+      names: const ['fuel', 'upkeep', 'car', 'costs'],
       child: GaragePageScaffold(
         // The car's own name, falling back while it loads. A page titled after
         // the thing it shows is the point of putting the title in the content.

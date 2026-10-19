@@ -34,6 +34,7 @@ import 'package:garage/features/costs/providers/running_cost_providers.dart';
 
 import '../../support/fake_attachments.dart';
 import '../../support/floating_button.dart';
+import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
 import 'package:garage/features/vehicles/data/vehicle_repository.dart';
 import 'package:garage/domain/entities/household.dart';
@@ -2597,5 +2598,20 @@ void main() {
       expect(find.text('Which driver?'), findsNothing);
       expect(saved, hasLength(1), reason: 'the report is built straight away');
     });
+  });
+
+  testWidgets('on the web each tab writes its name to the address', (
+    tester,
+  ) async {
+    asTheWeb(tester);
+    await pumpDetail(tester);
+    await tester.pumpAndSettle();
+
+    expect(await tabNamesWritten(tester, ['Costs', 'Car', 'Upkeep', 'Fuel']), [
+      'costs',
+      'car',
+      'upkeep',
+      'fuel',
+    ]);
   });
 }

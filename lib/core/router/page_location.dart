@@ -4,6 +4,10 @@ import 'package:go_router/go_router.dart';
 /// The path of the page [context] is in: `/vehicles/v1/fuel` for a car's fuel
 /// log, whether it was gone to or pushed. `/` outside a router, which only a
 /// widget test builds.
+String pageLocation(BuildContext context) => pageAddress(context).path;
+
+/// The address of the page [context] is in, its query included:
+/// `/vehicles/v1?tab=costs` for a car's page open on its costs.
 ///
 /// Read from the page's own route rather than the router's top, so a page
 /// underneath another knows where it is, not where the window is.
@@ -14,21 +18,21 @@ import 'package:go_router/go_router.dart';
 /// where it is. Once something else is gone to, it is still drawn until the
 /// new page has arrived, and the router has already moved on; it is then
 /// wherever the router is.
-String pageLocation(BuildContext context) {
+Uri pageAddress(BuildContext context) {
   final router = GoRouter.maybeOf(context);
   if (router == null) {
-    return '/';
+    return Uri(path: '/');
   }
   final current = router.routerDelegate.currentConfiguration;
   if (current.isError) {
-    return current.uri.path;
+    return current.uri;
   }
   try {
-    return GoRouterState.of(context).uri.path;
+    return GoRouterState.of(context).uri;
   } on GoError {
     // go_router has no way to ask whether a page has route state other than
     // asking for it: this is its answer that the page leaving has none.
-    return current.uri.path;
+    return current.uri;
   }
 }
 

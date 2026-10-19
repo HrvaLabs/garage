@@ -13,6 +13,7 @@ import 'package:garage/features/maintenance/widgets/maintenance_calendar.dart';
 import 'package:garage/domain/entities/household.dart';
 
 import '../../support/floating_button.dart';
+import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
 
 final _today = DateTime(2026, 8, 15);
@@ -680,5 +681,18 @@ void main() {
 
       expect(find.textContaining('Expected'), findsNothing);
     });
+  });
+
+  testWidgets('on the web each tab writes its name to the address', (
+    tester,
+  ) async {
+    asTheWeb(tester);
+    await pumpMaintenance(tester, projections: [projection()]);
+    await tester.pumpAndSettle();
+
+    expect(await tabNamesWritten(tester, ['Calendar', 'List']), [
+      'calendar',
+      'list',
+    ]);
   });
 }

@@ -51,7 +51,7 @@ List<Crumb> sectionCrumbs(
     ),
     'household' => Crumb(l10n.householdTitle, '/household'),
     'company' => Crumb(l10n.companyTitle, '/company'),
-    'api' => Crumb(l10n.apiTitle, '/api'),
+    'api-access' => Crumb(l10n.apiTitle, '/api-access'),
     _ => null,
   };
   if (section == null) {

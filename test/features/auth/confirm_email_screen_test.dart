@@ -6,6 +6,7 @@ import 'package:garage/features/auth/providers/auth_providers.dart';
 import 'package:garage/features/auth/screens/confirm_email_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show User;
 
+import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
 
 class FakeAuth implements AuthRepository {
@@ -137,5 +138,21 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(auth.calls, hasLength(1));
+  });
+
+  testWidgets('on the web the browser tab says what the page says', (
+    tester,
+  ) async {
+    final browser = asTheWeb(tester);
+    await pumpConfirm(tester, FakeAuth(fails: true), link: confirmation);
+    await tester.pumpAndSettle();
+
+    expect(
+      browser.titles,
+      containsAllInOrder([
+        'Confirming your email… · Garage',
+        'That link did not work · Garage',
+      ]),
+    );
   });
 }

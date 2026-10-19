@@ -7,6 +7,7 @@ import '../../../core/widgets/adaptive.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/garage_tab_bar.dart';
 import '../../../core/widgets/page_scaffold.dart';
+import '../../../core/widgets/routed_tabs.dart';
 import '../../../domain/entities/household.dart';
 import '../../household/providers/household_providers.dart';
 import '../providers/company_providers.dart';
@@ -64,8 +65,15 @@ class CompanyScreen extends ConsumerWidget {
       return refused(l10n.companyNotAdmin);
     }
 
-    return DefaultTabController(
-      length: 6,
+    return RoutedTabs(
+      names: const [
+        'drivers',
+        'deadlines',
+        'incidents',
+        'reimbursements',
+        'pack',
+        'settings',
+      ],
       child: GaragePageScaffold(
         title: l10n.companyTitle,
         contentWidth: ContentWidth.wide,

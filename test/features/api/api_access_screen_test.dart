@@ -26,8 +26,8 @@ Future<NavigationLog> pumpApiAccess(
   return pumpScreen(
     tester,
     const ApiAccessScreen(),
-    initialLocation: '/api',
-    extraRoutes: const {'/api/webhooks/:id'},
+    initialLocation: '/api-access',
+    extraRoutes: const {'/api-access/webhooks/:id'},
     locale: locale,
     textScale: textScale,
     surface: surface,
@@ -221,7 +221,7 @@ void main() {
       await tester.tap(find.text('home.example'));
       await tester.pumpAndSettle();
 
-      expect(log.visited, contains('/api/webhooks/w1'));
+      expect(log.visited, contains('/api-access/webhooks/w1'));
     });
 
     testWidgets('the copy button puts the address on the clipboard', (

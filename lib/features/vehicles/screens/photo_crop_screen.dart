@@ -4,6 +4,8 @@ import 'package:crop_your_image/crop_your_image.dart';
 import 'package:flutter/material.dart';
 import 'package:garage/l10n/app_localizations.dart';
 
+import '../../../core/widgets/page_title.dart';
+
 /// Lets a household frame a picked photo before it uploads, rather than
 /// sending whatever the camera happened to point at.
 ///
@@ -44,7 +46,7 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
+    final page = Scaffold(
       appBar: AppBar(
         title: Text(l10n.vehiclePhotoCropTitle),
         leading: IconButton(
@@ -68,5 +70,6 @@ class _PhotoCropScreenState extends State<PhotoCropScreen> {
         onCropped: _onCropped,
       ),
     );
+    return PageTitle(title: l10n.vehiclePhotoCropTitle, child: page);
   }
 }

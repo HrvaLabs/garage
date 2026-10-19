@@ -14,6 +14,7 @@ import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/failure_message.dart';
 import '../../../core/widgets/labeled_field.dart';
 import '../../../core/widgets/busy_label.dart';
+import '../../../core/widgets/page_title.dart';
 import '../providers/auth_providers.dart';
 
 class SignInScreen extends ConsumerStatefulWidget {
@@ -110,7 +111,7 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         ? state.error! as AppFailure
         : null;
 
-    return Scaffold(
+    final page = Scaffold(
       body: SafeArea(
         // Top-aligned: centred on a phone, the form floated in the lower
         // half with a blank third above it. The eye starts at the top.
@@ -249,5 +250,6 @@ class _SignInScreenState extends ConsumerState<SignInScreen> {
         ),
       ),
     );
+    return PageTitle(title: l10n.authSignInTitle, child: page);
   }
 }

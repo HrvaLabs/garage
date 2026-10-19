@@ -11,6 +11,7 @@ import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/adaptive.dart';
 import '../../../core/widgets/failure_message.dart';
 import '../../../core/supabase/supabase_client_provider.dart';
+import '../../../core/widgets/page_title.dart';
 import '../../vehicles/providers/guest_pass_providers.dart';
 import '../providers/household_providers.dart';
 import '../providers/pending_invite.dart';
@@ -169,7 +170,7 @@ class _JoinScreenState extends ConsumerState<JoinScreen> {
       }
     });
 
-    return Scaffold(
+    final page = Scaffold(
       appBar: AppBar(title: Text(l10n.joinTitle)),
       body: AdaptiveContent(
         child: Center(
@@ -207,6 +208,7 @@ class _JoinScreenState extends ConsumerState<JoinScreen> {
         ),
       ),
     );
+    return PageTitle(title: l10n.joinTitle, child: page);
   }
 
   List<Widget> _body(

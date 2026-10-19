@@ -654,7 +654,7 @@ class DataScreen extends ConsumerWidget {
             leading: const Icon(Icons.api),
             title: Text(l10n.apiTitle),
             subtitle: Text(l10n.apiHint),
-            onTap: () => context.push('/api'),
+            onTap: () => context.push('/api-access'),
           ),
         ],
       ),

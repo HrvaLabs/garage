@@ -8,6 +8,7 @@ import '../../features/dashboard/widgets/quick_add_button.dart';
 import 'adaptive.dart';
 import 'garage_sidebar.dart';
 import 'page_header.dart';
+import 'page_title.dart';
 import 'primary_action.dart';
 import 'stale_reads_banner.dart';
 
@@ -130,6 +131,11 @@ class GarageTabScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final page = _page(context);
+    return title == null ? page : PageTitle(title: title!, child: page);
+  }
+
+  Widget _page(BuildContext context) {
     // Above the content on every screen, so a page that reads three lists
     // says once that they are copies rather than each list saying nothing.
     final content = Column(

@@ -283,9 +283,10 @@ void main() {
       expect(sectionCrumbs(l10n, '/vehicles/v1').map((c) => c.label), [
         'Vehicles',
       ]);
-      expect(sectionCrumbs(l10n, '/api/webhooks/w1').map((c) => c.route), [
-        '/api',
-      ]);
+      expect(
+        sectionCrumbs(l10n, '/api-access/webhooks/w1').map((c) => c.route),
+        ['/api-access'],
+      );
     });
 
     test('a car\'s own page names Vehicles and the car', () {

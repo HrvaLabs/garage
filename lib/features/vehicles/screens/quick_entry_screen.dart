@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:garage/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/widgets/page_title.dart';
 import '../../../domain/entities/vehicle.dart';
 import '../../../domain/entries/quick_entry_target.dart';
 import '../providers/vehicle_providers.dart';
@@ -21,11 +23,19 @@ import '../widgets/vehicle_picker.dart';
 /// answer to that is the dashboard too: its empty state is the screen that
 /// explains how to add one.
 class QuickEntryScreen extends ConsumerStatefulWidget {
-  const QuickEntryScreen({super.key, required this.openSheet});
+  const QuickEntryScreen({
+    super.key,
+    required this.openSheet,
+    required this.title,
+  });
 
   /// Opens the entry sheet for one car and completes when it closes.
   final Future<Object?> Function(BuildContext context, String vehicleId)
   openSheet;
+
+  /// What the entry is called in the browser's tab, where this address can
+  /// be typed: [fillUpEntryTitle] or [costEntryTitle].
+  final String Function(AppLocalizations l10n) title;
 
   @override
   ConsumerState<QuickEntryScreen> createState() => _QuickEntryScreenState();
@@ -93,6 +103,15 @@ class _QuickEntryScreenState extends ConsumerState<QuickEntryScreen> {
     // an indefinite animation here means `pumpAndSettle` never returns for any
     // test that touches this route. The Scaffold is what keeps the frame the
     // app's own background colour rather than white in a dark theme.
-    return const Scaffold(body: SizedBox.expand());
+    return PageTitle(
+      title: widget.title(AppLocalizations.of(context)!),
+      child: const Scaffold(body: SizedBox.expand()),
+    );
   }
 }
+
+/// The fill-up shortcut's page, in the browser's tab.
+String fillUpEntryTitle(AppLocalizations l10n) => l10n.fuelAdd;
+
+/// The expense shortcut's page, in the browser's tab.
+String costEntryTitle(AppLocalizations l10n) => l10n.costAdd;

@@ -73,7 +73,7 @@ a crash *is* a restart: an in-memory log forgets precisely the failure somebody
 later goes looking for.
 
 **Reading it, without a cable.** Settings → About → **Diagnostics**
-(`lib/features/settings/screens/diagnostics_screen.dart:27`) lists the failures
+(`lib/features/settings/screens/diagnostics_screen.dart:28`) lists the failures
 newest-first, shares the whole log with the running version prepended, and
 clears it. That closes the gap that made every field report stop at "it said
 something went wrong".

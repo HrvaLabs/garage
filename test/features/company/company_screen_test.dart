@@ -19,6 +19,7 @@ import 'package:garage/features/household/providers/member_providers.dart';
 import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 
 import '../../support/fake_repositories.dart';
+import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
 import '../../support/vehicle_entries.dart';
 import '../household/household_screens_test.dart'
@@ -765,5 +766,32 @@ void main() {
 
     expect(tester.takeException(), isNull);
     expect(find.byKey(const Key('company-settings-save')), findsOneWidget);
+  });
+
+  testWidgets('on the web each tab writes its name to the address', (
+    tester,
+  ) async {
+    asTheWeb(tester);
+    await pumpConsole(tester);
+    await tester.pumpAndSettle();
+
+    expect(
+      await tabNamesWritten(tester, [
+        'Settings',
+        'Accountant pack',
+        'Reimbursements',
+        'Incidents',
+        'Deadlines',
+        'Drivers and cars',
+      ]),
+      [
+        'settings',
+        'pack',
+        'reimbursements',
+        'incidents',
+        'deadlines',
+        'drivers',
+      ],
+    );
   });
 }

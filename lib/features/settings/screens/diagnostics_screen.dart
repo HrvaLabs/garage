@@ -6,6 +6,7 @@ import 'package:share_plus/share_plus.dart';
 import '../../../core/app_info.dart';
 import '../../../core/errors/failure_log.dart';
 import '../../../core/theme/garage_tokens.dart';
+import '../../../core/widgets/page_title.dart';
 
 /// Hands text to the system share sheet. A provider so a test can read what
 /// was shared instead of driving a platform dialog.
@@ -40,7 +41,7 @@ class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
     // and the log is stored oldest-first because that is the order it grows in.
     final failures = recordedFailures.reversed.toList();
 
-    return Scaffold(
+    final page = Scaffold(
       appBar: AppBar(
         title: Text(l10n.diagnosticsTitle),
         actions: [
@@ -92,6 +93,7 @@ class _DiagnosticsScreenState extends ConsumerState<DiagnosticsScreen> {
               },
             ),
     );
+    return PageTitle(title: l10n.diagnosticsTitle, child: page);
   }
 
   Future<void> _share() async {

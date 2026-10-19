@@ -10,6 +10,7 @@ import 'adaptive.dart';
 import 'garage_bottom_nav.dart';
 import 'garage_sidebar.dart';
 import 'page_header.dart';
+import 'page_title.dart';
 import 'primary_action.dart';
 import 'stale_reads_banner.dart';
 
@@ -61,7 +62,10 @@ class GaragePageScaffold extends ConsumerWidget {
   final List<Crumb>? crumbs;
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context, WidgetRef ref) =>
+      PageTitle(title: title, child: _page(context, ref));
+
+  Widget _page(BuildContext context, WidgetRef ref) {
     // Above the content on every screen, so a page that reads three lists
     // says once that they are copies rather than each list saying nothing.
     final content = Column(

@@ -9,6 +9,7 @@ import '../../../domain/entities/reminder_rule.dart';
 import '../../../domain/entities/service_entry.dart';
 import '../../../core/widgets/page_scaffold.dart';
 import '../../../core/widgets/primary_action.dart';
+import '../../../core/widgets/routed_tabs.dart';
 import '../../../core/widgets/empty_state_art.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/confirm_delete.dart';
@@ -103,8 +104,8 @@ class _MaintenanceScreenState extends ConsumerState<MaintenanceScreen> {
     final l10n = AppLocalizations.of(context)!;
     final projections = ref.watch(vehicleProjectionsProvider(widget.vehicleId));
 
-    return DefaultTabController(
-      length: 2,
+    return RoutedTabs(
+      names: const ['list', 'calendar'],
       initialIndex: widget.openOnCalendar ? 1 : 0,
       child: GaragePageScaffold(
         // The car's own name: reached from the planner, a screen headed

@@ -8,6 +8,7 @@ import 'package:garage/domain/entities/vehicle.dart';
 import 'package:garage/core/supabase/supabase_client_provider.dart';
 import 'package:garage/features/household/data/garage_bootstrap_cache.dart';
 import 'package:garage/features/household/providers/household_providers.dart';
+import '../../support/browser.dart';
 import '../../support/fake_repositories.dart';
 import 'package:garage/features/settings/providers/unit_providers.dart';
 import 'package:garage/domain/entities/vehicle_transfer.dart';
@@ -467,6 +468,31 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('Frame the photo'), findsOneWidget);
+    });
+
+    testWidgets('on the web the editor names the browser tab, then hands '
+        'it back', (tester) async {
+      final browser = asTheWeb(tester);
+      await pumpEditScreen(
+        tester,
+        repository: RecordingVehicleRepository([car()]),
+        photos: FakeVehiclePhotoRepository(),
+        picked: realPickedPhoto(),
+      );
+      await tester.pumpAndSettle();
+      final form = browser.titles.last;
+
+      final button = find.text('Add a photo');
+      await tester.ensureVisible(button);
+      await tester.pumpAndSettle();
+      await tester.tap(button);
+      await tester.pumpAndSettle();
+      expect(browser.titles.last, 'Frame the photo · Garage');
+
+      await tester.tap(find.byTooltip('Cancel'));
+      await tester.pumpAndSettle();
+      expect(form, endsWith(' · Garage'));
+      expect(browser.titles.last, form);
     });
 
     testWidgets('confirming the crop uploads the cropped photo', (

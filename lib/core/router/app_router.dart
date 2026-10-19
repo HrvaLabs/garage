@@ -55,9 +55,22 @@ import '../theme/garage_tokens.dart';
 /// is current (e.g. the password-recovery prompt in main.dart).
 final rootNavigatorKey = GlobalKey<NavigatorState>();
 
+/// A pushed page's own address is the one the browser shows (decision 199).
+///
+/// go_router's default keeps the address of the page underneath: Statistics
+/// opened from the dashboard left `/` in the address bar, so no pushed page
+/// could be linked to, bookmarked or reloaded. The option's warning is about
+/// routes whose top-most address cannot be opened cold; every route here is
+/// a top-level path, so every one can. Nothing but the address reported to
+/// the browser reads it, so off the web it changes nothing.
+void reflectPushedPagesInAddress() {
+  GoRouter.optionURLReflectsImperativeAPIs = true;
+}
+
 /// Routes the user by the two gates they must pass: signed in, then in a
 /// household. Anything else is a redirect back to the gate they failed.
 final appRouterProvider = Provider<GoRouter>((ref) {
+  reflectPushedPagesInAddress();
   return GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: '/',
@@ -104,11 +117,17 @@ List<RouteBase> garageRoutes() {
     // on a phone the app is already set up on.
     GoRoute(
       path: quickFuelRoute,
-      builder: (_, _) => const QuickEntryScreen(openSheet: showFuelEntrySheet),
+      builder: (_, _) => const QuickEntryScreen(
+        openSheet: showFuelEntrySheet,
+        title: fillUpEntryTitle,
+      ),
     ),
     GoRoute(
       path: quickCostRoute,
-      builder: (_, _) => const QuickEntryScreen(openSheet: showCostEntrySheet),
+      builder: (_, _) => const QuickEntryScreen(
+        openSheet: showCostEntrySheet,
+        title: costEntryTitle,
+      ),
     ),
     GoRoute(
       path: '/planner',
@@ -120,9 +139,11 @@ List<RouteBase> garageRoutes() {
       builder: (_, _) => const MergeGaragesScreen(),
     ),
     GoRoute(path: '/company', builder: (_, _) => const CompanyScreen()),
-    GoRoute(path: '/api', builder: (_, _) => const ApiAccessScreen()),
+    // Not `/api`: the web host answers that with web/api.html, the public
+    // reference, so a reload of this page would have opened the reference.
+    GoRoute(path: '/api-access', builder: (_, _) => const ApiAccessScreen()),
     GoRoute(
-      path: '/api/webhooks/:id',
+      path: '/api-access/webhooks/:id',
       builder: (_, state) =>
           WebhookScreen(webhookId: state.pathParameters['id']!),
     ),

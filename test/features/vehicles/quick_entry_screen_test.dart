@@ -13,6 +13,7 @@ import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 import 'package:garage/features/vehicles/screens/quick_entry_screen.dart';
 import 'package:riverpod/misc.dart' show Override;
 
+import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
 
 /// Everything the fuel sheet reads on its way up, stubbed at the leaves.
@@ -39,7 +40,10 @@ Future<NavigationLog> pumpQuickFuel(
 }) {
   return pumpQuickEntry(
     tester,
-    const QuickEntryScreen(openSheet: showFuelEntrySheet),
+    const QuickEntryScreen(
+      openSheet: showFuelEntrySheet,
+      title: fillUpEntryTitle,
+    ),
     route: quickFuelRoute,
     vehicles: vehicles,
     failure: failure,
@@ -55,7 +59,10 @@ Future<NavigationLog> pumpQuickCost(
 }) {
   return pumpQuickEntry(
     tester,
-    const QuickEntryScreen(openSheet: showCostEntrySheet),
+    const QuickEntryScreen(
+      openSheet: showCostEntrySheet,
+      title: costEntryTitle,
+    ),
     route: quickCostRoute,
     vehicles: vehicles,
     locale: locale,
@@ -259,5 +266,18 @@ void main() {
       expect(find.byType(CostEntrySheet), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
+  });
+
+  // The sheet opens over the page at once, so the name is the page's first
+  // and last word: the browser tab keeps it while the sheet is up.
+  testWidgets('on the web the browser tab names the entry', (tester) async {
+    final browser = asTheWeb(tester);
+    await pumpQuickFuel(tester, vehicles: [testVehicle('v1')]);
+    await tester.pumpAndSettle();
+    expect(browser.titles.last, 'Log a fill-up · Garage');
+
+    await pumpQuickCost(tester, vehicles: [testVehicle('v1')]);
+    await tester.pumpAndSettle();
+    expect(browser.titles.last, 'Add cost · Garage');
   });
 }

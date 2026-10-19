@@ -25,6 +25,7 @@ import 'package:supabase_flutter/supabase_flutter.dart'
     show PostgrestException, User;
 
 import '../../support/driver_log.dart' show companyGarage;
+import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
 
 /// A garage that has asked for the settlement. It is off by default now, so
@@ -1901,5 +1902,13 @@ void main() {
 
       expect(find.text('Shared spend'), findsNothing);
     });
+  });
+
+  testWidgets('on the web onboarding names the browser tab', (tester) async {
+    final browser = asTheWeb(tester);
+    await pumpOnboarding(tester, RecordingHouseholdRepository());
+    await tester.pumpAndSettle();
+
+    expect(browser.titles.last, 'Set up your garage · Garage');
   });
 }

@@ -413,7 +413,7 @@ class _ApiAccessScreenState extends ConsumerState<ApiAccessScreen> {
                     ),
                   ],
                 ),
-                onTap: () => context.push('/api/webhooks/${webhook.id}'),
+                onTap: () => context.push('/api-access/webhooks/${webhook.id}'),
                 trailing: IconButton(
                   key: Key('copy-webhook-${webhook.id}'),
                   onPressed: () => _copyUrl(webhook),

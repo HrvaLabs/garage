@@ -205,7 +205,7 @@ Future<NavigationLog> pumpSettings(
     preferences: preferences,
     extraRoutes: const {
       '/household',
-      '/api',
+      '/api-access',
       '/about',
       // The rest of the "More" section.
       '/stats',

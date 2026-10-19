@@ -22,8 +22,8 @@ Future<NavigationLog> pumpWebhook(
   return pumpScreen(
     tester,
     WebhookScreen(webhookId: webhookId),
-    initialLocation: '/api/webhooks/$webhookId',
-    extraRoutes: const {'/api'},
+    initialLocation: '/api-access/webhooks/$webhookId',
+    extraRoutes: const {'/api-access'},
     locale: locale,
     textScale: textScale,
     surface: surface,
@@ -551,7 +551,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(repository.calls, contains('deleteWebhook:w1'));
-      expect(log.visited, contains('/api'));
+      expect(log.visited, contains('/api-access'));
     });
   });
 

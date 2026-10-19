@@ -25,6 +25,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:garage/domain/fuel/full_tank_range.dart';
 import 'package:garage/features/fuel/providers/fuel_providers.dart';
 
+import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
 
 FuelEntry fill(
@@ -1119,5 +1120,18 @@ void _fullTankRangeTests() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('on the web each tab writes its name to the address', (
+    tester,
+  ) async {
+    asTheWeb(tester);
+    await pumpStats(tester);
+    await tester.pumpAndSettle();
+
+    expect(
+      await tabNamesWritten(tester, ['Trips', 'Distance', 'Costs', 'Fill-ups']),
+      ['trips', 'distance', 'costs', 'fill-ups'],
+    );
   });
 }

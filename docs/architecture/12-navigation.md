@@ -1,6 +1,6 @@
 # Navigation and information architecture
 
-Thirty-seven routes, five bottom tabs, and one window that may be a phone or a
+Forty-one routes, five bottom tabs, and one window that may be a phone or a
 desktop browser. This is how they fit together, and what went wrong the last
 time they did not.
 
@@ -21,14 +21,14 @@ On a wide window the tabs lead a sidebar instead, `GarageSidebar` (see
 [The desktop sidebar](#the-desktop-sidebar)); a pushed screen keeps the sidebar
 rather than swapping it for a back button, because a browser window that loses
 its navigation on every push leaves the back button as the only way out
-(`lib/core/widgets/page_scaffold.dart:85`). The page's title moves from an app
+(`lib/core/widgets/page_scaffold.dart:89`). The page's title moves from an app
 bar into a top bar across the content pane, with a breadcrumb (see
 [The top bar](#the-top-bar)).
 
 ## Tabs cross-fade; pushed pages slide
 
 The five tabs are peers, so moving between them has no direction. `_tabPage`
-(`lib/core/router/app_router.dart:229`) wraps a tab's screen in a
+(`lib/core/router/app_router.dart:250`) wraps a tab's screen in a
 `CustomTransitionPage` that fades, and a directional push transition between
 peers reads as "forward" no matter which way the user actually moved.
 
@@ -102,7 +102,7 @@ screen. The console is a pushed page with its own tab strip, not a sixth tab:
 Material caps the bar at five, and the fleet is one thing, however many views
 it has. A driver's Vehicles tab is titled "My cars" on its own page
 (`lib/features/vehicles/screens/vehicles_screen.dart:96`) and labelled "Cars"
-in the bar (`lib/core/widgets/garage_bottom_nav.dart:60`) and the sidebar
+in the bar (`lib/core/widgets/garage_bottom_nav.dart:61`) and the sidebar
 (`lib/core/widgets/garage_sidebar.dart:85`): the bar takes one-word labels by
 test, so the tab could not carry the title's two words, and the owner chose the
 word (decision 194).
@@ -179,7 +179,7 @@ because the toolbar carried a title, a vehicle-name dropdown and an icon button.
 
 The rule this leaves: **app-bar actions are icons; anything with a variable-width
 label belongs in the body.** Statistics now puts its vehicle picker beside the
-period bar (`lib/features/stats/screens/stats_screen.dart:141`), which is also
+period bar (`lib/features/stats/screens/stats_screen.dart:142`), which is also
 where someone would look for a filter.
 **The trip log is a partial exception, knowingly.** Its toolbar still carries a
 vehicle dropdown, and adding the routes icon beside it pushed "Svi automobili"
@@ -214,12 +214,12 @@ The shape that works, and what the vehicle tabs do now:
 
 - **Anything that is content scrolls with the content.** The recalls card is
   the last row of the Car tab's list
-  (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1236`), reached by
+  (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1237`), reached by
   scrolling rather than by taking room. Upkeep is one lazily built list whose
   leading rows are the schedule and whose months are the history
-  (`vehicle_detail_screen.dart:1062`); the schedule is the Maintenance screen's
+  (`vehicle_detail_screen.dart:1063`); the schedule is the Maintenance screen's
   own list, told that something else scrolls it
-  (`lib/features/maintenance/screens/maintenance_screen.dart:193`).
+  (`lib/features/maintenance/screens/maintenance_screen.dart:194`).
 - **The everyday action is the tab's own**, an `ActionPane`
   (`lib/core/widgets/primary_action.dart:64`) belonging to the tab rather than
   to the screen: a FAB on a `Scaffold` of the tab's on a phone, a button above
@@ -343,18 +343,18 @@ only on the screen behind it.
 
 The rule that came out of it: **an act done standing at the car is on the
 car's page, without a menu.** Logging a reading and starting a drive are the
-app-bar icons (`lib/features/vehicles/screens/vehicle_detail_screen.dart:397`);
+app-bar icons (`lib/features/vehicles/screens/vehicle_detail_screen.dart:398`);
 while a drive is out the icon gives way to the in-progress card above the
 tabs, which carries "Finish drive". Logging a fill-up is the Fuel tab's own
-button (`vehicle_detail_screen.dart:736`), floating on a phone and above the
+button (`vehicle_detail_screen.dart:737`), floating on a phone and above the
 tab on a desk, as logging a service is Upkeep's
-(`vehicle_detail_screen.dart:1100`). The five newest fill-ups sit
+(`vehicle_detail_screen.dart:1101`). The five newest fill-ups sit
 under the gauge as the fuel log's own rows
 (`lib/features/fuel/widgets/fuel_entry_row.dart:20`), and "All fill-ups (N)"
-(`vehicle_detail_screen.dart:897`) is the way to the rest.
+(`vehicle_detail_screen.dart:898`) is the way to the rest.
 
 Two more things the page says rather than hides: a live guest pass puts "On
-loan to … until …" at the top (`vehicle_detail_screen.dart:938`), where the
+loan to … until …" at the top (`vehicle_detail_screen.dart:939`), where the
 only sign used to be three taps deep under the menu's "Lending"; and the
 running-cost card leads the Costs tab, where the question is asked.
 
@@ -474,7 +474,7 @@ bare in what is, after all, an HTML attribute.
 **An address nothing matches** opens the app's own page,
 `NotFoundScreen` (`lib/core/router/not_found_screen.dart:14`), in the app's
 language and with a button to the dashboard, as the router's `errorBuilder`
-(`lib/core/router/app_router.dart:74`). go_router's default said "Page Not
+(`lib/core/router/app_router.dart:87`). go_router's default said "Page Not
 Found" over the raw exception, in English, and it was what the launcher
 shortcuts opened until decision 190. The page records the path, never the
 query, as a failure, so Diagnostics can name the address. The gates still run
@@ -504,7 +504,8 @@ whole-segment prefix of the page's address (`currentLink`,
 `lib/core/widgets/garage_sidebar.dart:33`), so Statistics lights Statistics,
 a car's fuel log lights Vehicles, and an address no link holds lights nothing
 rather than the dashboard. `pageLocation`
-(`lib/core/router/page_location.dart:17`) reads that address from the page's
+(`lib/core/router/page_location.dart:7`), the path of `pageAddress`
+(`lib/core/router/page_location.dart:21`), reads that address from the page's
 own route rather than the router's top, so a page under a pushed one still
 knows where it is. A tab is gone to and anything else is pushed, so back
 returns to where the reader was. A link does nothing on the page it names, and
@@ -514,13 +515,13 @@ put Garage on top of merging garages, with back leading down again.
 
 The page for an address nothing matches is the one go_router builds without
 route state, and asking for its state throws, so it reads the router's own
-address (`lib/core/router/page_location.dart:23`); as it leaves, still drawn
+address (`lib/core/router/page_location.dart:27`); as it leaves, still drawn
 while the next page arrives, it reads wherever the router has gone
-(`lib/core/router/page_location.dart:28`). From that page every link goes,
+(`lib/core/router/page_location.dart:32`). From that page every link goes,
 the signed-in person's row included, where it would otherwise push: go_router
 builds a push from the configuration it is showing, its error included, and
 draws the same page again, so a pushed link did nothing there
-(`lib/core/router/page_location.dart:41`). The sidebar is drawn inside each
+(`lib/core/router/page_location.dart:45`). The sidebar is drawn inside each
 page rather than around the router, which is how a page knows its own address,
 and why the cross-fade between pages still has to hide two sidebars fading
 into each other.
@@ -529,8 +530,8 @@ into each other.
 
 On a wide window a page names itself in a top bar, `PageHeader`
 (`lib/core/widgets/page_header.dart:125`), where a phone has its app bar. Both
-scaffolds draw it (`lib/core/widgets/page_scaffold.dart:99`,
-`lib/core/widgets/garage_bottom_nav.dart:166`) across the content pane beside
+scaffolds draw it (`lib/core/widgets/page_scaffold.dart:103`,
+`lib/core/widgets/garage_bottom_nav.dart:172`) across the content pane beside
 the sidebar, above a rule; the content keeps its own column under it. The
 title used to be a heading held to that column, with the page's actions at the
 column's end. The bar belongs to the page, not to its text, as a tab strip
@@ -572,11 +573,11 @@ dialog meanwhile.
 The crumbs say where a pushed page sits, read from its address by
 `pageLocation`, as the sidebar reads which link to light. `sectionCrumbs`
 (`lib/core/widgets/page_header.dart:37`) names the section of any page below
-one: Vehicles, Garage (`/household`), Company and API access (`/api`). A car's
+one: Vehicles, Garage (`/household`), Company and API access (`/api-access`). A car's
 pages, `/vehicles/<id>/fuel` and the rest, name Vehicles and then the car; the
 car's own page names only Vehicles, its title being the car, and a new car is
 not a car. The car's name is `vehicleProvider`'s, which the scaffold reads
-(`lib/core/widgets/page_scaffold.dart:108`); until there is one, while the car
+(`lib/core/widgets/page_scaffold.dart:112`); until there is one, while the car
 loads or for a car the startup fetch does not know, the crumbs stop at
 Vehicles rather than read "Vehicles › Vehicles". A driver's Vehicles reads
 "Cars", as the sidebar's link does (decision 194). A tab, any other section,
@@ -598,3 +599,73 @@ know only the address: a car's maintenance opened from the planner names
 Vehicles and the car, not the planner, which back returns to; and the page for
 an address nothing matches, under a car, is crumbed as that car's page, as the
 sidebar lights Vehicles for it.
+
+## Addresses and titles on the web
+
+In a browser, at any width, each page shows its own address, a tab of a
+tabbed page is part of it, and the browser's tab is named after the page on
+top (decision 199). A phone's browser is a browser too. Android shows no
+address, and what of this reaches it is said below.
+
+**A page's address** is the one go_router reports to the browser after each
+move. By default it reported the address of the page under a pushed one, so
+Statistics opened from the dashboard read `/`. `reflectPushedPagesInAddress`
+(`lib/core/router/app_router.dart:66`) turns on
+`optionURLReflectsImperativeAPIs` before the router is built
+(`lib/core/router/app_router.dart:73`), and the page on top is reported. Each
+report after the first is a new entry in the browser's history, which its
+Back walks through.
+
+**A tab's address** is `?tab=` on its page's: `/vehicles/v1?tab=costs`,
+`/company?tab=deadlines`, `/stats?tab=distance`,
+`/vehicles/v1/maintenance?tab=calendar`. A page with tabs wraps itself in
+`RoutedTabs` (`lib/core/widgets/routed_tabs.dart:19`), which names them in
+the order they are drawn; `test/ci/page_addresses_test.dart:13` fails a bare
+`DefaultTabController`. It opens on the tab the address names, or on the
+page's own for an address that names none it knows
+(`lib/core/widgets/routed_tabs.dart:42`). That much is Android's too: the
+dashboard's "Total spent" opens Statistics on costs there as well. On the web
+a tab moved to is written to the address with go_router's `replace`
+(`lib/core/widgets/routed_tabs.dart:164`), which keeps the page, its key and
+its state, and changes only its address. It writes only while its page is the
+router's top (`lib/core/widgets/routed_tabs.dart:176`): `replace` rewrites
+the top page, whichever that is, and a row tapped while the tabs still move
+can push another page there before they stop. A menu or a dialog over the
+page is no page of the router's, so the tab is still written under one.
+Android writes nothing.
+
+**Back after a tab switch** returns to the tab before. The browser hands back
+the entry before, with the stack go_router stored beside it, and go_router
+restores that stack: the same page, at the address it had. `RoutedTabs` hears
+the address change and moves to the tab it names
+(`lib/core/widgets/routed_tabs.dart:123`), writing nothing for that move
+(`lib/core/widgets/routed_tabs.dart:156`). Back to an address without a tab
+lands on the first, and a name written then would be an entry over the one
+Back reached, with Forward lost. Only a change in the address moves the tabs
+(`lib/core/widgets/routed_tabs.dart:110`). Everything under a page hears when
+a menu or a dialog opens over it, and tabs that took that for their address
+changing would go back to its tab whenever one did: every time on Android,
+where a tab moved to is never written.
+
+**A tab's address loaded cold**, typed, bookmarked or reloaded, is any other
+address to the host: the Worker answers it with the app, which opens that page
+alone, on the tab it names, with no back arrow, there being nothing under it
+to go back to. An address the host answers with a page of its own never
+reaches the app, which is why API access moved from `/api`, where the public
+reference is; `test/core/router/router_urls_test.dart:51` fails a route at,
+or under, such an address.
+
+**The browser's tab** is named after the page on top, "Statistics · Garage",
+by `PageTitle` (`lib/core/widgets/page_title.dart:20`); the garage's own
+screen, called what the app is called, is named once. Both scaffolds wrap
+their page in it (`lib/core/widgets/page_scaffold.dart:66`,
+`lib/core/widgets/garage_bottom_nav.dart:135`), and a screen outside them wraps
+itself; `test/ci/page_addresses_test.dart:31` fails one that does neither. A
+page says its name when it comes on top (`lib/core/widgets/page_title.dart:56`),
+so closing Calculator over Statistics names Statistics again, and a page
+underneath says nothing while it rebuilds. It is the same widget whether its
+page is on top or not: a menu over a page takes the page off the top, and a
+wrapper that came and went with that would build the page again under every
+menu, losing the menu's choice. The name goes with the colour the app's own
+title gives the window (`lib/core/widgets/page_title.dart:74`), which the web
+paints its bar in. Off the web nothing is named.

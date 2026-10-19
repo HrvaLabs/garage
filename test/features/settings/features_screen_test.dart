@@ -21,7 +21,7 @@ Future<NavigationLog> pumpFeatures(WidgetTester tester) {
       '/household',
       '/trips',
       '/data',
-      '/api',
+      '/api-access',
     },
   );
 }
@@ -51,7 +51,7 @@ void main() {
       '/household',
       'lend',
       '/data',
-      '/api',
+      '/api-access',
       'receipts',
       '/routes',
       'observations',
@@ -133,7 +133,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.textContaining(fullTank), findsOneWidget);
-      expect(find.byKey(const Key('feature-/api')), findsOneWidget);
+      expect(find.byKey(const Key('feature-/api-access')), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }

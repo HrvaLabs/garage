@@ -8,6 +8,7 @@ import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/adaptive.dart';
 import '../../../core/widgets/garage_tab_bar.dart';
 import '../../../core/widgets/page_scaffold.dart';
+import '../../../core/widgets/routed_tabs.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../domain/entities/fuel_entry.dart';
 import '../../../domain/fuel/energy_type.dart';
@@ -93,8 +94,8 @@ class _StatsScreenState extends ConsumerState<StatsScreen> {
       preferences: ref.watch(unitPreferencesProvider),
     );
 
-    return DefaultTabController(
-      length: 4,
+    return RoutedTabs(
+      names: const ['fill-ups', 'costs', 'distance', 'trips'],
       initialIndex: widget.openOnCosts ? 1 : 0,
       child: GaragePageScaffold(
         title: l10n.statsTitle,

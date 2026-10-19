@@ -16,6 +16,7 @@ import 'package:garage/features/household/screens/join_screen.dart';
 import 'package:garage/features/vehicles/data/guest_pass_repository.dart';
 import 'package:garage/features/vehicles/providers/guest_pass_providers.dart';
 
+import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
 
 /// Records what an invite link asked the backend to do.
@@ -474,5 +475,15 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.textContaining('went wrong'), findsOneWidget);
+  });
+
+  testWidgets('on the web the browser tab is named for joining', (
+    tester,
+  ) async {
+    final browser = asTheWeb(tester);
+    await pumpJoin(tester, repository: RecordingHouseholdRepository());
+    await tester.pumpAndSettle();
+
+    expect(browser.titles.last, 'Join a garage · Garage');
   });
 }

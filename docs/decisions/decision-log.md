@@ -361,7 +361,7 @@ the platform push animated it: opening Statistics on the web slid the whole
 window in from the right and dragged the sidebar behind it out to the left, and
 the reader saw one sidebar leave and an identical one arrive. Tab switches were
 already immune because they build their own fading page
-(`lib/core/router/app_router.dart:229`); the ten pushed screens that also draw a
+(`lib/core/router/app_router.dart:250`); the ten pushed screens that also draw a
 sidebar were not.
 
 **Why not a shell route.** The correct fix is a `ShellRoute` holding the sidebar
@@ -1195,7 +1195,7 @@ every non-tab destination has a labelled entry point.
 `actions`. At twice the default text size the toolbar overflowed by 46 pixels: a
 title, a car's name and an icon in a fixed-width row that cannot wrap. The picker
 moved into the body beside the period bar
-(`lib/features/stats/screens/stats_screen.dart:141`).
+(`lib/features/stats/screens/stats_screen.dart:142`).
 
 **Why not shrink the control.** Capping the dropdown's width buys one text scale
 and fails at the next; the overflow is structural, not a tuning problem. A
@@ -1948,7 +1948,7 @@ already does authentication, threading and replies for free.
 
 **Why recent failures ride along, visible, not sent separately.** The same
 reasoning as the Diagnostics report `_report()` builds
-(`lib/features/settings/screens/diagnostics_screen.dart:114`): a bug report
+(`lib/features/settings/screens/diagnostics_screen.dart:116`): a bug report
 with no version and no error is a report nobody can act on three releases
 later. Composed into the draft the user sees before it sends, never
 collected anywhere on its own — this app's stance throughout is that nothing
@@ -4943,7 +4943,7 @@ appeared only when it had bad news would answer nobody.
 ## 138. Lending is in the vehicle menu, and every route must have a caller
 
 **September 2026.** `Lending` sits between Documents and Transfer in the
-vehicle menu (`lib/features/vehicles/screens/vehicle_detail_screen.dart:461`),
+vehicle menu (`lib/features/vehicles/screens/vehicle_detail_screen.dart:462`),
 and `test/ci/every_route_has_a_way_in_test.dart` fails the build for any route
 in `app_router.dart` that nothing in `lib/` opens.
 
@@ -5439,7 +5439,7 @@ behind each and the number of tanks it rests on. Nothing in it decays, so
 nothing in it goes stale.
 
 **Shown for one car, including the garage that only has one**
-(`stats_screen.dart:182`). A tank belongs to a vehicle, so averaging across a
+(`stats_screen.dart:183`). A tank belongs to a vehicle, so averaging across a
 diesel estate and a city runabout answers nobody. But the filter defaults to
 the whole garage even when the garage is one car, and for that reader "all
 vehicles" names their only car — a card should not need unlocking by a filter
@@ -5654,7 +5654,7 @@ decision, because it moves where everything on the car lives.
   coloured rows the fuel log uses (`lib/features/fuel/widgets/fuel_entry_row.dart:20`,
   extracted from the log so a fill-up reads the same on both), with "All
   fill-ups (N)" beneath them
-  (`lib/features/vehicles/screens/vehicle_detail_screen.dart:897`) and a
+  (`lib/features/vehicles/screens/vehicle_detail_screen.dart:898`) and a
   floating "Log a fill-up" like every other tab. Timeline fuel rows carry the
   economy under the cost
   (`lib/features/timeline/screens/timeline_screen.dart:320`), and the tour's
@@ -5663,7 +5663,7 @@ decision, because it moves where everything on the car lives.
 - **A drive starts from the car.** "Start a drive" was More › Trips › the
   vehicle dropdown › the car › the button, five taps, and absent from the
   owner's page while a borrower's had it. It is an app-bar action beside "Log
-  a reading" (`lib/features/vehicles/screens/vehicle_detail_screen.dart:397`),
+  a reading" (`lib/features/vehicles/screens/vehicle_detail_screen.dart:398`),
   hidden while a drive is out, when the in-progress card with "Finish drive"
   takes its place above the tabs; and the "+" sheet offers "Start a drive"
   before "Log a trip" (`lib/features/dashboard/quick_add.dart:102`).
@@ -5674,7 +5674,7 @@ decision, because it moves where everything on the car lives.
   now do too. The rows on Reminders about the car itself, tyres, documents,
   what it takes, the trip check, sit under a "This car" heading, so the tab
   reads as two things rather than seven. *Since decision 173 they have a tab
-  of their own* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1210`).
+  of their own* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1211`).
 - **One list, one name.** The due list is "Reminders" on the car and now
   "{car} · Reminders" when the dashboard or the planner opens it; a service is
   "Services" in the Timeline's filter as it is on every button; the settings
@@ -5684,7 +5684,7 @@ decision, because it moves where everything on the car lives.
   gone, in three languages.
 - **A car on loan says so.** A live pass puts "On loan to {label} until
   {date}" at the top of the owner's page
-  (`lib/features/vehicles/screens/vehicle_detail_screen.dart:938`), tapping
+  (`lib/features/vehicles/screens/vehicle_detail_screen.dart:939`), tapping
   through to Lending. A pass nobody has claimed is not a loan and shows
   nothing.
 - **The tour points at the door.** "Lend a car" opens the car's lending page
@@ -5931,7 +5931,7 @@ still matches both spellings for posted prices.
 **17 September 2026.** `PRIVACY.md` and its hosted copy name the controller,
 list Cloudflare as the host of garage.hrva.cc, and say what every borrower is
 shown. Both auth screens link to the policy
-(`lib/features/auth/screens/sign_in_screen.dart:237`). Three strings that
+(`lib/features/auth/screens/sign_in_screen.dart:238`). Three strings that
 overstated what the app does were rewritten in all three languages.
 
 **A link, not a consent sentence.** "By continuing you agree to the privacy
@@ -6424,11 +6424,11 @@ alone, as before.
 
 **18 September 2026.** The vehicle page's four tabs are what the car burns,
 what it is due for and has had done, the car itself, and what it costs
-(`lib/features/vehicles/screens/vehicle_detail_screen.dart:531`). Upkeep puts
+(`lib/features/vehicles/screens/vehicle_detail_screen.dart:532`). Upkeep puts
 the schedule above the services and readings logged, in one scroll
-(`vehicle_detail_screen.dart:1062`); Car holds the tyres, the papers, the parts,
+(`vehicle_detail_screen.dart:1063`); Car holds the tyres, the papers, the parts,
 the check before a long drive, open problems and the recall check
-(`vehicle_detail_screen.dart:1210`). The strip shares the width out when every
+(`vehicle_detail_screen.dart:1211`). The strip shares the width out when every
 label fits and scrolls when one does not
 (`lib/core/widgets/garage_tab_bar.dart:10`).
 
@@ -6625,7 +6625,7 @@ delete.
 - The three figures open where each is explained: the cars, statistics on its
   costs tab, and statistics
   (`lib/features/dashboard/widgets/household_metrics_strip.dart:56`).
-  `/stats?tab=costs` opens on costs (`lib/core/router/app_router.dart:125`).
+  `/stats?tab=costs` opens on costs (`lib/core/router/app_router.dart:155`).
 - A car out on loan says so on its dashboard card and in the car list
   (`lib/features/vehicles/widgets/on_loan_badge.dart:15`), from one query for
   every car in the garage
@@ -6685,7 +6685,7 @@ a quarter, a half-year, a year, two and five that fits five labels, puts the
 year where the year turns and the month's name elsewhere, and labels a span
 too short to cross a boundary by its two ends. The records cards on the costs
 and distance tabs add "Average per year" under the day and the month
-(`lib/features/stats/screens/stats_screen.dart:40`).
+(`lib/features/stats/screens/stats_screen.dart:41`).
 
 **What was wrong.** The axis was labelled at the first reading, the last and
 the day halfway between — "7/25", "2/26", "9/26" — which read as three dates
@@ -7680,3 +7680,79 @@ every `FilledButton` with the accent, the tonal one too, so beside a page's
 own act Add read as the same offer twice. *Cost:* a list still ends in the
 room it keeps clear for a floating button (`GarageTokens.fabClearance`), 88
 pixels a desk no longer needs.
+
+## 199. The web idioms
+
+**18 October 2026, the owner's decisions of 20 and 27 September.** What a
+browser expects of a website, added once, app-wide. Unlike the desktop shell
+(decision 198), which a wide window chooses, these belong to the web at every
+width: a phone's browser is still a browser, with an address bar, a back
+button and tabs of its own. Android's code path is the one the screens
+already had, and what reaches it is named below.
+
+**Every page has an address.** go_router showed the address of the page
+underneath a pushed one, so Statistics opened from the dashboard read `/`,
+and no pushed page could be linked to, bookmarked or reloaded.
+`reflectPushedPagesInAddress` turns on `GoRouter.optionURLReflectsImperativeAPIs`
+before the router is built (`lib/core/router/app_router.dart:73`), and the
+address bar shows the page on top. go_router warns that the top page's
+address cannot always be opened cold; every route here is a top-level path
+and none is handed anything but its address, so every one can. The option is
+read in one place, the address go_router reports to the browser, which
+Android has no use for: off the web it changes nothing.
+
+**Every tab too.** The console's tabs, a car's, Statistics' and the
+maintenance screen's are `?tab=` in the address (`/vehicles/v1?tab=costs`,
+`/company?tab=deadlines`), as `/stats?tab=costs` already was: a query
+parameter, not a path of its own such as `/vehicles/:id/fuel`, which is
+already the fuel log's address. `RoutedTabs` takes the place of
+`DefaultTabController` (`lib/core/widgets/routed_tabs.dart:19`): it opens on
+the tab the address names, on Android as on the web, and moves to the one it
+names when the address changes under the page. On the web it writes the tab moved to with
+go_router's `replace`, which keeps the page and its state and changes only
+its address. Statistics and maintenance keep `openOnCosts` and
+`openOnCalendar`: the route still sets them from the address, and they say
+which tab to open on when there is no address to read, as for a screen a test
+builds bare. Android writes nothing; it shows no address, and a tab it never
+writes is one thing fewer to go wrong there. *Cost:* each tab moved to is an
+entry in the browser's history, as every other move is, so Back walks back
+through the tabs before it leaves the page. Written over the current entry,
+a tab would have been the one move Back could not undo. Back to a tab writes
+nothing, since a name written there would bury the entry Forward returns to.
+And a page whose tab has been written is no longer the page `push` returned:
+`replace` gives it a completer of its own and drops the one `push` handed
+out, so an `await context.push(…)` of a tabbed page would never return after
+a tab switch on the web; nothing awaits one today.
+
+**The browser tab names the page.** "Statistics · Garage", "Statistika ·
+Garaža", from the page on top, and "Garage" alone for the garage's own screen,
+which is called what the app is. `PageTitle`
+(`lib/core/widgets/page_title.dart:20`) says it: both scaffolds put it around
+every page, and the eight screens outside them put it around themselves
+(signing in and up, the emailed link, joining, onboarding, diagnostics,
+framing a photo and the launcher's quick entry). The emailed link's tab says
+what its page says: that it is confirming, then, if it has to, that the link
+did not work. A page names the tab when it comes on top, and again if its
+title changes while it is there; a page underneath says nothing, though it
+still builds when what it shows changes. The obvious way, a `Title` wrapped
+around the page only while it is on top, would have broken every menu. A menu,
+a dialog or a popover over a page takes it off the top, so the wrapper would
+have gone whenever one opened, and the page with it, built again from nothing,
+the choice made in the menu going to a button no longer there: every ⋮ menu,
+the sidebar's garage switcher, the quick-add. `PageTitle` is the same widget
+around the same child, on top or not, and gives the browser the name itself,
+with the colour the app's own title gives the window: the web paints its bar
+in the colour that comes with a name, black for none. Android names nothing,
+the same call there renaming the app in the list of recent apps. *Cost:*
+framing a photo is pushed outside the router, so it names the tab but has no
+address; the edit form's stays in the address bar.
+
+**API access is at `/api-access`.** The web host answers `/api` with
+`web/api.html`, the public reference, as it answered `/features` with the
+showcase until the tour moved to `/tour` (decision 92). The route worked
+while the app went to it, and a reload or a shared link opened the
+reference. Once every pushed page showed its own address, API access opened
+from Your data and reloaded would always have ended there. The reference
+keeps `/api`, which `GarageLinks.apiDocs` and the sitemap name, and
+`test/core/router/router_urls_test.dart:51` fails a route that sits at, or
+under, a page the host serves itself.

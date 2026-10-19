@@ -9,6 +9,7 @@ import '../../../core/theme/garage_theme.dart';
 import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/labeled_field.dart';
 import '../../../core/widgets/failure_message.dart';
+import '../../../core/widgets/page_title.dart';
 import '../../../domain/household/garage_name.dart';
 import '../../auth/providers/auth_providers.dart';
 import '../providers/household_providers.dart';
@@ -80,7 +81,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         : null;
     final busy = state.isLoading;
 
-    return Scaffold(
+    final page = Scaffold(
       appBar: AppBar(
         title: Text(l10n.onboardingTitle),
         actions: [
@@ -255,5 +256,6 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
         ),
       ),
     );
+    return PageTitle(title: l10n.onboardingTitle, child: page);
   }
 }

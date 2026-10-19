@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/errors/app_failure.dart';
 import '../../../core/theme/garage_tokens.dart';
+import '../../../core/widgets/page_title.dart';
 import '../../../domain/auth/email_link.dart';
 import '../providers/auth_providers.dart';
 
@@ -59,14 +60,19 @@ class _ConfirmEmailScreenState extends ConsumerState<ConfirmEmailScreen> {
           child: FutureBuilder<void>(
             future: _confirming,
             builder: (context, snapshot) {
+              // The browser's tab says what the page says, here and below.
               if (snapshot.connectionState != ConnectionState.done) {
-                return Column(
+                final checking = Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const CircularProgressIndicator(),
                     const SizedBox(height: GarageTokens.space4),
                     Text(l10n.authConfirmChecking),
                   ],
+                );
+                return PageTitle(
+                  title: l10n.authConfirmChecking,
+                  child: checking,
                 );
               }
 
@@ -86,7 +92,7 @@ class _ConfirmEmailScreenState extends ConsumerState<ConfirmEmailScreen> {
                 return const SizedBox.shrink();
               }
 
-              return Column(
+              final failed = Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
@@ -114,6 +120,10 @@ class _ConfirmEmailScreenState extends ConsumerState<ConfirmEmailScreen> {
                     child: Text(l10n.authConfirmSignIn),
                   ),
                 ],
+              );
+              return PageTitle(
+                title: l10n.authConfirmFailedTitle,
+                child: failed,
               );
             },
           ),

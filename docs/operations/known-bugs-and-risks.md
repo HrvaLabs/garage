@@ -885,7 +885,7 @@ branch never ran. In Riverpod 3 a provider whose *first* load throws settles as
 an `AsyncLoading` **carrying** the error, so the class never becomes
 `AsyncError` and a screen waiting for it waits forever: here, a launcher
 shortcut that opened a blank page and stayed on it. Ask `hasValue` and
-`hasError`, not the class (`lib/features/vehicles/screens/quick_entry_screen.dart:75`).
+`hasError`, not the class (`lib/features/vehicles/screens/quick_entry_screen.dart:85`).
 
 Two neighbours of the same version, worth knowing separately:
 
@@ -1000,6 +1000,51 @@ several releases later.
 
 ## Recently fixed, worth remembering
 
+### A tab moved to on the web could replace the page pushed over it
+
+**Low, caught before shipping, 19 October 2026.** A tab moved to is written to
+the page's address with go_router's `replace` once the tabs stop moving, and
+`replace` rewrites the router's top page, whichever page that is. A row tapped
+while they still moved, tyres on a car's Car tab say, pushed its page first,
+and that page was then replaced by a second car page at `?tab=car`. A tab is
+now written only while its page is the router's top
+(`lib/core/widgets/routed_tabs.dart:176`), which a menu or a dialog over it
+leaves it. `test/core/widgets/routed_tabs_test.dart:211` pushes a page while
+the tabs move and finds it still there; the test after it opens a dialog
+meanwhile and finds the tab written all the same.
+
+### Reloading API access opened the API reference
+
+**Low, fixed 18 October 2026; since the reference was published in August.**
+The web host answers `/api` with `web/api.html`, the public reference, and the
+API access screen was routed at `/api` too. The app went there without asking
+the host, so the screen opened, until the browser itself was asked for the
+address: deleting a webhook opened by its link went to `/api`, and a reload or
+the address shared opened the reference instead of the app. Once a pushed page
+showed its own address (decision 199), every reload of API access would have
+ended there. The screen is at `/api-access`, its webhooks under it, and the
+reference keeps `/api`. `test/core/router/router_urls_test.dart:51` fails a
+route at, or under, an address the host answers with a page of its own.
+
+### A name for the browser tab that came and went would have rebuilt the page under every menu
+
+**Low, caught before shipping, 18 October 2026.** As first designed, a page
+named the browser's tab through a `Title` wrapped around it only while it was
+on top. On the web a menu, a dropdown, a dialog or a popover takes the page off
+the top, so the wrapper would have gone and come back with each, and Flutter,
+finding something else where the `Title` was, builds everything under it again
+from nothing. Scroll positions and typed text would have gone, and so would
+the menu's choice: a `PopupMenuButton` drops one when its own state has gone,
+so every ⋮ menu, the sidebar's garage switcher and the quick-add would have
+done nothing on the web. No test would have seen it, a test running as Android,
+where the name is off. `PageTitle` is the same widget on top or not, and names
+the tab itself when its page comes on top
+(`lib/core/widgets/page_title.dart:56`).
+`test/core/widgets/page_title_test.dart:161` opens a menu over a page, chooses,
+and finds the choice delivered and the page's state as it was. It is the
+frame's rule again (decision 198): a wrapper present on one side of a change
+only replaces everything under it.
+
 ### On a desk, the not-found page's pushed links did nothing
 
 **Low, fixed 18 October 2026; found the same day, and as old as the page.**
@@ -1013,7 +1058,7 @@ the router then draws only the error page. Nothing was thrown or logged; the
 click did nothing. The rail's links outside the tabs pushed too, so it was not
 new with the sidebar. A link and the person's row now go rather than push
 while the router's configuration is an error
-(`lib/core/router/page_location.dart:41`, read at
+(`lib/core/router/page_location.dart:45`, read at
 `lib/core/widgets/garage_sidebar.dart:188` and
 `lib/core/widgets/garage_sidebar.dart:434`): there is nothing on that page to
 come back to. `test/core/router/not_found_screen_test.dart:151` opens the
@@ -1198,7 +1243,7 @@ screen: "Page Not Found" over the raw `GoException: no routes for location:
 screen never shows a raw message. The launcher shortcuts were the way in
 (below); a mistyped web address or an old link still was. Such an address now
 opens `NotFoundScreen` (`lib/core/router/not_found_screen.dart:14`, wired at
-`lib/core/router/app_router.dart:74`): the app's title and sentence, and a
+`lib/core/router/app_router.dart:87`): the app's title and sentence, and a
 button to the dashboard. It records `no page at <path>` as a failure, the
 path and never the query, which can carry a token, so Diagnostics names the
 address a report is about. The gates run first, as for any address: a visitor
@@ -1215,7 +1260,7 @@ take one-word labels by test, which "My cars", "Moja vozila" and "Le mie
 auto" are not, so the word was the owner's to choose. On 20 September the
 owner chose "Cars", "Auti" and "Auto", for a driver only. The bottom bar and
 the sidebar read the role and take that label for the cars tab
-(`lib/core/widgets/garage_bottom_nav.dart:60`,
+(`lib/core/widgets/garage_bottom_nav.dart:61`,
 `lib/core/widgets/garage_sidebar.dart:85`); everybody else keeps
 "Vehicles". `test/core/widgets/garage_bottom_nav_test.dart` holds the new
 label to one word in every language with the others, and asks for both
@@ -1462,7 +1507,7 @@ Resume button had the same shape since v1.6.20. No test saw it because the
 screen-test harness ran with Material's default theme. Fixed in v1.6.23:
 `GarageTheme.inlineButton` (`lib/core/theme/garage_theme.dart:67`) for a
 button that sits beside something, applied at the six sites, and the harness
-now carries the app's theme (`test/support/pump_screen.dart:273`), so a
+now carries the app's theme (`test/support/pump_screen.dart:276`), so a
 button placed that way again fails its test with "BoxConstraints forces an
 infinite width" instead of shipping. Lesson: a harness with a different
 theme from the app tests a different app. For the same reason it builds the
@@ -1567,7 +1612,7 @@ four: the sleeps alone were two seconds the tests never needed.
 The lesson: a fixed sleep inside `runAsync` is a bet on the scheduler, and a
 seam that keeps the work on the fake clock is the fix, not a longer sleep.
 `XFile` is that seam for a file. The one such sleep left is in
-`test/features/vehicles/vehicle_edit_screen_test.dart:491`, where an image
+`test/features/vehicles/vehicle_edit_screen_test.dart:517`, where an image
 is parsed in a real isolate through `compute`; that one has no in-memory
 stand-in yet and will show the same shape if it ever fails under load.
 
@@ -1698,7 +1743,7 @@ their list with a key this build does not know
 (`lib/features/vehicles/stored_keys.dart:14`), so a car stored by a newer build
 keeps its fuel type, kind, drive or gearbox instead of showing a blank field and
 saving whatever the form held. It is tested in
-`test/features/vehicles/vehicle_edit_screen_test.dart:950`. The entry under
+`test/features/vehicles/vehicle_edit_screen_test.dart:976`. The entry under
 "Open" outlived the fix by several releases.
 
 ### Statistics by station listed one forecourt under each name it was saved with
@@ -1962,7 +2007,7 @@ each was a promise that had stopped describing it.
 - **The privacy policy could not be read before an account existed.** It was
   linked from About and More, both behind the sign-in, and GDPR Art. 13 asks
   for the information when the data is collected. Both auth screens now carry a
-  plain link (`lib/features/auth/screens/sign_in_screen.dart:237`), and
+  plain link (`lib/features/auth/screens/sign_in_screen.dart:238`), and
   deliberately not a "by continuing you agree" sentence: a policy is
   information, and there are no terms in force to agree to.
 - **The policy named nobody and left out a processor.** It now names the
@@ -3058,8 +3103,8 @@ stack, so the reports said only that it happened.
 gone, so any `ref` written *after* an `await` is a bet that the screen outlives
 the call. Three places lost that bet:
 
-- **Sign-in and sign-up** (`lib/features/auth/screens/sign_in_screen.dart:74`,
-  `sign_up_screen.dart:43`). The worst shape of it: a sign-in that *works* is
+- **Sign-in and sign-up** (`lib/features/auth/screens/sign_in_screen.dart:75`,
+  `sign_up_screen.dart:44`). The worst shape of it: a sign-in that *works* is
   precisely what makes the router replace the screen, so the read after the
   await raced the redirect and the crash landed on the success path. Whether it
   threw depended on which of the two won, which is why it was intermittent
@@ -3097,7 +3142,7 @@ stale until something else refreshes it. Affects the entry sheets and the
 ### Tapping "More" slid a page in over its own navigation bar
 **Was Low**, and purely visual. The bottom nav's five destinations are peers,
 so four of them were registered with `_tabPage` and cross-fade
-(`lib/core/router/app_router.dart:229`). `/more` was added later with a plain
+(`lib/core/router/app_router.dart:250`). `/more` was added later with a plain
 `builder:` and so fell back to the platform push transition — the animation a
 *detail* page gets. Tapping it slid a new page in sideways over the very
 navigation bar it was launched from, while every other tab dissolved in place.
@@ -4581,8 +4626,8 @@ incidents card keeps its add button for whoever sees it, and there is no
 guest policy on `incidents`. But the card is on the Car tab, and a borrowed
 car's page has no tabs: since 8 September, before incidents existed, a car
 that is not in one of your garages opens the borrower's page, the briefing
-and what the pass allows (`lib/features/vehicles/screens/vehicle_detail_screen.dart:603`).
-`test/features/vehicles/vehicle_detail_screen_test.dart:620` looks for the
+and what the pass allows (`lib/features/vehicles/screens/vehicle_detail_screen.dart:604`).
+`test/features/vehicles/vehicle_detail_screen_test.dart:621` looks for the
 button on a borrowed car, and the test after it finds it on the owner's.
 
 ### Moving to Flutter 3.47.7: five files rewritten, two first runs failed
@@ -4722,7 +4767,7 @@ cache is no use to a phone that opens on the sign-in gate. It does not.
 with no expiry check (`supabase_auth.dart` line 108, into `setInitialSession`,
 `gotrue_client.dart` lines 1138 to 1155 of gotrue 2.26.0), so after an hour
 away `currentUser` is not null, the router treats the person as signed in
-(`lib/core/router/app_router.dart:64`), the startup cache is read under their
+(`lib/core/router/app_router.dart:77`), the startup cache is read under their
 id and the read cache has its user key. `recoverSession` then tries a refresh
 without holding startup up; offline it fails with
 `AuthRetryableFetchException` after up to about ten seconds of retries

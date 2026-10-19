@@ -180,11 +180,14 @@ Future<NavigationLog> pumpScreen(
     );
   }
 
+  // `/company?tab=deadlines` is opened at `/company`: a route's path has no
+  // query, and the query is what a test of a tab's address is about.
+  final screenPath = Uri.parse(initialLocation).path;
   final router = GoRouter(
     initialLocation: initialLocation,
     routes: [
       GoRoute(
-        path: initialLocation,
+        path: screenPath,
         builder: (context, state) {
           log.visited.add(state.uri.toString());
           return screen;
@@ -202,7 +205,7 @@ Future<NavigationLog> pumpScreen(
         '/stats',
         '/company',
         ...extraRoutes,
-      }.where((path) => path != initialLocation))
+      }.where((path) => path != screenPath))
         stub(path),
     ],
   );

@@ -133,7 +133,7 @@ rather than refused.
 
 **"My cars"** is the vehicles screen wearing a driver's presentation
 (`lib/features/vehicles/screens/vehicles_screen.dart:78`), under a tab that
-reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:60`, and in the sidebar
+reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:61`, and in the sidebar
 `lib/core/widgets/garage_sidebar.dart:85` and a desk page's crumbs
 `lib/core/widgets/page_header.dart:49`): the title, no Add vehicle button,
 no archived section, an empty state that names the administrator as the one
@@ -162,13 +162,13 @@ sign-off keeps the card and says why.
 **The driver's car page** keeps the four tabs and the everyday buttons, and
 loses the owner's once-in-a-while acts, every one of which the policies
 refuse: a driver gets a menu of their own with *Report an incident* and
-*Create report* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:509`),
-no add-reminder row (`lib/features/vehicles/screens/vehicle_detail_screen.dart:2337`)
-and no *Add income* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1636`).
+*Create report* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:510`),
+no add-reminder row (`lib/features/vehicles/screens/vehicle_detail_screen.dart:2338`)
+and no *Add income* (`lib/features/vehicles/screens/vehicle_detail_screen.dart:1637`).
 The menu is theirs only for a car handed to them: a driver holding somebody
 else's car on a pass gets the borrower's page like anyone. The report reads
 what they can read and asks no "which driver" of them
-(`lib/features/vehicles/screens/vehicle_detail_screen.dart:198`): the log a
+(`lib/features/vehicles/screens/vehicle_detail_screen.dart:199`): the log a
 driver holds is their own windows, so any other pick would file an empty
 logbook. A report whose read fails says so in a snackbar rather than ending
 the tap in silence. The tyres,
@@ -264,13 +264,13 @@ entry keeps its place when its author goes, and resolves to nobody.
 
 ## The console
 
-`/company` (`lib/features/company/screens/company_screen.dart:24`) is an
+`/company` (`lib/features/company/screens/company_screen.dart:25`) is an
 admin's, among the sidebar's tools and under More on a phone, leading the
 list while there is one (`lib/core/widgets/secondary_destinations.dart:36`).
 It refuses, in words, a garage off the plan and a member who is not its admin,
 and shows progress rather than either refusal while the household is still
 unknown on a cold start typed in by URL
-(`lib/features/company/screens/company_screen.dart:36`). Tabs, on a
+(`lib/features/company/screens/company_screen.dart:37`). Tabs, on a
 `GarageTabBar` that scrolls rather than cuts a label:
 
 | Tab | Widget | What it holds |
@@ -535,7 +535,7 @@ tables. A departed driver is not choosable:
 their rows are reached by exporting everyone and filtering the `driver`
 column on "Former member". The mileage logbook asks which driver after the
 period, on the plan and never of a driver
-(`lib/features/vehicles/screens/vehicle_detail_screen.dart:198`), through the
+(`lib/features/vehicles/screens/vehicle_detail_screen.dart:199`), through the
 resolution rather than the typed name: the log says whose car it was, the
 free text says who was at the wheel that day.
 

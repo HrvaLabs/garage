@@ -181,7 +181,7 @@ class FeaturesScreen extends ConsumerWidget {
         icon: Icons.code_outlined,
         title: l10n.apiTitle,
         blurb: l10n.featureApiBlurb,
-        route: '/api',
+        route: '/api-access',
       ),
     ];
 

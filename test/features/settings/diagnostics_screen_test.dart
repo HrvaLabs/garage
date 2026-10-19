@@ -5,6 +5,7 @@ import 'package:garage/core/errors/failure_log.dart';
 import 'package:garage/features/settings/screens/diagnostics_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
 
 /// Records what the app tried to hand to the share sheet.
@@ -174,5 +175,14 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('on the web the browser tab is named Diagnostics', (
+    tester,
+  ) async {
+    final browser = asTheWeb(tester);
+    await pumpDiagnostics(tester);
+
+    expect(browser.titles.last, 'Diagnostics · Garage');
   });
 }
