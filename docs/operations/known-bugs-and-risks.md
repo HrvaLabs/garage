@@ -1315,6 +1315,19 @@ regaining focus counts as coming back, so switching windows triggers a
 check too. It is one small request, and a tab that has been told stops
 asking.
 
+**And two checks could both tell, fixed 17 October 2026.** A check waits on
+the network, so the first frame's and one from coming back to the tab could
+be waiting at once, and each told the reader: a second notice queued behind
+the first. One check runs at a time now. The request's catch takes an
+`Exception` only, offline or an answer that is not the file; an `Error` is a
+fault in the check itself and goes on to the failure log instead of being
+swallowed. The notice sits in `GarageAppFrame`
+(`lib/core/widgets/app_frame.dart`), which keeps one shape on both sides of
+the wide breakpoint, because a wrapper that came and went with the window's
+width would start the notice again on a resize and it would tell again.
+`test/core/web/update_notice_test.dart` holds when the server is asked, and
+`test/core/widgets/app_frame_test.dart` the resize.
+
 ### The web app was a blank page until Flutter's first frame
 
 **Was Medium on the web, and what every visitor saw first; fixed 27
@@ -1378,10 +1391,12 @@ Resume button had the same shape since v1.6.20. No test saw it because the
 screen-test harness ran with Material's default theme. Fixed in v1.6.23:
 `GarageTheme.inlineButton` (`lib/core/theme/garage_theme.dart:24`) for a
 button that sits beside something, applied at the six sites, and the harness
-now carries the app's theme (`test/support/pump_screen.dart:272`), so a
+now carries the app's theme (`test/support/pump_screen.dart:273`), so a
 button placed that way again fails its test with "BoxConstraints forces an
 infinite width" instead of shipping. Lesson: a harness with a different
-theme from the app tests a different app.
+theme from the app tests a different app. For the same reason it builds the
+app's frame too (`GarageAppFrame`, `lib/core/widgets/app_frame.dart`), the
+widget `lib/main.dart` puts around every page.
 
 ### A restore or an import hit the free cap halfway, with the generic sentence
 

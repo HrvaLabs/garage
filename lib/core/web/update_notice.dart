@@ -72,6 +72,10 @@ class _UpdateNoticeState extends ConsumerState<UpdateNotice> {
   /// Once said, not repeated every half hour until the reload.
   bool _told = false;
 
+  /// A check is waiting on the server. The first frame's and a return to the
+  /// tab can overlap, and both would hear of the same build and say so.
+  bool _asking = false;
+
   @override
   void initState() {
     super.initState();
@@ -91,16 +95,19 @@ class _UpdateNoticeState extends ConsumerState<UpdateNotice> {
   }
 
   Future<void> _check() async {
-    if (_told || !mounted) {
+    if (_told || _asking || !mounted) {
       return;
     }
+    _asking = true;
     final String? published;
     try {
       published = await ref.read(publishedBuildProvider)();
-    } on Object {
+    } on Exception {
       // Offline, or an answer that is not the file: the next check asks
       // again, and there is nothing worth telling anybody.
       return;
+    } finally {
+      _asking = false;
     }
     if (!mounted ||
         !isNewerBuild(running: AppInfo.build, published: published)) {

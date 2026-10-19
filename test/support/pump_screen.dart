@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/format/unit_format.dart';
 import 'package:garage/core/localization/garage_localizations.dart';
 import 'package:garage/core/theme/garage_theme.dart';
+import 'package:garage/core/widgets/app_frame.dart';
 import 'package:garage/core/provider_retry.dart';
 import 'package:garage/core/supabase/supabase_client_provider.dart';
 import 'package:garage/domain/entities/household.dart';
@@ -277,10 +278,41 @@ Future<NavigationLog> pumpScreen(
         builder: (context, child) => MediaQuery.withClampedTextScaling(
           minScaleFactor: textScale,
           maxScaleFactor: textScale,
-          child: child!,
+          child: GarageAppFrame(child: child!),
         ),
       ),
     ),
   );
   return log;
+}
+
+/// A desk's window: the size the desktop layer is drawn at.
+const desktopSurface = Size(1440, 900);
+
+/// [pumpScreen] in [desktopSurface]: whatever the app draws on a wide window,
+/// as a browser on a desk gets it.
+Future<NavigationLog> pumpDesktop(
+  WidgetTester tester,
+  Widget screen, {
+  List<Override> overrides = const [],
+  String initialLocation = '/',
+  Iterable<String> extraRoutes = const [],
+  Locale? locale,
+  Household? household = testHousehold,
+  String role = 'admin',
+  List<Vehicle> vehicles = const [],
+  Size surface = desktopSurface,
+}) {
+  return pumpScreen(
+    tester,
+    screen,
+    overrides: overrides,
+    initialLocation: initialLocation,
+    extraRoutes: extraRoutes,
+    locale: locale,
+    household: household,
+    role: role,
+    vehicles: vehicles,
+    surface: surface,
+  );
 }

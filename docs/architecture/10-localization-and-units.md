@@ -44,7 +44,7 @@ is empty (`:117`).
 **Material's and Cupertino's words come from the app's own list.** `MaterialApp`
 is handed `garageLocalizationsDelegates`
 (`lib/core/localization/garage_localizations.dart:19`, used at
-`lib/main.dart:147`), not the `AppLocalizations.localizationsDelegates` that
+`lib/main.dart:146`), not the `AppLocalizations.localizationsDelegates` that
 gen-l10n generates. That list hands over Flutter's global delegates, which
 choose among every language Flutter translates at run time, so every one of
 them was compiled in; naming the three the app ships in lets the rest be

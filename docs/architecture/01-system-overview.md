@@ -83,18 +83,25 @@ Within a feature the split is always the same, for example `lib/features/fuel/`:
 
 ## Startup
 
-`lib/main.dart:27` runs four things before the app appears:
+`lib/main.dart:26` runs four things before the app appears:
 
-1. `Env.assertConfigured()` (`lib/main.dart:41`) fails fast when the Supabase URL
+1. `Env.assertConfigured()` (`lib/main.dart:40`) fails fast when the Supabase URL
    or key dart-define is missing, rather than letting the app open and every
    query fail one by one.
-2. `initializeDateFormatting()` (`lib/main.dart:42`), because dates render in two
+2. `initializeDateFormatting()` (`lib/main.dart:41`), because dates render in two
    locales.
-3. `Supabase.initialize` (`lib/main.dart:44`) with the publishable key. The
+3. `Supabase.initialize` (`lib/main.dart:43`) with the publishable key. The
    comment there records that `anonKey` was renamed `publishableKey` upstream and
    is the same public value, still gated by RLS.
-4. `runApp` inside a `ProviderScope` (`lib/main.dart:52`), which is what makes
+4. `runApp` inside a `ProviderScope` (`lib/main.dart:51`), which is what makes
    every provider override in tests possible.
+
+Every page then sits inside `GarageAppFrame`
+(`lib/core/widgets/app_frame.dart`), which `MaterialApp.router`'s `builder`
+puts around it: snackbars sized to the window, and the new-version notice the
+web build shows. `test/support/pump_screen.dart` builds the same frame, so a
+screen test sees what the app puts around a page, a phone-sized one included:
+its snackbars float, as a phone's do.
 
 ### The first fetch
 
