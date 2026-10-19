@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/widgets/page_header.dart';
+import 'package:garage/l10n/app_localizations.dart';
 
 Future<void> pumpHeader(
   WidgetTester tester,
   Size size, {
   List<Widget> actions = const [],
   VoidCallback? onBack,
+  List<Crumb> crumbs = const [],
+  List<Widget> trailing = const [],
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -15,7 +18,13 @@ Future<void> pumpHeader(
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
-        body: PageHeader(title: 'Fuel', actions: actions, onBack: onBack),
+        body: PageHeader(
+          title: 'Fuel',
+          actions: actions,
+          onBack: onBack,
+          crumbs: crumbs,
+          trailing: trailing,
+        ),
       ),
     ),
   );
@@ -88,5 +97,119 @@ void main() {
           'the sidebar is the navigation on desktop; a back arrow on a '
           'top-level page is phone chrome with nowhere to go',
     );
+  });
+
+  testWidgets('where the page sits is said above its title, in links', (
+    tester,
+  ) async {
+    await pumpHeader(
+      tester,
+      const Size(1500, 1000),
+      crumbs: const [
+        Crumb('Vehicles', '/vehicles'),
+        Crumb('Golf', '/vehicles/v1'),
+      ],
+    );
+
+    expect(
+      tester.getTopLeft(find.text('Golf')).dy,
+      lessThan(tester.getTopLeft(find.text('Fuel')).dy),
+    );
+    expect(
+      tester.getSemantics(find.byKey(const Key('crumb-/vehicles'))),
+      isSemantics(label: 'Vehicles', isLink: true, hasTapAction: true),
+    );
+  });
+
+  testWidgets('what every page offers comes after the page\'s own actions', (
+    tester,
+  ) async {
+    await pumpHeader(
+      tester,
+      const Size(1500, 1000),
+      actions: [
+        IconButton(
+          key: const Key('action'),
+          onPressed: () {},
+          icon: const Icon(Icons.edit),
+        ),
+      ],
+      trailing: [
+        IconButton(
+          key: const Key('trailing'),
+          onPressed: () {},
+          icon: const Icon(Icons.add),
+        ),
+      ],
+    );
+
+    expect(
+      tester.getTopLeft(find.byKey(const Key('trailing'))).dx,
+      greaterThan(tester.getTopRight(find.byKey(const Key('action'))).dx),
+    );
+  });
+
+  group('the crumbs a page is given from its address', () {
+    late AppLocalizations l10n;
+    setUpAll(() async {
+      l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    });
+
+    test('a section itself has none', () {
+      expect(sectionCrumbs(l10n, '/stats'), isEmpty);
+      expect(sectionCrumbs(l10n, '/vehicles'), isEmpty);
+    });
+
+    test('a page one below a section names the section', () {
+      expect(sectionCrumbs(l10n, '/household/merge').map((c) => c.route), [
+        '/household',
+      ]);
+      expect(sectionCrumbs(l10n, '/vehicles/v1').map((c) => c.label), [
+        'Vehicles',
+      ]);
+      expect(sectionCrumbs(l10n, '/api/webhooks/w1').map((c) => c.route), [
+        '/api',
+      ]);
+    });
+
+    test('a car\'s own page names Vehicles and the car', () {
+      final crumbs = sectionCrumbs(l10n, '/vehicles/v1/fuel', carName: 'Golf');
+      expect(crumbs.map((c) => c.label), ['Vehicles', 'Golf']);
+      expect(crumbs.map((c) => c.route), ['/vehicles', '/vehicles/v1']);
+    });
+
+    test('and names the car only once its name is known', () {
+      // Not "Vehicles › Vehicles" while the car loads, or for a car the
+      // startup fetch does not know.
+      final crumbs = sectionCrumbs(l10n, '/vehicles/v1/fuel');
+      expect(crumbs.map((c) => c.label), ['Vehicles']);
+      expect(crumbs.map((c) => c.route), ['/vehicles']);
+    });
+
+    test('a new car is not a car', () {
+      expect(sectionCrumbs(l10n, '/vehicles/new').map((c) => c.label), [
+        'Vehicles',
+      ]);
+    });
+
+    test('a driver\'s cars are Cars, as in the sidebar', () {
+      expect(
+        sectionCrumbs(
+          l10n,
+          '/vehicles/v1/fuel',
+          carName: 'Golf',
+          driver: true,
+        ).map((c) => c.label),
+        ['Cars', 'Golf'],
+      );
+      expect(
+        sectionCrumbs(
+          l10n,
+          '/household/merge',
+          driver: true,
+        ).map((c) => c.label),
+        ['Garage'],
+      );
+    });
   });
 }

@@ -21,7 +21,9 @@ On a wide window the tabs lead a sidebar instead, `GarageSidebar` (see
 [The desktop sidebar](#the-desktop-sidebar)); a pushed screen keeps the sidebar
 rather than swapping it for a back button, because a browser window that loses
 its navigation on every push leaves the back button as the only way out
-(`lib/core/widgets/page_scaffold.dart:65`).
+(`lib/core/widgets/page_scaffold.dart:79`). The page's title moves from an app
+bar into a top bar across the content pane, with a breadcrumb (see
+[The top bar](#the-top-bar)).
 
 ## Tabs cross-fade; pushed pages slide
 
@@ -512,3 +514,44 @@ while the next page arrives, it reads wherever the router has gone
 page rather than around the router, which is how a page knows its own address,
 and why the cross-fade between pages still has to hide two sidebars fading
 into each other.
+
+## The top bar
+
+On a wide window a page names itself in a top bar, `PageHeader`
+(`lib/core/widgets/page_header.dart:114`), where a phone has its app bar. Both
+scaffolds draw it (`lib/core/widgets/page_scaffold.dart:98`,
+`lib/core/widgets/garage_bottom_nav.dart:164`) across the content pane beside
+the sidebar, above a rule; the content keeps its own column under it. The
+title used to be a heading held to that column, with the page's actions at the
+column's end. The bar belongs to the page, not to its text, as a tab strip
+does (decision 32); a page with a strip has it under the bar, and the strip
+draws the rule itself. A bar across the whole window, sidebar included, is a
+phone's, so this one stops at the sidebar, and its back arrow comes only when
+there is somewhere to go back to: a page opened by its address has an empty
+stack. Left to right: the back arrow, the crumbs over the title, the page's
+own actions, and a slot (`trailing`) for what a page offers beyond them.
+
+The crumbs say where a pushed page sits, read from its address by
+`pageLocation`, as the sidebar reads which link to light. `sectionCrumbs`
+(`lib/core/widgets/page_header.dart:37`) names the section of any page below
+one: Vehicles, Garage (`/household`), Company and API access (`/api`). A car's
+pages, `/vehicles/<id>/fuel` and the rest, name Vehicles and then the car; the
+car's own page names only Vehicles, its title being the car, and a new car is
+not a car. The car's name is `vehicleProvider`'s, which the scaffold reads
+(`lib/core/widgets/page_scaffold.dart:107`); until there is one, while the car
+loads or for a car the startup fetch does not know, the crumbs stop at
+Vehicles rather than read "Vehicles › Vehicles". A driver's Vehicles reads
+"Cars", as the sidebar's link does (decision 194). A tab, any other section,
+and an address `sectionCrumbs` does not know have none: the sidebar already
+says where they are. A page may pass its own (`GaragePageScaffold.crumbs`);
+none does.
+
+Each crumb is a link to a screen reader as well as to the pointer, and is
+gone to, not pushed (`lib/core/widgets/page_header.dart:92`). The sidebar
+pushes what is not a tab because that move is sideways and back should undo
+it; a crumb leads up, and pushing the section on top of the page under it
+would make back lead down again. The crumbs know only the address: a car's
+maintenance opened from the planner names Vehicles and the car, not the
+planner, which back returns to; and the page for an address nothing matches,
+under a car, is crumbed as that car's page, as the sidebar lights Vehicles for
+it.

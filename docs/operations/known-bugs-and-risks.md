@@ -229,7 +229,8 @@ fix, and is a column the log does not have yet.
 cache, has arrived (`lib/features/company/providers/company_providers.dart:67`),
 so a cold open with no usable copy draws the member's presentation for a
 moment: "Vehicles" before "My cars" in the title and before "Cars" on the
-tab, the Company entry at the top of More for an admin, and on a
+tab, in the sidebar and in a desk page's crumbs, the Company entry at the top
+of More for an admin, and on a
 `/vehicles/:id` typed in by URL the add-reminder row and the income button
 until the bootstrap lands. The copy carries the role, and since 17 October a
 fetch that could not read it no longer rewrites it, so the moment is the

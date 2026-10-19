@@ -1,11 +1,16 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/domain/account/account_identity.dart';
+import 'package:garage/domain/entities/household.dart';
+import 'package:garage/domain/entities/vehicle.dart';
 import 'package:garage/features/auth/providers/auth_providers.dart';
 import 'package:garage/features/household/providers/household_providers.dart';
+import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 import 'package:garage/l10n/app_localizations.dart';
 import 'package:garage/core/widgets/page_scaffold.dart';
 
@@ -179,5 +184,125 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(GarageSidebar), findsNothing);
+  });
+
+  testWidgets('the top bar runs the width of the pane', (tester) async {
+    await pumpDesktop(
+      tester,
+      const GaragePageScaffold(title: 'Fuel', body: SizedBox()),
+      initialLocation: '/vehicles/v1/fuel',
+    );
+    await tester.pumpAndSettle();
+
+    // Sidebar 240 and its rule 1: the rest of a 1440 window is the pane.
+    expect(tester.getSize(find.byType(PageHeader)).width, 1440 - 241);
+  });
+
+  testWidgets('a car\'s page on a desk says where it is, and leads there', (
+    tester,
+  ) async {
+    final log = await pumpDesktop(
+      tester,
+      const GaragePageScaffold(title: 'Golf · Fuel', body: SizedBox()),
+      initialLocation: '/vehicles/v1/fuel',
+      vehicles: [testVehicle('v1', nickname: 'Golf')],
+      extraRoutes: const ['/vehicles/v1'],
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('crumb-/vehicles')), findsOneWidget);
+    expect(find.byKey(const Key('crumb-/vehicles/v1')), findsOneWidget);
+    expect(find.text('Golf'), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('crumb-/vehicles/v1')));
+    await tester.pumpAndSettle();
+    expect(log.last, '/vehicles/v1');
+  });
+
+  group('the car\'s crumb waits for its name', () {
+    // A crumb standing in for the car with the section's word would read
+    // "Vehicles › Vehicles".
+    Finder vehiclesInTopBar() => find.descendant(
+      of: find.byType(PageHeader),
+      matching: find.text('Vehicles'),
+    );
+
+    testWidgets('while the car loads', (tester) async {
+      await pumpDesktop(
+        tester,
+        const GaragePageScaffold(title: 'Fuel', body: SizedBox()),
+        initialLocation: '/vehicles/v1/fuel',
+        overrides: [
+          vehicleProvider(
+            'v1',
+          ).overrideWith((ref) => Completer<Vehicle?>().future),
+        ],
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('crumb-/vehicles')), findsOneWidget);
+      expect(find.byKey(const Key('crumb-/vehicles/v1')), findsNothing);
+      expect(vehiclesInTopBar(), findsOneWidget);
+    });
+
+    testWidgets('and for a car the startup fetch does not know', (
+      tester,
+    ) async {
+      await pumpDesktop(
+        tester,
+        const GaragePageScaffold(title: 'Fuel', body: SizedBox()),
+        initialLocation: '/vehicles/v9/fuel',
+        vehicles: [testVehicle('v1', nickname: 'Golf')],
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.byKey(const Key('crumb-/vehicles')), findsOneWidget);
+      expect(find.byKey(const Key('crumb-/vehicles/v9')), findsNothing);
+      expect(vehiclesInTopBar(), findsOneWidget);
+    });
+  });
+
+  testWidgets('a driver\'s crumb says Cars, as the sidebar does', (
+    tester,
+  ) async {
+    await pumpDesktop(
+      tester,
+      const GaragePageScaffold(title: 'Golf · Fuel', body: SizedBox()),
+      initialLocation: '/vehicles/v1/fuel',
+      vehicles: [testVehicle('v1', nickname: 'Golf')],
+      household: const Household(id: 'h1', name: 'Prijevoz', plan: 'company'),
+      role: 'driver',
+    );
+    await tester.pumpAndSettle();
+
+    expect(
+      find.descendant(
+        of: find.byKey(const Key('crumb-/vehicles')),
+        matching: find.text('Cars'),
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Vehicles'), findsNothing);
+  });
+
+  testWidgets('a page that names its own crumbs is taken at its word', (
+    tester,
+  ) async {
+    await pumpDesktop(
+      tester,
+      const GaragePageScaffold(title: 'Fuel', crumbs: [], body: SizedBox()),
+      initialLocation: '/vehicles/v1/fuel',
+      vehicles: [testVehicle('v1', nickname: 'Golf')],
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('crumb-/vehicles')), findsNothing);
+  });
+
+  testWidgets('a phone has no crumbs, its app bar is enough', (tester) async {
+    await pumpPage(tester, surface: const Size(400, 900));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('crumb-/vehicles')), findsNothing);
   });
 }

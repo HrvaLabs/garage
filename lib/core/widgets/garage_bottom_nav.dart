@@ -82,8 +82,9 @@ void _goTo(BuildContext context, GarageTab current, int index) {
 }
 
 /// Scaffold for the four top-level tab screens. Adapts the navigation to the
-/// window: bottom bar on phones, [GarageSidebar] beside a centred content
-/// column on wide windows.
+/// window: bottom bar on phones, [GarageSidebar] beside the content pane on
+/// wide windows, where a titled page's top bar spans the pane above a
+/// centred content column.
 class GarageTabScaffold extends StatelessWidget {
   const GarageTabScaffold({
     super.key,
@@ -104,9 +105,10 @@ class GarageTabScaffold extends StatelessWidget {
   final ContentWidth contentWidth;
 
   /// The page's name. Given this, the scaffold titles the page itself: an app
-  /// bar on a phone, a heading inside the content on a desktop window, where a
-  /// top bar above a sidebar is phone chrome. Screens still passing [appBar]
-  /// keep their old presentation on both.
+  /// bar on a phone, and on a desktop window a top bar across the content
+  /// pane ([PageHeader]), beside the sidebar, where a bar above it would be
+  /// phone chrome. Screens still passing [appBar] keep their old presentation
+  /// on both.
   final String? title;
 
   /// Shown beside the title, in the app bar or the page header as appropriate.
@@ -152,20 +154,23 @@ class GarageTabScaffold extends StatelessWidget {
             child: Scaffold(
               backgroundColor: Colors.transparent,
               floatingActionButton: floatingActionButton,
-              body: AdaptiveContent(
-                width: contentWidth,
-                // The page names itself inside the content here, rather
-                // than in a bar above the sidebar.
-                child: title == null
-                    ? content
-                    : Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          PageHeader(title: title!, actions: actions),
-                          Expanded(child: content),
-                        ],
-                      ),
-              ),
+              // The page names itself in a bar across the pane, rather than
+              // in one above the sidebar. A tab is a section: no crumbs.
+              body: title == null
+                  ? AdaptiveContent(width: contentWidth, child: content)
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        PageHeader(title: title!, actions: actions),
+                        const Divider(height: 1),
+                        Expanded(
+                          child: AdaptiveContent(
+                            width: contentWidth,
+                            child: content,
+                          ),
+                        ),
+                      ],
+                    ),
             ),
           ),
         ],

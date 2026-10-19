@@ -189,6 +189,14 @@ void main() {
       );
     });
 
+    testWidgets('and the top bar runs the width of the pane', (tester) async {
+      await pumpTitled(tester, desktopSurface);
+      await tester.pumpAndSettle();
+
+      // Sidebar 240 and its rule 1: the rest of a 1440 window is the pane.
+      expect(tester.getSize(find.byType(PageHeader)).width, 1440 - 241);
+    });
+
     testWidgets('a phone keeps the app bar', (tester) async {
       await pumpTitled(tester, const Size(400, 900));
       await tester.pumpAndSettle();

@@ -134,7 +134,8 @@ rather than refused.
 **"My cars"** is the vehicles screen wearing a driver's presentation
 (`lib/features/vehicles/screens/vehicles_screen.dart:77`), under a tab that
 reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:58`, and in the sidebar
-`lib/core/widgets/garage_sidebar.dart:84`): the title, no Add button, no
+`lib/core/widgets/garage_sidebar.dart:84` and a desk page's crumbs
+`lib/core/widgets/page_header.dart:49`): the title, no Add button, no
 archived section, an empty state that names the administrator as the one who
 hands a car over, and two cards above the grid. The dashboard
 says the same to a driver with no car yet

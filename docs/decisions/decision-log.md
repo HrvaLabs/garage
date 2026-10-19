@@ -7621,3 +7621,20 @@ waits, and the privacy policy, which About opens. The sidebar is still drawn
 inside every page rather than around the router, which is what lets a page
 know its own address, and what the cross-fade between pages still has to
 hide.
+
+**A top bar with a breadcrumb.** A page's title and its actions span the
+content pane above a rule, where they were a heading held to the text column:
+they belong to the page, not to its text, which is why a tab strip left that
+column too (decision 32). The bar's far end has a slot for what a page offers
+beyond its own actions. A page below a section says where it sits, read from
+its address: `Vehicles › Golf` above a car's fuel log, `Garage` above merging
+garages. Each crumb is a link, and is gone to rather than pushed, since it
+leads up. A driver's Vehicles reads "Cars" there too (decision 194). The
+car's crumb waits for the car's name: while the car loads, or for a car the
+startup fetch does not know, the crumbs stop at Vehicles rather than read
+`Vehicles › Vehicles`, and when the name comes it joins the row the section's
+crumb already holds, so the title does not move. *Cost:* the crumbs know only
+what the address says. A car's maintenance opened from the planner names
+Vehicles and the car, not the planner, which only back returns to; and an
+address nothing matches, under a car, is crumbed as that car's page, as the
+sidebar lights Vehicles for it.
