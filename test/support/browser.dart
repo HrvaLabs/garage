@@ -1,7 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garage/core/links/url_opener.dart';
 import 'package:garage/core/router/app_router.dart';
+import 'package:garage/core/web/browser_menu.dart';
 import 'package:garage/core/widgets/date_pickers.dart';
 import 'package:garage/core/widgets/page_title.dart';
 import 'package:garage/core/widgets/routed_tabs.dart';
@@ -10,7 +14,8 @@ import 'package:go_router/go_router.dart';
 
 /// The browser around the web build, as much of it as a test needs: the name
 /// it gives the tab, a history the app writes its addresses to and Back
-/// reads them from, and the clipboard a copy lands on.
+/// reads them from, the clipboard a copy lands on, and its own right-click
+/// menu.
 class FakeBrowser {
   FakeBrowser._(this._tester);
 
@@ -25,6 +30,15 @@ class FakeBrowser {
 
   /// What the page last copied, or null when it has copied nothing.
   String? copied;
+
+  /// What the app asked of the browser's own right-click menu, oldest first:
+  /// `disableContextMenu` or `enableContextMenu`, the calls the framework's
+  /// `BrowserContextMenu` makes.
+  final List<String> contextMenuCalls = [];
+
+  /// Holds the browser's answer to those back until completed, for a test of
+  /// the moment before it arrives; null answers at once.
+  Completer<void>? contextMenuAnswer;
 
   final List<({String uri, Object? state})> _history = [];
   int _at = -1;
@@ -66,9 +80,11 @@ class FakeBrowser {
 
 /// Runs the rest of the test as the web build: each page names the browser's
 /// tab, a tab strip writes its tab to the address, a pushed page shows its
-/// own, a date's popover opens with its field ready to type in, and a page's
-/// text on a desk can be selected. Off in a test as on Android, so a test
-/// about the web asks for it, before it pumps the app.
+/// own, a date's popover opens with its field ready to type in, a page's
+/// text on a desk can be selected, a link opens in a new tab on a middle
+/// click or with Ctrl or ⌘ held, and the browser's own right-click menu goes
+/// off at a wide window. Off in a test as on Android, so a test about the
+/// web asks for it, before it pumps the app.
 FakeBrowser asTheWeb(WidgetTester tester) {
   final browser = FakeBrowser._(tester);
   final titled = PageTitle.enabled;
@@ -76,10 +92,25 @@ FakeBrowser asTheWeb(WidgetTester tester) {
   final reflects = GoRouter.optionURLReflectsImperativeAPIs;
   final focuses = GarageDatePicker.focusesField;
   final selects = SelectablePage.web;
+  final tabs = NewTab.web;
+  final menu = BrowserMenu.web;
+  final disable = BrowserMenu.disable;
+  final enable = BrowserMenu.enable;
+  // From the browser as it starts: a switch another test threw by hand and
+  // left waiting would keep a desk's page from drawing.
+  BrowserMenu.reset();
   PageTitle.enabled = true;
   RoutedTabs.writesAddress = true;
   GarageDatePicker.focusesField = true;
   SelectablePage.web = true;
+  NewTab.web = true;
+  BrowserMenu.web = true;
+  // The framework's switch refuses to be thrown off the web, before it says
+  // anything to the browser: the same call to the browser goes in its place.
+  BrowserMenu.disable = () =>
+      SystemChannels.contextMenu.invokeMethod<void>('disableContextMenu');
+  BrowserMenu.enable = () =>
+      SystemChannels.contextMenu.invokeMethod<void>('enableContextMenu');
   reflectPushedPagesInAddress();
 
   final messenger = tester.binding.defaultBinaryMessenger;
@@ -101,14 +132,25 @@ FakeBrowser asTheWeb(WidgetTester tester) {
     }
     return null;
   });
+  messenger.setMockMethodCallHandler(SystemChannels.contextMenu, (call) async {
+    browser.contextMenuCalls.add(call.method);
+    await browser.contextMenuAnswer?.future;
+    return null;
+  });
   addTearDown(() {
     messenger
       ..setMockMethodCallHandler(SystemChannels.platform, null)
-      ..setMockMethodCallHandler(SystemChannels.navigation, null);
+      ..setMockMethodCallHandler(SystemChannels.navigation, null)
+      ..setMockMethodCallHandler(SystemChannels.contextMenu, null);
     PageTitle.enabled = titled;
     RoutedTabs.writesAddress = writes;
     GarageDatePicker.focusesField = focuses;
     SelectablePage.web = selects;
+    NewTab.web = tabs;
+    BrowserMenu.web = menu;
+    BrowserMenu.disable = disable;
+    BrowserMenu.enable = enable;
+    BrowserMenu.reset();
     GoRouter.optionURLReflectsImperativeAPIs = reflects;
   });
   return browser;

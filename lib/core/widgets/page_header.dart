@@ -1,7 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:garage/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
+import '../links/url_opener.dart';
 import '../theme/garage_theme.dart';
 import '../theme/garage_tokens.dart';
 
@@ -64,8 +67,10 @@ List<Crumb> sectionCrumbs(
   ];
 }
 
-/// The crumbs, each a link, small and muted above the title.
-class Breadcrumbs extends StatelessWidget {
+/// The crumbs, each a link, small and muted above the title. In a browser a
+/// middle click on one, or a click with Ctrl or ⌘ held, opens it in a new tab
+/// (decision 199).
+class Breadcrumbs extends ConsumerWidget {
   const Breadcrumbs({required this.crumbs, super.key});
 
   /// How far a crumb's target reaches past its text on every side. Bare, the
@@ -77,7 +82,7 @@ class Breadcrumbs extends StatelessWidget {
   final List<Crumb> crumbs;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final style = Theme.of(
       context,
     ).textTheme.bodySmall?.copyWith(color: context.tokens.muted);
@@ -91,16 +96,27 @@ class Breadcrumbs extends StatelessWidget {
           Semantics(
             container: true,
             link: true,
-            child: InkWell(
-              key: Key('crumb-${crumb.route}'),
-              borderRadius: BorderRadius.circular(GarageTokens.radiusSm),
-              // Gone to, not pushed: a crumb leads up. Pushed, it would put
-              // the section on top of the page under it, and back would lead
-              // down again.
-              onTap: () => context.go(crumb.route),
-              child: Padding(
-                padding: const EdgeInsets.all(reach),
-                child: Text(crumb.label, style: style),
+            child: Listener(
+              onPointerDown: (event) {
+                if (event.buttons == kMiddleMouseButton) {
+                  openInNewTab(ref, crumb.route);
+                }
+              },
+              child: InkWell(
+                key: Key('crumb-${crumb.route}'),
+                borderRadius: BorderRadius.circular(GarageTokens.radiusSm),
+                // Gone to, not pushed: a crumb leads up. Pushed, it would put
+                // the section on top of the page under it, and back would
+                // lead down again.
+                onTap: () {
+                  if (!openedInNewTab(ref, crumb.route)) {
+                    context.go(crumb.route);
+                  }
+                },
+                child: Padding(
+                  padding: const EdgeInsets.all(reach),
+                  child: Text(crumb.label, style: style),
+                ),
               ),
             ),
           ),

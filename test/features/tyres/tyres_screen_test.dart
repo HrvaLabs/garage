@@ -10,6 +10,7 @@ import 'package:garage/features/tyres/screens/tyres_screen.dart';
 import 'package:garage/features/maintenance/providers/maintenance_providers.dart';
 
 import '../../support/pump_screen.dart';
+import '../../support/right_click.dart';
 import '../../support/vehicle_entries.dart';
 
 class FakeTyreRepository implements TyreRepository {
@@ -1233,5 +1234,40 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.takeException(), isNull);
+  });
+
+  // On a desk a right-click on a set opens what its ⋮ does, and only where
+  // the ⋮ is: a driver sees the sets and none of the actions.
+  group('a right click on a set on a desk', () {
+    testWidgets('offers what its ⋮ does', (tester) async {
+      final repository = FakeTyreRepository([
+        tyreSet(id: 's1', retiredAt: DateTime.utc(2026, 5, 1)),
+      ]);
+      await pumpTyres(tester, repository, surface: desktopSurface);
+      await tester.pumpAndSettle();
+
+      await rightClick(tester, find.text('Winter — studded'));
+      await tester.tap(find.text('Bring back into use'));
+      await tester.pumpAndSettle();
+
+      expect(repository.unretired, ['s1']);
+    });
+
+    testWidgets('offers a driver nothing, as the set shows no ⋮', (
+      tester,
+    ) async {
+      await pumpTyres(
+        tester,
+        FakeTyreRepository([tyreSet()]),
+        role: 'driver',
+        surface: desktopSurface,
+      );
+      await tester.pumpAndSettle();
+      expect(find.byType(PopupMenuButton<void>), findsNothing);
+
+      await rightClick(tester, find.text('Winter — studded'));
+
+      expect(find.byType(PopupMenuItem<void>), findsNothing);
+    });
   });
 }

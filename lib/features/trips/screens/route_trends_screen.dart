@@ -6,6 +6,7 @@ import '../../../core/theme/garage_theme.dart';
 import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/confirm_delete.dart';
+import '../../../core/widgets/context_menu_region.dart';
 import '../../../core/widgets/page_scaffold.dart';
 import '../../../core/format/unit_format.dart';
 import '../../../domain/entities/trip_entry.dart';
@@ -174,39 +175,45 @@ class _RoutePicker extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-    return Row(
-      children: [
-        Expanded(
-          child: DropdownButtonFormField<String>(
-            key: const Key('route-trend-route'),
-            // Or a long route name at a large font size pushes the arrow off
-            // the right of a 320 px phone. Ellipsised is legible; overflowing
-            // is not.
-            isExpanded: true,
-            initialValue: chosen.id,
-            items: [
-              for (final route in routes)
-                DropdownMenuItem(value: route.id, child: Text(route.name)),
-            ],
-            onChanged: (value) {
-              for (final route in routes) {
-                if (route.id == value) {
-                  onChanged(route);
-                  return;
+    // The ⋮'s, and a right-click's on a desk.
+    List<PopupMenuEntry<void Function()>> items(BuildContext context) => [
+      PopupMenuItem(value: onRename, child: Text(l10n.routeRename)),
+      PopupMenuItem(value: onDelete, child: Text(l10n.routeDelete)),
+    ];
+    return ContextMenuRegion<void Function()>(
+      itemBuilder: items,
+      onSelected: (action) => action(),
+      child: Row(
+        children: [
+          Expanded(
+            child: DropdownButtonFormField<String>(
+              key: const Key('route-trend-route'),
+              // Or a long route name at a large font size pushes the arrow off
+              // the right of a 320 px phone. Ellipsised is legible; overflowing
+              // is not.
+              isExpanded: true,
+              initialValue: chosen.id,
+              items: [
+                for (final route in routes)
+                  DropdownMenuItem(value: route.id, child: Text(route.name)),
+              ],
+              onChanged: (value) {
+                for (final route in routes) {
+                  if (route.id == value) {
+                    onChanged(route);
+                    return;
+                  }
                 }
-              }
-            },
+              },
+            ),
           ),
-        ),
-        PopupMenuButton<void Function()>(
-          key: const Key('route-trend-menu'),
-          onSelected: (action) => action(),
-          itemBuilder: (context) => [
-            PopupMenuItem(value: onRename, child: Text(l10n.routeRename)),
-            PopupMenuItem(value: onDelete, child: Text(l10n.routeDelete)),
-          ],
-        ),
-      ],
+          PopupMenuButton<void Function()>(
+            key: const Key('route-trend-menu'),
+            onSelected: (action) => action(),
+            itemBuilder: items,
+          ),
+        ],
+      ),
     );
   }
 }

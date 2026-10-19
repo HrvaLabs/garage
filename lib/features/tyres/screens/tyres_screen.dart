@@ -10,6 +10,7 @@ import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/page_scaffold.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/confirm_delete.dart';
+import '../../../core/widgets/context_menu_region.dart';
 import '../../../core/widgets/date_pickers.dart';
 import '../../../core/widgets/failure_message.dart';
 import '../../../core/widgets/adaptive.dart';
@@ -693,176 +694,178 @@ class _TyreSetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final tread = set.latestReading?.shallowestMm;
+    // The ⋮'s, and a right-click's on a desk; a driver has neither. Each
+    // item acts itself.
+    List<PopupMenuEntry<void>> items(BuildContext context) => [
+      // Fitting another set already swaps them; a household with one set had
+      // no way to say the car is on something else, and its storage line
+      // went on claiming a shelf.
+      if (set.fitted && !set.isRetired)
+        PopupMenuItem<void>(onTap: onUnfit, child: Text(l10n.tyresUnfit)),
+      if (set.isRetired)
+        PopupMenuItem<void>(onTap: onUnretire, child: Text(l10n.tyresUnretire))
+      else
+        PopupMenuItem<void>(
+          // Not red: the set and its readings stay.
+          onTap: onRetire,
+          child: Text(l10n.tyresRetire),
+        ),
+      PopupMenuItem<void>(
+        onTap: onDelete,
+        child: Text(
+          l10n.tyresDelete,
+          style: TextStyle(color: context.tokens.danger),
+        ),
+      ),
+    ];
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(GarageTokens.space4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    set.name,
-                    style: Theme.of(context).textTheme.titleMedium,
-                  ),
-                ),
-                if (set.isRetired)
-                  Text(
-                    l10n.tyresRetired,
-                    style: TextStyle(color: context.tokens.muted),
-                  )
-                else if (set.fitted)
-                  Text(
-                    l10n.tyresFitted,
-                    style: TextStyle(color: context.tokens.accent),
-                  ),
-              ],
-            ),
-            Text(
-              [
-                tyreSeasonLabel(l10n, set.season),
-                if (set.size != null) set.size!,
-                // Only while it is off the car. A set on the vehicle that
-                // also says "Garage shelf" is two answers to one question.
-                if (!set.fitted && set.storageLocation != null)
-                  set.storageLocation!,
-              ].join(' · '),
-              style: TextStyle(color: context.tokens.muted),
-            ),
-            const SizedBox(height: GarageTokens.space2),
-            if (tread == null)
-              Text(
-                l10n.tyresTreadNone,
-                style: TextStyle(color: context.tokens.muted),
-              )
-            else
-              Text(
-                '${l10n.tyresTread}: ${format.formatMillimetres(tread)}'
-                '${_corner(l10n, set.latestReading?.shallowestCorner) ?? ''}',
-                style: GarageTheme.numeric(
-                  Theme.of(context).textTheme.bodyMedium!,
-                ),
-              ),
-            // When it was taken. Two readings a week apart are a wear rate;
-            // one from last winter is a number to check again.
-            if (set.latestReading case final reading? when tread != null)
-              Text(
-                l10n.tyresMeasuredOn(format.formatShortDate(reading.date)),
-                style: Theme.of(
-                  context,
-                ).textTheme.bodySmall?.copyWith(color: context.tokens.muted),
-              ),
-            // Left against right on one axle: a gap there is alignment or
-            // suspension, a different problem from a set wearing out, and the
-            // worst corner alone cannot tell them apart. Front against rear
-            // is not a fault — every bike wears its rear out first, and so
-            // does a front-wheel-drive car's front — so it is not measured
-            // here. Past a millimetre only: a hand-held depth gauge does not
-            // resolve tenths.
-            if (set.latestReading?.worstAxle case final axle?
-                when axle.high - axle.low >= 1)
-              Text(
-                l10n.tyresUneven(
-                  format.formatMillimetres(axle.low),
-                  format.formatMillimetres(axle.high),
-                ),
-                style: TextStyle(color: context.tokens.muted),
-              ),
-            if (set.isBelowLegal(legalMinimumMm))
-              Text(
-                l10n.tyresBelowLegalAt(
-                  format.formatMillimetres(legalMinimumMm),
-                ),
-                style: TextStyle(color: context.tokens.danger),
-              )
-            else if (wear != null)
-              Text(
-                // The distance is measured; the date is that distance over the
-                // vehicle's driving rate, and a vehicle with no rate to measure
-                // gets no date rather than one built on an assumption that
-                // would read exactly like a measurement.
-                switch (wear!.projectedReplacementDate) {
-                  final date? => l10n.tyresWearEstimate(
-                    format.formatDistance(wear!.remainingKm.toDouble()),
-                    format.formatDate(date),
-                  ),
-                  null => l10n.tyresWearEstimateDistanceOnly(
-                    format.formatDistance(wear!.remainingKm.toDouble()),
-                  ),
-                },
-                style: TextStyle(color: context.tokens.muted),
-              ),
-            // Under the tread line, because age is the other half of the same
-            // question and reads as a footnote to it. Nothing at all while the
-            // set is fresh: a line that is always there stops being read.
-            if (age case final it? when it.standing != TyreAgeStanding.fresh)
-              Text(
-                switch ((it.standing, it.estimated)) {
-                  (TyreAgeStanding.expired, false) => l10n.tyresAgeExpired(
-                    it.years,
-                  ),
-                  (TyreAgeStanding.expired, true) =>
-                    l10n.tyresAgeExpiredEstimated(it.years),
-                  (_, false) => l10n.tyresAgeAgeing(it.years),
-                  (_, true) => l10n.tyresAgeAgeingEstimated(it.years),
-                },
-                style: TextStyle(
-                  color: it.standing == TyreAgeStanding.expired
-                      ? context.tokens.danger
-                      : context.tokens.muted,
-                ),
-              ),
-            if (!readOnly)
-              Wrap(
-                spacing: GarageTokens.space2,
+    return ContextMenuRegion<void>(
+      enabled: !readOnly,
+      itemBuilder: items,
+      onSelected: (_) {},
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(GarageTokens.space4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 children: [
-                  if (!set.fitted && !set.isRetired)
-                    TextButton(onPressed: onFit, child: Text(l10n.tyresFit)),
-                  TextButton(onPressed: onEdit, child: Text(l10n.commonEdit)),
-                  if (!set.isRetired)
-                    TextButton(
-                      onPressed: onRecordTread,
-                      child: Text(l10n.tyresAddReading),
+                  Expanded(
+                    child: Text(
+                      set.name,
+                      style: Theme.of(context).textTheme.titleMedium,
                     ),
-                  // Behind a menu: two red words wrapping to a second line,
-                  // weighted the same as "Fit to vehicle", is not where a
-                  // destructive action belongs.
-                  PopupMenuButton<void>(
-                    tooltip: l10n.tyresMoreActions,
-                    itemBuilder: (context) => [
-                      // Fitting another set already swaps them; a household
-                      // with one set had no way to say the car is on something
-                      // else, and its storage line went on claiming a shelf.
-                      if (set.fitted && !set.isRetired)
-                        PopupMenuItem<void>(
-                          onTap: onUnfit,
-                          child: Text(l10n.tyresUnfit),
-                        ),
-                      if (set.isRetired)
-                        PopupMenuItem<void>(
-                          onTap: onUnretire,
-                          child: Text(l10n.tyresUnretire),
-                        )
-                      else
-                        PopupMenuItem<void>(
-                          // Not red: the set and its readings stay.
-                          onTap: onRetire,
-                          child: Text(l10n.tyresRetire),
-                        ),
-                      PopupMenuItem<void>(
-                        onTap: onDelete,
-                        child: Text(
-                          l10n.tyresDelete,
-                          style: TextStyle(color: context.tokens.danger),
-                        ),
-                      ),
-                    ],
                   ),
+                  if (set.isRetired)
+                    Text(
+                      l10n.tyresRetired,
+                      style: TextStyle(color: context.tokens.muted),
+                    )
+                  else if (set.fitted)
+                    Text(
+                      l10n.tyresFitted,
+                      style: TextStyle(color: context.tokens.accent),
+                    ),
                 ],
               ),
-          ],
+              Text(
+                [
+                  tyreSeasonLabel(l10n, set.season),
+                  if (set.size != null) set.size!,
+                  // Only while it is off the car. A set on the vehicle that
+                  // also says "Garage shelf" is two answers to one question.
+                  if (!set.fitted && set.storageLocation != null)
+                    set.storageLocation!,
+                ].join(' · '),
+                style: TextStyle(color: context.tokens.muted),
+              ),
+              const SizedBox(height: GarageTokens.space2),
+              if (tread == null)
+                Text(
+                  l10n.tyresTreadNone,
+                  style: TextStyle(color: context.tokens.muted),
+                )
+              else
+                Text(
+                  '${l10n.tyresTread}: ${format.formatMillimetres(tread)}'
+                  '${_corner(l10n, set.latestReading?.shallowestCorner) ?? ''}',
+                  style: GarageTheme.numeric(
+                    Theme.of(context).textTheme.bodyMedium!,
+                  ),
+                ),
+              // When it was taken. Two readings a week apart are a wear rate;
+              // one from last winter is a number to check again.
+              if (set.latestReading case final reading? when tread != null)
+                Text(
+                  l10n.tyresMeasuredOn(format.formatShortDate(reading.date)),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: context.tokens.muted),
+                ),
+              // Left against right on one axle: a gap there is alignment or
+              // suspension, a different problem from a set wearing out, and the
+              // worst corner alone cannot tell them apart. Front against rear
+              // is not a fault — every bike wears its rear out first, and so
+              // does a front-wheel-drive car's front — so it is not measured
+              // here. Past a millimetre only: a hand-held depth gauge does not
+              // resolve tenths.
+              if (set.latestReading?.worstAxle case final axle?
+                  when axle.high - axle.low >= 1)
+                Text(
+                  l10n.tyresUneven(
+                    format.formatMillimetres(axle.low),
+                    format.formatMillimetres(axle.high),
+                  ),
+                  style: TextStyle(color: context.tokens.muted),
+                ),
+              if (set.isBelowLegal(legalMinimumMm))
+                Text(
+                  l10n.tyresBelowLegalAt(
+                    format.formatMillimetres(legalMinimumMm),
+                  ),
+                  style: TextStyle(color: context.tokens.danger),
+                )
+              else if (wear != null)
+                Text(
+                  // The distance is measured; the date is that distance over the
+                  // vehicle's driving rate, and a vehicle with no rate to measure
+                  // gets no date rather than one built on an assumption that
+                  // would read exactly like a measurement.
+                  switch (wear!.projectedReplacementDate) {
+                    final date? => l10n.tyresWearEstimate(
+                      format.formatDistance(wear!.remainingKm.toDouble()),
+                      format.formatDate(date),
+                    ),
+                    null => l10n.tyresWearEstimateDistanceOnly(
+                      format.formatDistance(wear!.remainingKm.toDouble()),
+                    ),
+                  },
+                  style: TextStyle(color: context.tokens.muted),
+                ),
+              // Under the tread line, because age is the other half of the same
+              // question and reads as a footnote to it. Nothing at all while the
+              // set is fresh: a line that is always there stops being read.
+              if (age case final it? when it.standing != TyreAgeStanding.fresh)
+                Text(
+                  switch ((it.standing, it.estimated)) {
+                    (TyreAgeStanding.expired, false) => l10n.tyresAgeExpired(
+                      it.years,
+                    ),
+                    (TyreAgeStanding.expired, true) =>
+                      l10n.tyresAgeExpiredEstimated(it.years),
+                    (_, false) => l10n.tyresAgeAgeing(it.years),
+                    (_, true) => l10n.tyresAgeAgeingEstimated(it.years),
+                  },
+                  style: TextStyle(
+                    color: it.standing == TyreAgeStanding.expired
+                        ? context.tokens.danger
+                        : context.tokens.muted,
+                  ),
+                ),
+              if (!readOnly)
+                Wrap(
+                  spacing: GarageTokens.space2,
+                  children: [
+                    if (!set.fitted && !set.isRetired)
+                      TextButton(onPressed: onFit, child: Text(l10n.tyresFit)),
+                    TextButton(onPressed: onEdit, child: Text(l10n.commonEdit)),
+                    if (!set.isRetired)
+                      TextButton(
+                        onPressed: onRecordTread,
+                        child: Text(l10n.tyresAddReading),
+                      ),
+                    // Behind a menu: two red words wrapping to a second line,
+                    // weighted the same as "Fit to vehicle", is not where a
+                    // destructive action belongs.
+                    PopupMenuButton<void>(
+                      tooltip: l10n.tyresMoreActions,
+                      itemBuilder: items,
+                    ),
+                  ],
+                ),
+            ],
+          ),
         ),
       ),
     );

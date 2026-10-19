@@ -7,6 +7,7 @@ import '../../../core/format/unit_format.dart';
 import '../../../core/theme/garage_theme.dart';
 import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/confirm_delete.dart';
+import '../../../core/widgets/context_menu_region.dart';
 import '../../../core/widgets/failure_message.dart';
 import '../../../core/widgets/pick_one.dart';
 import '../../../domain/entities/incident.dart';
@@ -99,80 +100,77 @@ class _IncidentRow extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final tokens = context.tokens;
     final colour = incident.isOpen ? tokens.warn : tokens.muted;
+    // The ⋮'s, and a right-click's on a desk.
+    List<PopupMenuEntry<String>> items(BuildContext context) => [
+      PopupMenuItem(
+        value: incident.isOpen ? 'close' : 'reopen',
+        child: Text(incident.isOpen ? l10n.incidentClose : l10n.incidentReopen),
+      ),
+      PopupMenuItem(value: 'edit', child: Text(l10n.incidentEdit)),
+      PopupMenuItem(value: 'delete', child: Text(l10n.incidentDelete)),
+    ];
+    void act(String action) => _act(context, ref, action);
 
     return Padding(
       padding: const EdgeInsets.only(top: GarageTokens.space3),
-      child: Opacity(
-        opacity: incident.isOpen ? 1 : 0.6,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: GarageTokens.space2,
-                    vertical: GarageTokens.space1,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colour.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(
-                      GarageTokens.radiusPill,
+      child: ContextMenuRegion<String>(
+        itemBuilder: items,
+        onSelected: act,
+        child: Opacity(
+          opacity: incident.isOpen ? 1 : 0.6,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: GarageTokens.space2,
+                      vertical: GarageTokens.space1,
                     ),
-                  ),
-                  child: Text(
-                    incidentStatusLabel(l10n, incident.status),
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: colour,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: GarageTokens.space3),
-                Expanded(
-                  child: Text(
-                    [
-                      incidentKindLabel(l10n, incident.kind),
-                      format.formatDate(incident.happenedOn),
-                      if (incident.amount case final amount?)
-                        format.formatMoney(amount),
-                    ].join(' · '),
-                    style: TextStyle(color: tokens.muted),
-                  ),
-                ),
-                PopupMenuButton<String>(
-                  key: Key('incident-menu-${incident.id}'),
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: incident.isOpen ? 'close' : 'reopen',
-                      child: Text(
-                        incident.isOpen
-                            ? l10n.incidentClose
-                            : l10n.incidentReopen,
+                    decoration: BoxDecoration(
+                      color: colour.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(
+                        GarageTokens.radiusPill,
                       ),
                     ),
-                    PopupMenuItem(
-                      value: 'edit',
-                      child: Text(l10n.incidentEdit),
+                    child: Text(
+                      incidentStatusLabel(l10n, incident.status),
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colour,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Text(l10n.incidentDelete),
+                  ),
+                  const SizedBox(width: GarageTokens.space3),
+                  Expanded(
+                    child: Text(
+                      [
+                        incidentKindLabel(l10n, incident.kind),
+                        format.formatDate(incident.happenedOn),
+                        if (incident.amount case final amount?)
+                          format.formatMoney(amount),
+                      ].join(' · '),
+                      style: TextStyle(color: tokens.muted),
                     ),
-                  ],
-                  onSelected: (value) => _act(context, ref, value),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: GarageTokens.space1),
-              child: Text(incident.description),
-            ),
-            DriverOnDate(
-              vehicleId: incident.vehicleId,
-              date: incident.happenedOn,
-            ),
-          ],
+                  ),
+                  PopupMenuButton<String>(
+                    key: Key('incident-menu-${incident.id}'),
+                    itemBuilder: items,
+                    onSelected: act,
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: GarageTokens.space1),
+                child: Text(incident.description),
+              ),
+              DriverOnDate(
+                vehicleId: incident.vehicleId,
+                date: incident.happenedOn,
+              ),
+            ],
+          ),
         ),
       ),
     );

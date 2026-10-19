@@ -1,12 +1,15 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garage/core/web/browser_menu.dart';
 import 'package:garage/core/web/update_notice.dart';
 import 'package:garage/core/widgets/adaptive.dart';
 import 'package:garage/core/widgets/app_frame.dart';
 import 'package:garage/core/widgets/page_scaffold.dart';
 
+import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
 
 /// The harness built the router with the app's theme and none of what the
@@ -106,5 +109,106 @@ void main() {
       expect(find.text('under'), findsNothing, reason: 'at $size');
     }
     expect(tester.state(find.byType(Navigator).first), same(navigator));
+  });
+
+  // On a wide window a right-click is the app's: a row's menu, or the
+  // selection's Copy, and a field's own cut, copy and paste. A phone-sized
+  // browser keeps the browser's, its spelling suggestions with it. The frame
+  // sees the window's width, so it throws the switch, as the window crosses
+  // the line and at no other time.
+  group('the browser\'s own right-click menu', () {
+    const page = Scaffold(body: Text('page'));
+
+    testWidgets('goes off at a wide window and comes back as it narrows', (
+      tester,
+    ) async {
+      final browser = asTheWeb(tester);
+      await pumpDesktop(tester, page);
+      await tester.pumpAndSettle();
+      expect(browser.contextMenuCalls, ['disableContextMenu']);
+
+      tester.view.physicalSize = const Size(400, 900);
+      await tester.pumpAndSettle();
+      expect(browser.contextMenuCalls, [
+        'disableContextMenu',
+        'enableContextMenu',
+      ]);
+
+      tester.view.physicalSize = desktopSurface;
+      await tester.pumpAndSettle();
+      expect(browser.contextMenuCalls, [
+        'disableContextMenu',
+        'enableContextMenu',
+        'disableContextMenu',
+      ]);
+    });
+
+    testWidgets('is left as the browser has it at a phone\'s width', (
+      tester,
+    ) async {
+      final browser = asTheWeb(tester);
+      await pumpScreen(tester, page);
+      await tester.pumpAndSettle();
+      expect(browser.contextMenuCalls, isEmpty);
+
+      tester.view.physicalSize = desktopSurface;
+      await tester.pumpAndSettle();
+      expect(browser.contextMenuCalls, ['disableContextMenu']);
+    });
+
+    testWidgets('is asked once however the window moves on one side of the '
+        'line', (tester) async {
+      final browser = asTheWeb(tester);
+      await pumpDesktop(tester, page);
+      await tester.pumpAndSettle();
+      for (final size in const [Size(1000, 800), Size(1300, 700)]) {
+        tester.view.physicalSize = size;
+        await tester.pumpAndSettle();
+      }
+      expect(browser.contextMenuCalls, ['disableContextMenu']);
+
+      for (final size in const [Size(400, 900), Size(600, 800)]) {
+        tester.view.physicalSize = size;
+        await tester.pumpAndSettle();
+      }
+      expect(browser.contextMenuCalls, [
+        'disableContextMenu',
+        'enableContextMenu',
+      ]);
+    });
+
+    testWidgets('is never asked about off the web', (tester) async {
+      final calls = <String>[];
+      final messenger = tester.binding.defaultBinaryMessenger;
+      messenger.setMockMethodCallHandler(SystemChannels.contextMenu, (
+        call,
+      ) async {
+        calls.add(call.method);
+        return null;
+      });
+      addTearDown(
+        () => messenger.setMockMethodCallHandler(
+          SystemChannels.contextMenu,
+          null,
+        ),
+      );
+
+      await pumpDesktop(tester, page);
+      await tester.pumpAndSettle();
+      tester.view.physicalSize = const Size(400, 900);
+      await tester.pumpAndSettle();
+
+      expect(calls, isEmpty);
+    });
+
+    // The framework's own switch is what the frame throws: it is what tells
+    // the selection and the fields to draw their own menus once the
+    // browser's is off. It refuses to be thrown off the web, before it says
+    // anything to the browser, so a test of the web's half puts the same
+    // call in its place.
+    test('the switch thrown is the framework\'s own', () {
+      expect(BrowserMenu.disable, same(BrowserContextMenu.disableContextMenu));
+      expect(BrowserMenu.enable, same(BrowserContextMenu.enableContextMenu));
+    });
   });
 }

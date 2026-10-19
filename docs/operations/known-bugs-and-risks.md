@@ -254,7 +254,7 @@ that ask shows while it loads.
 
 **Low.** When the log could not be read, `driverRow` prints the failure
 sentence as each driver's detail
-(`lib/features/household/screens/household_screen.dart:564`), so a garage
+(`lib/features/household/screens/household_screen.dart:565`), so a garage
 with five drivers says "you do not have access" five times. Once, above the
 list, would do; left because the rows are where the missing fact belongs and
 the repeat is only ever seen on a refused first load.
@@ -587,8 +587,11 @@ widget's own state. What a screen holds above its scaffold survives, which is
 where the forms keep their fields. Measured before the desk's text selection
 went in (decision 199): a list scrolled 300 pixels, a typed word and a
 counter were all gone after 1440 → 400 → 1440 pixels. The selection and
-the desk's keys belong to the desk's tree and add nothing to it. The frame
-keeps one shape for its own state (`lib/core/widgets/app_frame.dart:23`);
+the desk's keys belong to the desk's tree and add nothing to it. In a
+browser, widening also leaves the content pane empty for a beat, until the
+browser says its own right-click menu is off, and the page is then built
+once (decision 199); that adds no second loss either. The frame
+keeps one shape for its own state (`lib/core/widgets/app_frame.dart:26`);
 the scaffolds would need the content under one key in both trees, the
 phone's included.
 
@@ -618,6 +621,20 @@ widget test under the app's router showed the same. It was so before the desk's 
 which add no focus of their own (decision 199). A scope with the web's edge
 between the view and the router would hand the end on; it would be a change
 of its own.
+
+### After a key pressed in an open menu, the next right-click on a page's text shows nothing
+
+**Low; open, found 19 October 2026 in a browser look.** On a desk in a
+browser a right-click on the page's text shows the selection's own Copy and
+Select All (decision 199). Seen in headless Chrome on the wasm build, each
+time it was tried: with a row's menu open, by a right-click or through its ⋮
+alike, a key pressed (`n`) and the menu closed with Escape, the next
+right-click on the page's text selected nothing and showed nothing. The one
+after it showed both. Without the key, and after a key in a notice instead
+of a menu, the first right-click worked. The cause was not found: it is the
+selection's answer, not the row's, since the ⋮'s own menu does it too. The
+browser's own menu used to answer every right-click there, so nothing showed
+it before.
 
 ### A page copied whole runs its words together
 
@@ -1212,8 +1229,8 @@ click did nothing. The rail's links outside the tabs pushed too, so it was not
 new with the sidebar. A link and the person's row now go rather than push
 while the router's configuration is an error
 (`lib/core/router/page_location.dart:45`, read at
-`lib/core/widgets/garage_sidebar.dart:188` and
-`lib/core/widgets/garage_sidebar.dart:434`): there is nothing on that page to
+`lib/core/widgets/garage_sidebar.dart:192` and
+`lib/core/widgets/garage_sidebar.dart:446`): there is nothing on that page to
 come back to. `test/core/router/not_found_screen_test.dart:151` opens the
 app's own router at an unknown address on a desk and leaves it by the tour's
 link and by the person's row.
@@ -1226,11 +1243,11 @@ joined the slot ahead of Add, as a car's documents or parts finished loading,
 Flutter paired the two wrappers by position and built Add again from nothing.
 A choice made in the quick-add dialog meanwhile then found its button gone and
 did nothing. Each widget now has a gap beside it instead
-(`lib/core/widgets/page_header.dart:198`), and Add carries a key of its own,
+(`lib/core/widgets/page_header.dart:214`), and Add carries a key of its own,
 so it is matched with itself whatever joins it.
-`test/core/widgets/page_header_test.dart:215` adds a widget ahead of another
+`test/core/widgets/page_header_test.dart:225` adds a widget ahead of another
 and takes it away, and the second stays the same element throughout;
-`test/core/widgets/page_header_test.dart:243` does it with two of a kind,
+`test/core/widgets/page_header_test.dart:253` does it with two of a kind,
 told apart by their keys.
 
 ### An edit made with no signal was lost when the save it changed had landed
@@ -1315,12 +1332,12 @@ recording its tread, retiring it and deleting it. The entry named only the
 add buttons. The screens are now read-only to a driver: no add button, rows
 that open nothing, a set card with its readings and none of its actions, and
 an empty list that says nothing has been recorded rather than asking for the
-first (`lib/features/tyres/screens/tyres_screen.dart:543`,
+first (`lib/features/tyres/screens/tyres_screen.dart:544`,
 `lib/features/documents/screens/documents_screen.dart:41`,
-`lib/features/parts/screens/vehicle_parts_screen.dart:39`); the Car tab's row
-for what the car takes says the same. `test/features/tyres/tyres_screen_test.dart:253`,
+`lib/features/parts/screens/vehicle_parts_screen.dart:40`); the Car tab's row
+for what the car takes says the same. `test/features/tyres/tyres_screen_test.dart:254`,
 `test/features/documents/documents_screen_test.dart:113` and
-`test/features/parts/vehicle_parts_screen_test.dart:82` pump each as a driver.
+`test/features/parts/vehicle_parts_screen_test.dart:83` pump each as a driver.
 
 ### A backup made with no signal was made from copies
 
@@ -1358,12 +1375,12 @@ That alone would have broken the same night's "It has stopped": the day it
 stopped was the UTC instant's too, a day before the day noticed, which the
 table's check refuses (`supabase/migrations/0060_observations.sql:47`), so the
 card dates it from the clock's local day as well
-(`lib/features/observations/widgets/observations_card.dart:240`). The reminder
+(`lib/features/observations/widgets/observations_card.dart:242`). The reminder
 sheet had the same default for the service it logs when only the reading of
 the last one is given (`lib/features/maintenance/widgets/reminder_rule_sheet.dart:311`).
 Each has a test at half past midnight:
 `test/features/observations/observation_sheet_test.dart:82`,
-`test/features/observations/observations_card_test.dart:192` and
+`test/features/observations/observations_card_test.dart:194` and
 `test/features/maintenance/reminder_rule_sheet_test.dart:593`.
 
 ### Reminders a phone set before push was on still fired
@@ -1414,7 +1431,7 @@ auto" are not, so the word was the owner's to choose. On 20 September the
 owner chose "Cars", "Auti" and "Auto", for a driver only. The bottom bar and
 the sidebar read the role and take that label for the cars tab
 (`lib/core/widgets/garage_bottom_nav.dart:64`,
-`lib/core/widgets/garage_sidebar.dart:85`); everybody else keeps
+`lib/core/widgets/garage_sidebar.dart:87`); everybody else keeps
 "Vehicles". `test/core/widgets/garage_bottom_nav_test.dart` holds the new
 label to one word in every language with the others, and asks for both
 roles at phone and desktop width. Decision 194.

@@ -8,6 +8,7 @@ import '../../../core/format/unit_format.dart';
 import '../../../core/theme/garage_theme.dart';
 import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/confirm_delete.dart';
+import '../../../core/widgets/context_menu_region.dart';
 import '../../../core/widgets/failure_message.dart';
 import '../../../domain/entities/observation.dart';
 import '../../settings/providers/unit_providers.dart';
@@ -119,110 +120,111 @@ class _ObservationRow extends ConsumerWidget {
       ),
       ObservationState.resolved => (l10n.observationResolved, tokens.muted),
     };
+    // The ⋮'s, and a right-click's on a desk.
+    List<PopupMenuEntry<String>> items(BuildContext context) => [
+      PopupMenuItem(
+        value: observation.isOpen ? 'resolve' : 'reopen',
+        child: Text(
+          observation.isOpen
+              ? l10n.observationMarkResolved
+              : l10n.observationReopen,
+        ),
+      ),
+      PopupMenuItem(value: 'edit', child: Text(l10n.observationEdit)),
+      PopupMenuItem(value: 'delete', child: Text(l10n.observationDelete)),
+    ];
+    void act(String action) => _act(context, ref, action);
 
     return Padding(
       padding: const EdgeInsets.only(top: GarageTokens.space3),
-      child: Opacity(
-        opacity: observation.isOpen ? 1 : 0.6,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: GarageTokens.space2,
-                    vertical: GarageTokens.space1,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colour.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(
-                      GarageTokens.radiusPill,
+      child: ContextMenuRegion<String>(
+        itemBuilder: items,
+        onSelected: act,
+        child: Opacity(
+          opacity: observation.isOpen ? 1 : 0.6,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: GarageTokens.space2,
+                      vertical: GarageTokens.space1,
                     ),
-                  ),
-                  child: Text(
-                    label,
-                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                      color: colour,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: GarageTokens.space3),
-                Expanded(
-                  child: Text(
-                    observation.isOpen
-                        ? l10n.observationOpenFor(
-                            observation.openForAt(now).inDays,
-                          )
-                        : l10n.observationResolvedOn(
-                            format.formatDate(
-                              observation.resolvedOn!.toLocal(),
-                            ),
-                          ),
-                    style: TextStyle(color: tokens.muted),
-                  ),
-                ),
-                PopupMenuButton<String>(
-                  key: Key('observation-menu-${observation.id}'),
-                  itemBuilder: (context) => [
-                    PopupMenuItem(
-                      value: observation.isOpen ? 'resolve' : 'reopen',
-                      child: Text(
-                        observation.isOpen
-                            ? l10n.observationMarkResolved
-                            : l10n.observationReopen,
+                    decoration: BoxDecoration(
+                      color: colour.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(
+                        GarageTokens.radiusPill,
                       ),
                     ),
-                    PopupMenuItem(
-                      value: 'edit',
-                      child: Text(l10n.observationEdit),
+                    child: Text(
+                      label,
+                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                        color: colour,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Text(l10n.observationDelete),
+                  ),
+                  const SizedBox(width: GarageTokens.space3),
+                  Expanded(
+                    child: Text(
+                      observation.isOpen
+                          ? l10n.observationOpenFor(
+                              observation.openForAt(now).inDays,
+                            )
+                          : l10n.observationResolvedOn(
+                              format.formatDate(
+                                observation.resolvedOn!.toLocal(),
+                              ),
+                            ),
+                      style: TextStyle(color: tokens.muted),
                     ),
-                  ],
-                  onSelected: (value) => _act(context, ref, value),
-                ),
-              ],
-            ),
-            Padding(
-              padding: const EdgeInsets.only(top: GarageTokens.space1),
-              child: Text(observation.note),
-            ),
-            if (observation.state == ObservationState.stillThere)
+                  ),
+                  PopupMenuButton<String>(
+                    key: Key('observation-menu-${observation.id}'),
+                    itemBuilder: items,
+                    onSelected: act,
+                  ),
+                ],
+              ),
               Padding(
                 padding: const EdgeInsets.only(top: GarageTokens.space1),
-                child: Text(
-                  l10n.observationAddressedNotResolved,
-                  style: TextStyle(color: tokens.danger),
-                ),
+                child: Text(observation.note),
               ),
-            if (observation.odometerKm case final km?)
-              Padding(
-                padding: const EdgeInsets.only(top: GarageTokens.space1),
-                child: Text(
-                  format.formatDistance(km.toDouble(), decimals: 0),
-                  style: GarageTheme.numeric(
-                    Theme.of(context).textTheme.labelSmall!,
-                  ).copyWith(color: tokens.muted),
+              if (observation.state == ObservationState.stillThere)
+                Padding(
+                  padding: const EdgeInsets.only(top: GarageTokens.space1),
+                  child: Text(
+                    l10n.observationAddressedNotResolved,
+                    style: TextStyle(color: tokens.danger),
+                  ),
                 ),
-              ),
-            // The drive it was noticed on is stored and was never shown. It
-            // is the difference between "it rattles" and "it rattled on the
-            // motorway last Tuesday", which is what a mechanic asks next.
-            if (observation.happenedOnATrip)
-              Padding(
-                padding: const EdgeInsets.only(top: GarageTokens.space1),
-                child: Text(
-                  l10n.observationOnTrip,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.labelSmall?.copyWith(color: tokens.muted),
+              if (observation.odometerKm case final km?)
+                Padding(
+                  padding: const EdgeInsets.only(top: GarageTokens.space1),
+                  child: Text(
+                    format.formatDistance(km.toDouble(), decimals: 0),
+                    style: GarageTheme.numeric(
+                      Theme.of(context).textTheme.labelSmall!,
+                    ).copyWith(color: tokens.muted),
+                  ),
                 ),
-              ),
-          ],
+              // The drive it was noticed on is stored and was never shown. It
+              // is the difference between "it rattles" and "it rattled on the
+              // motorway last Tuesday", which is what a mechanic asks next.
+              if (observation.happenedOnATrip)
+                Padding(
+                  padding: const EdgeInsets.only(top: GarageTokens.space1),
+                  child: Text(
+                    l10n.observationOnTrip,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.labelSmall?.copyWith(color: tokens.muted),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

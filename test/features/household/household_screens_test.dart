@@ -27,6 +27,7 @@ import 'package:supabase_flutter/supabase_flutter.dart'
 import '../../support/driver_log.dart' show companyGarage;
 import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
+import '../../support/right_click.dart';
 
 /// A garage that has asked for the settlement. It is off by default now, so
 /// the tests that exercise it have to say so.
@@ -1910,5 +1911,63 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(browser.titles.last, 'Set up your garage · Garage');
+  });
+
+  // On a desk a right-click on a member opens what their ⋮ does, and only
+  // for an admin, the one the ⋮ is shown to.
+  group('a right click on a member on a desk', () {
+    Future<RecordingHouseholdRepository> pumpMembers(
+      WidgetTester tester, {
+      required String myRole,
+    }) async {
+      final households = RecordingHouseholdRepository(
+        households: const [settlingHousehold],
+        people: [
+          HouseholdMember(userId: 'u1', displayName: 'Karlo', role: myRole),
+          HouseholdMember(
+            userId: 'u2',
+            displayName: 'Ana',
+            role: myRole == 'admin' ? 'member' : 'admin',
+          ),
+        ],
+      );
+      await pumpScreen(
+        tester,
+        const HouseholdScreen(),
+        initialLocation: '/household',
+        surface: desktopSurface,
+        household: settlingHousehold,
+        overrides: [
+          householdRepositoryProvider.overrideWithValue(households),
+          authRepositoryProvider.overrideWithValue(SilentAuthRepository()),
+        ],
+      );
+      await tester.pumpAndSettle();
+      return households;
+    }
+
+    testWidgets('offers an admin what the ⋮ does', (tester) async {
+      final households = await pumpMembers(tester, myRole: 'admin');
+
+      await rightClick(tester, find.widgetWithText(ListTile, 'Ana').first);
+      expect(find.text('Make admin'), findsOneWidget);
+      await tester.tap(find.text('Remove from garage').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+      await tester.pumpAndSettle();
+
+      expect(households.removed, ['u2']);
+    });
+
+    testWidgets('offers a member nothing, as the row shows no ⋮', (
+      tester,
+    ) async {
+      await pumpMembers(tester, myRole: 'member');
+      expect(find.byKey(const Key('member-menu-u2')), findsNothing);
+
+      await rightClick(tester, find.widgetWithText(ListTile, 'Ana').first);
+
+      expect(find.byType(PopupMenuItem<String>), findsNothing);
+    });
   });
 }

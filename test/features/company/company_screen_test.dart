@@ -21,6 +21,7 @@ import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
 import '../../support/fake_repositories.dart';
 import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
+import '../../support/right_click.dart';
 import '../../support/vehicle_entries.dart';
 import '../household/household_screens_test.dart'
     show RecordingHouseholdRepository;
@@ -793,5 +794,35 @@ void main() {
         'drivers',
       ],
     );
+  });
+
+  // On a desk a right-click on a car opens what its ⋮ does, and only where
+  // the ⋮ is: a car with a window still open to remove.
+  group('a right click on a car', () {
+    testWidgets('offers the removal its ⋮ does', (tester) async {
+      final repository = await pumpConsole(
+        tester,
+        fleet: [window('a1', from: DateTime.utc(2026, 9, 1))],
+      );
+
+      await rightClick(tester, find.text('Golf'));
+      await tester.tap(find.text('Remove from the log').last);
+      await tester.pumpAndSettle();
+      await tester.tap(find.widgetWithText(FilledButton, 'Delete'));
+      await tester.pumpAndSettle();
+
+      expect(writesOf(repository), ['delete:a1']);
+    });
+
+    testWidgets('offers nothing on a car nobody has had, which shows no ⋮', (
+      tester,
+    ) async {
+      await pumpConsole(tester);
+      expect(find.byKey(const Key('company-car-menu-v1')), findsNothing);
+
+      await rightClick(tester, find.text('Golf'));
+
+      expect(find.byType(PopupMenuItem<String>), findsNothing);
+    });
   });
 }

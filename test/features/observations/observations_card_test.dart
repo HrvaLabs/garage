@@ -8,6 +8,7 @@ import 'package:garage/features/observations/providers/observation_providers.dar
 import 'package:garage/features/observations/widgets/observations_card.dart';
 
 import '../../support/pump_screen.dart';
+import '../../support/right_click.dart';
 
 class RecordingObservations implements ObservationRepository {
   RecordingObservations({this.stored = const []});
@@ -61,13 +62,14 @@ Future<void> pumpCard(
   WidgetTester tester,
   RecordingObservations repository, {
   DateTime? now,
+  Size surface = const Size(420, 1400),
 }) async {
   await pumpScreen(
     tester,
     const Scaffold(
       body: SingleChildScrollView(child: ObservationsCard(vehicleId: 'v1')),
     ),
-    surface: const Size(420, 1400),
+    surface: surface,
     overrides: [
       observationRepositoryProvider.overrideWithValue(repository),
       if (now != null) clockProvider.overrideWithValue(() => now),
@@ -240,5 +242,20 @@ void main() {
       findsOneWidget,
     );
     expect(repository.calls, isEmpty);
+  });
+
+  // On a desk a right-click on one opens what its ⋮ does.
+  testWidgets('a right click on one on a desk offers what its ⋮ does', (
+    tester,
+  ) async {
+    final repository = RecordingObservations(stored: [seen()]);
+    await pumpCard(tester, repository, surface: desktopSurface);
+
+    await rightClick(tester, find.text('Rattles when cold'));
+    expect(find.text('Edit'), findsOneWidget);
+    await tester.tap(find.text('It has stopped').last);
+    await tester.pumpAndSettle();
+
+    expect(repository.calls, ['update:o1']);
   });
 }

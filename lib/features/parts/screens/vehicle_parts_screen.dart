@@ -5,6 +5,7 @@ import 'package:garage/l10n/app_localizations.dart';
 import '../../../core/theme/garage_theme.dart';
 import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/async_value_view.dart';
+import '../../../core/widgets/context_menu_region.dart';
 import '../../../core/widgets/page_scaffold.dart';
 import '../../../core/widgets/primary_action.dart';
 import '../../../domain/entities/vehicle_part.dart';
@@ -119,49 +120,54 @@ class _PartCard extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final tokens = context.tokens;
     final driver = ref.watch(isDriverForVehicleProvider(part.vehicleId));
+    // The ⋮'s, and a right-click's on a desk.
+    List<PopupMenuEntry<String>> items(BuildContext context) => [
+      PopupMenuItem(value: 'edit', child: Text(l10n.partsEdit)),
+      PopupMenuItem(value: 'delete', child: Text(l10n.partsDelete)),
+    ];
+    void act(String action) => _act(context, ref, action);
 
     return Padding(
       padding: const EdgeInsets.only(bottom: GarageTokens.space3),
-      child: Card(
-        child: ListTile(
-          key: Key('part-${part.id}'),
-          title: Text(serviceTypeLabel(l10n, part.serviceTypeKey)),
-          subtitle: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // The spec is the point of the row; it gets the weight, the job
-              // it belongs to is the caption.
-              Text(
-                part.spec,
-                style: GarageTheme.numeric(
-                  Theme.of(context).textTheme.bodyLarge!,
-                ).copyWith(color: tokens.fg),
-              ),
-              if (part.notes case final notes? when notes.isNotEmpty)
-                Text(notes, style: TextStyle(color: tokens.muted)),
-            ],
+      child: ContextMenuRegion<String>(
+        enabled: !driver,
+        itemBuilder: items,
+        onSelected: act,
+        child: Card(
+          child: ListTile(
+            key: Key('part-${part.id}'),
+            title: Text(serviceTypeLabel(l10n, part.serviceTypeKey)),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // The spec is the point of the row; it gets the weight, the job
+                // it belongs to is the caption.
+                Text(
+                  part.spec,
+                  style: GarageTheme.numeric(
+                    Theme.of(context).textTheme.bodyLarge!,
+                  ).copyWith(color: tokens.fg),
+                ),
+                if (part.notes case final notes? when notes.isNotEmpty)
+                  Text(notes, style: TextStyle(color: tokens.muted)),
+              ],
+            ),
+            isThreeLine: part.notes?.isNotEmpty ?? false,
+            trailing: driver
+                ? null
+                : PopupMenuButton<String>(
+                    key: Key('part-menu-${part.id}'),
+                    onSelected: act,
+                    itemBuilder: items,
+                  ),
+            onTap: driver
+                ? null
+                : () => showVehiclePartSheet(
+                    context,
+                    part.vehicleId,
+                    existing: part,
+                  ),
           ),
-          isThreeLine: part.notes?.isNotEmpty ?? false,
-          trailing: driver
-              ? null
-              : PopupMenuButton<String>(
-                  key: Key('part-menu-${part.id}'),
-                  onSelected: (action) => _act(context, ref, action),
-                  itemBuilder: (context) => [
-                    PopupMenuItem(value: 'edit', child: Text(l10n.partsEdit)),
-                    PopupMenuItem(
-                      value: 'delete',
-                      child: Text(l10n.partsDelete),
-                    ),
-                  ],
-                ),
-          onTap: driver
-              ? null
-              : () => showVehiclePartSheet(
-                  context,
-                  part.vehicleId,
-                  existing: part,
-                ),
         ),
       ),
     );

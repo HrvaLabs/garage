@@ -103,7 +103,7 @@ Material caps the bar at five, and the fleet is one thing, however many views
 it has. A driver's Vehicles tab is titled "My cars" on its own page
 (`lib/features/vehicles/screens/vehicles_screen.dart:97`) and labelled "Cars"
 in the bar (`lib/core/widgets/garage_bottom_nav.dart:64`) and the sidebar
-(`lib/core/widgets/garage_sidebar.dart:85`): the bar takes one-word labels by
+(`lib/core/widgets/garage_sidebar.dart:87`): the bar takes one-word labels by
 test, so the tab could not carry the title's two words, and the owner chose the
 word (decision 194).
 See [13](13-company.md#the-console).
@@ -219,7 +219,7 @@ The shape that works, and what the vehicle tabs do now:
   leading rows are the schedule and whose months are the history
   (`vehicle_detail_screen.dart:1063`); the schedule is the Maintenance screen's
   own list, told that something else scrolls it
-  (`lib/features/maintenance/screens/maintenance_screen.dart:194`).
+  (`lib/features/maintenance/screens/maintenance_screen.dart:195`).
 - **The everyday action is the tab's own**, an `ActionPane`
   (`lib/core/widgets/primary_action.dart:64`) belonging to the tab rather than
   to the screen: a FAB on a `Scaffold` of the tab's on a phone, a button above
@@ -279,7 +279,7 @@ shortcut's intent without resolving resources, so
 `/@2131689530`, and every tap on either shortcut opened go_router's "Page Not
 Found" from August to October 2026. `shortcuts.xml` therefore writes the URL
 out. The Dart side builds the same URL as `GarageLinks.logFuel`
-(`lib/core/links/url_opener.dart:73`) from `quickFuelRoute`
+(`lib/core/links/url_opener.dart:117`) from `quickFuelRoute`
 (`lib/core/router/app_redirect.dart:37`), and
 `test/ci/launcher_entry_points_test.dart` fails if the resource, the
 shortcut's literal and the Dart link stop agreeing, or if the shortcut goes
@@ -511,8 +511,9 @@ every keyboard handler when it ends and keeps the pointer's routes, and one
 added only the first time was gone from the second test on.
 
 A ⋮ is still Material's menu (`showMenu`, through `PopupMenuButton`), rows of
-one line, and a choice is this card, with the rows its phone sheet has: a
-desk has the two.
+one line, and so is a row's right-click
+([right-click and new tabs](#right-click-and-new-tabs)); a choice is this
+card, with the rows its phone sheet has: a desk has the two.
 
 ## Links from outside: what Android will and will not open
 
@@ -568,7 +569,7 @@ first: somebody signed out is sent to sign in, wherever they were going.
 ## The desktop sidebar
 
 On a wide window both scaffolds draw `GarageSidebar`
-(`lib/core/widgets/garage_sidebar.dart:58`) beside the page in place of the
+(`lib/core/widgets/garage_sidebar.dart:60`) beside the page in place of the
 bottom bar (decisions 81 and 198). From the desktop breakpoint, 1200 pixels, it
 is labelled and 240 wide; between 900 and 1200 it is 72 wide, icons named in
 tooltips. Top to bottom: the garage on screen, by name or, below 1200, as an
@@ -586,7 +587,7 @@ and the privacy policy, which About opens.
 
 The link a page sits under is lit: the one whose route is the longest
 whole-segment prefix of the page's address (`currentLink`,
-`lib/core/widgets/garage_sidebar.dart:33`), so Statistics lights Statistics,
+`lib/core/widgets/garage_sidebar.dart:35`), so Statistics lights Statistics,
 a car's fuel log lights Vehicles, and an address no link holds lights nothing
 rather than the dashboard. `pageLocation`
 (`lib/core/router/page_location.dart:7`), the path of `pageAddress`
@@ -595,7 +596,7 @@ own route rather than the router's top, so a page under a pushed one still
 knows where it is. A tab is gone to and anything else is pushed, so back
 returns to where the reader was. A link does nothing on the page it names, and
 a lit link on a page under it goes to its section, as the crumb beside it
-does (`lib/core/widgets/garage_sidebar.dart:188`): it leads up, and pushed, it
+does (`lib/core/widgets/garage_sidebar.dart:192`): it leads up, and pushed, it
 put Garage on top of merging garages, with back leading down again.
 
 The page for an address nothing matches is the one go_router builds without
@@ -614,7 +615,7 @@ into each other.
 ## The top bar
 
 On a wide window a page names itself in a top bar, `PageHeader`
-(`lib/core/widgets/page_header.dart:125`), where a phone has its app bar. Both
+(`lib/core/widgets/page_header.dart:141`), where a phone has its app bar. Both
 scaffolds draw it (`lib/core/widgets/page_scaffold.dart:108`,
 `lib/core/widgets/garage_bottom_nav.dart:180`) across the content pane beside
 the sidebar, above a rule; the content keeps its own column under it. The
@@ -650,14 +651,14 @@ choice of a service or a reminder, and on a desk its label names both,
 "Service or reminder", where "Add" read the same as the quick-add beside it;
 on documents and parts a driver is offered no add button there either. The
 slot puts its gap beside each widget rather than around it
-(`lib/core/widgets/page_header.dart:198`), and the quick-add carries a key of
+(`lib/core/widgets/page_header.dart:214`), and the quick-add carries a key of
 its own: wrapped alike, the quick-add was paired with a page's own act joining
 before it as a list loaded, and built again, losing a choice made in its
 dialog meanwhile.
 
 The crumbs say where a pushed page sits, read from its address by
 `pageLocation`, as the sidebar reads which link to light. `sectionCrumbs`
-(`lib/core/widgets/page_header.dart:37`) names the section of any page below
+(`lib/core/widgets/page_header.dart:40`) names the section of any page below
 one: Vehicles, Garage (`/household`), Company and API access (`/api-access`). A car's
 pages, `/vehicles/<id>/fuel` and the rest, name Vehicles and then the car; the
 car's own page names only Vehicles, its title being the car, and a new car is
@@ -671,12 +672,12 @@ says where they are. A page may pass its own (`GaragePageScaffold.crumbs`);
 none does.
 
 Each crumb is a link to a screen reader as well as to the pointer, and is
-gone to, not pushed (`lib/core/widgets/page_header.dart:100`). The sidebar
+gone to, not pushed (`lib/core/widgets/page_header.dart:113`). The sidebar
 pushes a link that is neither a tab nor lit because that move is sideways and
 back should undo it; a crumb leads up, as a lit link does, and pushing the
 section on top of the page under it would make back lead down again. A
 crumb's target reaches four pixels past its text on every side
-(`lib/core/widgets/page_header.dart:75`), because on a tablet held sideways it
+(`lib/core/widgets/page_header.dart:80`), because on a tablet held sideways it
 is touched, and bare it was the small text alone. The bar gives up as much of
 its margin, so the crumbs' text, the title's start and the back arrow stay
 where they were; a page with crumbs has a bar four pixels taller. The crumbs
@@ -759,7 +760,7 @@ paints its bar in. Off the web nothing is named.
 
 In a browser at a wide window a page's text can be selected and copied, as a
 web page's can (decision 199). Both scaffolds put `SelectablePage`
-(`lib/core/widgets/selectable_page.dart:20`) around a page's content under
+(`lib/core/widgets/selectable_page.dart:34`) around a page's content under
 its top bar (`lib/core/widgets/page_scaffold.dart:151`, and
 `lib/core/widgets/garage_bottom_nav.dart:175` and
 `lib/core/widgets/garage_bottom_nav.dart:198` for a tab), so the sidebar,
@@ -769,10 +770,10 @@ keyboard, as a click in a browser does, and the system's keys select the
 page and copy it: ⌘A and ⌘C on a Mac, Ctrl elsewhere. Tab passes over the
 page, as over a web page, from the top bar to the page's first control: the
 focus a click gives the text is one traversal skips
-(`lib/core/widgets/selectable_page.dart:39`). A right-click opens the browser's
-own menu, whose Copy takes the selection the click landed in, or else the
-word under the pointer: the framework writes it into an invisible element
-under the page for the browser to copy from. What is copied runs one piece
+(`lib/core/widgets/selectable_page.dart:53`). A right-click on the text shows
+the selection's own Copy and Select all, the browser's menu being off at a
+wide window, and a right-click on a row with a ⋮ shows the row's menu
+instead ([right-click and new tabs](#right-click-and-new-tabs)). What is copied runs one piece
 of text into the next with nothing between them, so a figure copies as
 itself and a page copied whole as one run of words, read in rows across its
 columns (open in known-bugs). The browser's own find does not reach the
@@ -780,7 +781,7 @@ words: Flutter draws them, and a page loaded as usual has none of them in
 the document for it to search.
 
 It is the web's, and a wide window's. `SelectablePage.web`
-(`lib/core/widgets/selectable_page.dart:28`) is the web build, as
+(`lib/core/widgets/selectable_page.dart:42`) is the web build, as
 `PageTitle.enabled` is, and the scaffolds' phone shapes have no selection. A
 tablet held sideways is wide too, and there, as on a phone and in a
 phone-sized browser, a long press stays the row's. The tour, signed out,
@@ -788,6 +789,21 @@ keeps a phone's shape at every width and so has none. A window resized
 across 900 pixels already builds the page again in its other shape (open in
 known-bugs); the selection belongs to the desk's shape and is there or not by
 the build alone, so it adds nothing to that.
+
+The page waits for the browser to say its menu is off, and only then is
+built, once, inside the selection
+(`lib/core/widgets/selectable_page.dart:63`). The selection reads whether
+the browser's menu is on as it is built, and while it is on wraps itself in
+an invisible element for that menu to copy from; told otherwise later, it
+changes shape and builds the page under it again from nothing. The browser
+answers a beat after the frame that made the window wide, so for that beat,
+at a desk's first frame and as a window widens across the line, the content
+pane is empty. Built bare and moved into the selection when the answer came,
+a list that builds its rows as it scrolls failed the framework's own checks:
+each row met the selection mid-life. So a desk page's first frame in a
+browser is its shell, the sidebar and the top bar, and the content fills a
+frame or so later: the first frame `scripts/measure_first_frame.sh` times is
+the sign-in page's, which is outside the scaffolds and does not wait.
 
 A chart's plot leaves itself out. Each of the six puts
 `SelectionContainer.disabled` around its fl_chart widget
@@ -812,7 +828,7 @@ touch screen at a desk loses the swipe as well. Six rows: a fill-up in the
 fuel log; a service, a reading, a cost and an income on a car's page; and a
 trip in the trip log. A click opens each, and its form deletes it.
 
-`test/core/widgets/selection_test.dart:159` copies pages and charts as the
+`test/core/widgets/selection_test.dart:182` copies pages and charts as the
 web build; each row's screen test drags a mouse across its figure
 (`test/features/fuel/fuel_log_screen_test.dart:190`,
 `test/features/vehicles/vehicle_detail_screen_test.dart:2623`,
@@ -891,7 +907,7 @@ a browser rings the focus a key moved and not the focus a click gave.
 `FocusRings` (`lib/core/widgets/focus_rings.dart:15`) says which: rings from
 a Tab or an arrow (`lib/core/widgets/focus_rings.dart:48`) until the next
 press, and the frame draws the desk's theme with them or without
-(`lib/core/widgets/app_frame.dart:50`). The arrows move the focus in a menu,
+(`lib/core/widgets/app_frame.dart:63`). The arrows move the focus in a menu,
 and between controls off the web; in a browser they scroll the page, and the
 ring shows where the focus was left. Flutter's own highlight mode cannot
 tell a key from a click, a mouse leaving it where the keyboard put it, so a
@@ -916,3 +932,82 @@ the page's text clicked in a browser too
 (`test/core/widgets/desktop_shortcuts_test.dart:354`), and Tab past them
 (`test/core/widgets/desktop_shortcuts_test.dart:416`);
 `test/core/widgets/focus_rings_test.dart:64` draws the ring.
+
+## Right-click and new tabs
+
+On a wide window a row with a ⋮ opens the same menu on a right-click, at
+the pointer (decision 199). `ContextMenuRegion`
+(`lib/core/widgets/context_menu_region.dart:22`) is handed the ⋮'s items and
+its handler, and is `enabled` exactly where the ⋮ is shown
+(`lib/core/widgets/context_menu_region.dart:40`): a part for somebody who is
+not a driver, a member for an admin, a guest pass while it is open, a car on
+the console while it has a window to remove, a tyre set for somebody who is
+not a driver. Where the ⋮ is hidden there is no right-click menu. Nine rows
+have one: a part, a reminder (on the maintenance screen and on the car's
+Upkeep tab), a member of the garage, an observation, an incident, a car on
+the console, a tyre set, a guest pass, and the route on route trends. A menu
+whose items act themselves (`PopupMenuItem.onTap`, the tyres' and the
+passes') is handed a handler that does nothing. It is Material's own menu,
+`showMenu` (`lib/core/widgets/context_menu_region.dart:71`), as a ⋮'s is, so
+the two look alike; its top is at the pointer, and it grows to the right of
+the pointer on the left half of the window and to the left of it on the
+right half, as Material places a menu. The region is there at every width
+with nothing to do on a phone
+(`lib/core/widgets/context_menu_region.dart:55`), so a window resized across
+the line keeps the row under it: a phone has no right-click, and a long
+press there is the row's already.
+
+**One menu at a time.** In a browser a desk's page is a selection, whose own
+right-click shows Copy and Select all, decided when a press has been held
+long enough to be told from a tap. A row's right-click held that long showed
+both menus. The row claims a press of the secondary button as it goes down
+(`lib/core/widgets/context_menu_region.dart:99`), so the selection is told
+it lost the press and shows nothing, and the row's menu opens on the press,
+as a desk's does. A right-click on the page's text beside a row is still the
+selection's.
+
+**The menu is a route**, pushed on the navigator the page is on, as a ⋮'s
+is, so the page stops being the top while it is open and its keys go quiet
+([keys on a desk](#keys-on-a-desk)): `n` with a row's menu open opens
+nothing. A menu drawn over the page without a route of its own, a
+`MenuAnchor`, would leave the keys live under it.
+
+**The browser's own menu** is off in a browser at a wide window and on again
+when the window narrows (`BrowserMenu`, `lib/core/web/browser_menu.dart:23`).
+Over the canvas it offered little more than saving the page as an image.
+With it off a right-click is the app's: a row's menu, the selection's Copy
+and Select all, and in a field Flutter's own cut, copy and paste, which the
+framework draws only once the browser's menu is off. A phone-sized browser
+keeps the browser's, its spelling suggestions with it; at a desk a field has
+none (decision 199). The frame throws the switch, being where the window's
+width is seen (`lib/core/widgets/app_frame.dart:57`), and only as the window
+crosses the line (`lib/core/web/browser_menu.dart:39`): the selection reads
+it as it is built and changes shape with it, building the page under it
+again, and crossing the line builds the page again anyway. The framework
+hears the browser's answer a beat after that frame, and the page waits for
+it ([text a desk can select](#text-a-desk-can-select)). Off the web there is
+no such menu, and nothing throws the switch.
+
+**A link opens in a new tab** in a browser on a middle click, or on a click
+with ⌘ held on a Mac and Ctrl elsewhere, as a link on a web page does, and
+the page stays where it was: a sidebar link
+(`lib/core/widgets/garage_sidebar.dart:189` for the click,
+`lib/core/widgets/garage_sidebar.dart:263` for the middle button) and a
+crumb (`lib/core/widgets/page_header.dart:101`,
+`lib/core/widgets/page_header.dart:112`). A Mac's browser turns a click with
+Ctrl held into a right-click, so there Ctrl opens no tab. `newTabOpenerProvider`
+(`lib/core/links/url_opener.dart:24`) opens it, a seam as
+`urlOpenerProvider` is, so a test records the tab rather than opening it.
+Off the web there are no tabs: a click with Ctrl held on a tablet with a
+keyboard is a click, and a middle click does nothing
+(`lib/core/links/url_opener.dart:53`). The signed-in person's row at the
+foot of the sidebar is not one of the links and opens no tab.
+
+`test/core/widgets/context_menu_region_test.dart` right-clicks a row, quickly
+and held, through a page's selection on the three desk systems, and with a
+row's menu open presses `n`; each row's screen test right-clicks it where
+its ⋮ is shown and where it is not; `test/core/widgets/garage_sidebar_test.dart`
+and `test/core/widgets/page_header_test.dart` open links in new tabs, in a
+browser and off the web; `test/core/widgets/app_frame_test.dart` records
+what the browser is asked as a window widens and narrows, and
+`test/core/widgets/selection_test.dart` that a page waits for its answer.

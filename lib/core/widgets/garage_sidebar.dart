@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:garage/l10n/app_localizations.dart';
@@ -6,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/auth/providers/auth_providers.dart';
 import '../../features/company/providers/company_providers.dart';
 import '../../features/household/providers/household_providers.dart';
+import '../links/url_opener.dart';
 import '../router/page_location.dart';
 import '../theme/garage_theme.dart';
 import '../theme/garage_tokens.dart';
@@ -158,7 +160,7 @@ class GarageSidebar extends ConsumerWidget {
   }
 }
 
-class _SidebarItem extends StatelessWidget {
+class _SidebarItem extends ConsumerWidget {
   const _SidebarItem({
     required this.link,
     required this.selected,
@@ -180,9 +182,11 @@ class _SidebarItem extends StatelessWidget {
   /// Garage on merging garages: it leads up to its section, as the crumb
   /// beside it does, where a push would put the section on top of its own
   /// page. Anything else is pushed, except from the page for an address
-  /// nothing matches, where a push goes nowhere ([atUnknownAddress]).
-  void _open(BuildContext context) {
-    if (here) {
+  /// nothing matches, where a push goes nowhere ([atUnknownAddress]). In a
+  /// browser, with Ctrl or ⌘ held, it opens in a new tab instead, this page
+  /// included, as a link on a web page does (decision 199).
+  void _open(BuildContext context, WidgetRef ref) {
+    if (openedInNewTab(ref, link.route) || here) {
       return;
     }
     if (link.tab || selected || atUnknownAddress(context)) {
@@ -193,7 +197,7 @@ class _SidebarItem extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final tokens = context.tokens;
     final shape = RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(GarageTokens.radiusSm),
@@ -211,7 +215,7 @@ class _SidebarItem extends StatelessWidget {
       child: InkWell(
         key: Key('sidebar-${link.route}'),
         customBorder: shape,
-        onTap: () => _open(context),
+        onTap: () => _open(context, ref),
         child: SizedBox(
           height: 40,
           child: extended
@@ -253,15 +257,23 @@ class _SidebarItem extends StatelessWidget {
         container: true,
         selected: selected,
         label: extended ? null : link.label,
-        // The label above names an icon to a screen reader once; the
-        // tooltip is for the pointer.
-        child: extended
-            ? tile
-            : Tooltip(
-                message: link.label,
-                excludeFromSemantics: true,
-                child: tile,
-              ),
+        // A middle click opens the link in a new tab, in a browser.
+        child: Listener(
+          onPointerDown: (event) {
+            if (event.buttons == kMiddleMouseButton) {
+              openInNewTab(ref, link.route);
+            }
+          },
+          // The label above names an icon to a screen reader once; the
+          // tooltip is for the pointer.
+          child: extended
+              ? tile
+              : Tooltip(
+                  message: link.label,
+                  excludeFromSemantics: true,
+                  child: tile,
+                ),
+        ),
       ),
     );
   }

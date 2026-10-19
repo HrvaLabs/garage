@@ -9,6 +9,7 @@ import 'package:garage/features/trips/widgets/route_trend_chart.dart';
 
 import '../../support/fake_repositories.dart';
 import '../../support/pump_screen.dart';
+import '../../support/right_click.dart';
 
 const commute = TripRoute(id: 'r1', householdId: 'h1', name: 'Home → Work');
 
@@ -376,5 +377,19 @@ void main() {
 
       expect(tester.takeException(), isNull);
     });
+  });
+
+  // On a desk a right-click on the route opens what its ⋮ does.
+  testWidgets('a right click on the route on a desk offers its ⋮', (
+    tester,
+  ) async {
+    await pumpTrends(tester, surface: desktopSurface);
+
+    await rightClick(tester, find.byKey(const Key('route-trend-route')));
+    expect(find.text('Delete route'), findsOneWidget);
+    await tester.tap(find.text('Rename route'));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const Key('route-rename-field')), findsOneWidget);
   });
 }

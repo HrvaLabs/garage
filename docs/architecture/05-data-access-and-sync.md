@@ -37,7 +37,7 @@ implementation for roughly a dozen repositories.
 
 Platform capabilities follow the same rule. A widget that needs to open a URL, pick
 a file, or upload a photo goes through a provider seam in `lib/core/`
-(`lib/core/links/url_opener.dart:14`, `lib/core/files/file_picker.dart:9`), so the
+(`lib/core/links/url_opener.dart:16`, `lib/core/files/file_picker.dart:9`), so the
 test substitutes a recorder for the browser or the picker. Adding a plugin call
 directly inside a widget is the one pattern that reliably makes a screen
 untestable.

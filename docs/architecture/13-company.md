@@ -79,7 +79,7 @@ like is below.
 
 **A driver can join as one.** An admin of a garage whose plan is current is
 asked, on inviting somebody, who the code is for, a driver first
-(`lib/features/household/screens/household_screen.dart:83`), and a driver's
+(`lib/features/household/screens/household_screen.dart:84`), and a driver's
 code makes the joiner a driver at the join, so they never hold a member's
 view of the garage, not even for the minutes before somebody got to "Make
 driver". A code waiting to be handed out again is only ever one for the same
@@ -108,10 +108,10 @@ company's van.
 **Making a driver** is on the members screen, for an admin, while the plan is
 current — the update policy refuses the role otherwise
 (`supabase/migrations/0080_company.sql:569`) — and never on your own row
-(`lib/features/household/screens/household_screen.dart:665`). A driver's row
+(`lib/features/household/screens/household_screen.dart:606`). A driver's row
 says which cars they have today, or that they have none. When the viewer is
 a driver, only their own row says so
-(`lib/features/household/screens/household_screen.dart:564`): the policy
+(`lib/features/household/screens/household_screen.dart:565`): the policy
 shows a driver their own windows and nothing else, so the log they hold
 cannot say another driver has no car. The role stays on a lapsed garage: its
 drivers keep their cars, and only a new driver waits for the plan.
@@ -134,8 +134,8 @@ rather than refused.
 **"My cars"** is the vehicles screen wearing a driver's presentation
 (`lib/features/vehicles/screens/vehicles_screen.dart:79`), under a tab that
 reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:64`, and in the sidebar
-`lib/core/widgets/garage_sidebar.dart:85` and a desk page's crumbs
-`lib/core/widgets/page_header.dart:49`): the title, no Add vehicle button,
+`lib/core/widgets/garage_sidebar.dart:87` and a desk page's crumbs
+`lib/core/widgets/page_header.dart:52`): the title, no Add vehicle button,
 no archived section, an empty state that names the administrator as the one
 who hands a car over, and two cards above the grid. The dashboard
 says the same to a driver with no car yet
@@ -176,7 +176,7 @@ documents and parts screens are read-only to a driver, who holds select on
 them and nothing else: no add button, rows that open nothing, a tyre set
 with its readings and none of its actions, and an empty list that says
 nothing is recorded rather than asking for the first
-(`lib/features/tyres/screens/tyres_screen.dart:543`).
+(`lib/features/tyres/screens/tyres_screen.dart:544`).
 
 ## The assignment log
 
@@ -200,7 +200,7 @@ that covers it), and the app's sentence tells the admin to remove the wrong
 handover first (`lib/core/errors/app_failure.dart:142`). The console's row
 menu removes the newest window still open — usually today's, but a handover
 arranged on Friday for Monday is open too, is not today's, and is the
-likelier mistake (`lib/features/company/widgets/drivers_and_cars_tab.dart:166`).
+likelier mistake (`lib/features/company/widgets/drivers_and_cars_tab.dart:167`).
 A sale closes the seller's driver out: every window that still reaches today
 is cut on the day before the sale and one that opens today or later is
 deleted (`supabase/migrations/0080_company.sql:300`).
@@ -275,7 +275,7 @@ unknown on a cold start typed in by URL
 
 | Tab | Widget | What it holds |
 |---|---|---|
-| Drivers and cars | `lib/features/company/widgets/drivers_and_cars_tab.dart:30` | A card per car: who has it today, since when, signed or not, a Hand over button, the earlier windows, and a menu that strikes the newest open window from the log |
+| Drivers and cars | `lib/features/company/widgets/drivers_and_cars_tab.dart:31` | A card per car: who has it today, since when, signed or not, a Hand over button, the earlier windows, and a menu that strikes the newest open window from the log |
 | Deadlines | `lib/features/company/widgets/deadlines_tab.dart:30` | This month, or everything ahead, grouped by month; a row opens the car |
 | Incidents | `lib/features/company/widgets/incidents_tab.dart:20` | Open, or all, across the fleet, archived cars included; a row opens the sheet |
 | Reimbursements | `lib/features/company/widgets/reimbursements_tab.dart:26` | Who is owed what, per month, with Mark as paid |
@@ -294,13 +294,13 @@ make them a driver" when there is nobody to hand to.
 member row, the pending-handovers card and the incidents and observations
 cards on the car page render `failureMessage` when a read failed with nothing
 cached, and progress while loading, rather than "Nobody" on every car with
-nothing to report (`lib/features/company/widgets/drivers_and_cars_tab.dart:48`)
-or a header over nothing (`lib/features/incidents/widgets/incidents_card.dart:63`).
+nothing to report (`lib/features/company/widgets/drivers_and_cars_tab.dart:49`)
+or a header over nothing (`lib/features/incidents/widgets/incidents_card.dart:64`).
 The cache serves last-good rows on a network failure only, so a refusal or a
 server error on a first load has nothing to fall back on, and the cause
 reaches `failure_log` once per build. Every tab offers the fleet's Retry: the
 Drivers and cars tab under its sentence
-(`lib/features/company/widgets/drivers_and_cars_tab.dart:79`), since the log
+(`lib/features/company/widgets/drivers_and_cars_tab.dart:80`), since the log
 and the members are kept alive and would otherwise wait for a resume or a
 realtime event; the Reimbursements tab folds a failed names read into its
 own state (`lib/features/company/widgets/reimbursements_tab.dart:43`) rather
@@ -378,7 +378,7 @@ leaves the line showing what is still owed rather than the full total.
 
 **The household settlement is switched off for a fleet.** The settlement card
 and its setting are hidden on the plan
-(`lib/features/household/screens/household_screen.dart:696`,
+(`lib/features/household/screens/household_screen.dart:688`,
 `lib/features/settings/screens/settings_screen.dart:425`): drivers do not owe
 the company; the company owes whoever paid out of their own pocket, which is
 what the reimbursements are.
@@ -393,7 +393,7 @@ amount, a status (`open`, `at_insurer`, `repaired`, `paid`, `closed`) and a
 the same sweep on delete every other entry's receipts get (decision 129).
 `lib/features/incidents/` mirrors the observations feature: a repository over
 the read cache, a card on the Car tab
-(`lib/features/incidents/widgets/incidents_card.dart:22`) with the driver line
+(`lib/features/incidents/widgets/incidents_card.dart:23`) with the driver line
 under each row, a sheet (`lib/features/incidents/widgets/incident_sheet.dart:30`),
 a menu per row for close, reopen, edit and delete. A driver reports on an
 assigned car through their own menu; admins manage all. Realtime carries the

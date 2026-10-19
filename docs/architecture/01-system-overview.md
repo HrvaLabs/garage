@@ -105,6 +105,10 @@ one, floated into its bottom right corner, the new-version notice the web
 build shows, and the record of the last press, which a choice on a desk
 hangs from (`PointerAnchor`, decision 199): kept at every width and on
 Android too, it adds nothing to the tree, and nothing on a phone reads it.
+In a browser it also turns the browser's own right-click menu off as the
+window becomes wide and on again as it narrows (`BrowserMenu`,
+`lib/core/web/browser_menu.dart`, decision 199), the frame being where the
+window's width is seen; that too adds nothing to the tree.
 `test/support/pump_screen.dart` builds the same frame, so a screen test sees
 what the app puts around a page, a phone-sized one included: its snackbars
 float, as a phone's do, and one pumped at a desk's size (`pumpDesktop`) gets

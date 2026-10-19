@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -41,6 +43,27 @@ Future<String?> _copyThePage(
 }
 
 const _page = GaragePageScaffold(title: 'Fuel', body: Text('52.3 L'));
+
+/// A page's text that counts the times it was built from nothing.
+class _Counted extends StatefulWidget {
+  const _Counted();
+
+  static int made = 0;
+
+  @override
+  State<_Counted> createState() => _CountedState();
+}
+
+class _CountedState extends State<_Counted> {
+  @override
+  void initState() {
+    super.initState();
+    _Counted.made += 1;
+  }
+
+  @override
+  Widget build(BuildContext context) => const Text('52.3 L');
+}
 
 final _format = UnitFormat(locale: 'en', preferences: metricPreferences);
 
@@ -248,6 +271,57 @@ void main() {
       await tester.pump();
       expect(FocusManager.instance.primaryFocus, before);
     });
+  });
+
+  // The selection reads whether the browser's own menu is on as it is built,
+  // and wraps itself for that menu while it is. The browser says it is off a
+  // beat after the frame that crossed the line, so a selection built in that
+  // frame would change shape when it heard, building the page under it again
+  // from nothing. The page waits, and is built once, inside the selection.
+  testWidgets('a page waits for the browser\'s menu to be off, then is built '
+      'once, inside the selection', (tester) async {
+    _Counted.made = 0;
+    final browser = asTheWeb(tester);
+    final answer = browser.contextMenuAnswer = Completer<void>();
+    await pumpDesktop(
+      tester,
+      const GaragePageScaffold(title: 'Fuel', body: _Counted()),
+      initialLocation: '/vehicles/v1/fuel',
+    );
+    await tester.pumpAndSettle();
+    expect(browser.contextMenuCalls, ['disableContextMenu']);
+    expect(find.text('52.3 L'), findsNothing);
+    expect(find.text('Fuel'), findsOneWidget, reason: 'the top bar is drawn');
+
+    answer.complete();
+    await tester.pumpAndSettle();
+
+    expect(_selectable('52.3 L'), findsOneWidget);
+    expect(_Counted.made, 1);
+  });
+
+  testWidgets('and so does a page whose window widens across the line', (
+    tester,
+  ) async {
+    _Counted.made = 0;
+    final browser = asTheWeb(tester);
+    await pumpScreen(
+      tester,
+      const GaragePageScaffold(title: 'Fuel', body: _Counted()),
+      initialLocation: '/vehicles/v1/fuel',
+    );
+    await tester.pumpAndSettle();
+    final answer = browser.contextMenuAnswer = Completer<void>();
+    _Counted.made = 0;
+
+    tester.view.physicalSize = desktopSurface;
+    await tester.pumpAndSettle();
+    expect(find.text('52.3 L'), findsNothing);
+
+    answer.complete();
+    await tester.pumpAndSettle();
+    expect(_selectable('52.3 L'), findsOneWidget);
+    expect(_Counted.made, 1);
   });
 
   testWidgets('a tablet held sideways keeps its long press for the row', (

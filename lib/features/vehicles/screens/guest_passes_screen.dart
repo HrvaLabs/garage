@@ -6,6 +6,7 @@ import '../../../core/format/unit_format.dart';
 import '../../../core/theme/garage_theme.dart';
 import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/async_value_view.dart';
+import '../../../core/widgets/context_menu_region.dart';
 import '../../../core/widgets/date_pickers.dart';
 import '../../../core/widgets/page_scaffold.dart';
 import '../../../core/widgets/primary_action.dart';
@@ -139,110 +140,119 @@ class _PassRow extends ConsumerWidget {
         state == GuestPassState.live ||
         state == GuestPassState.waiting ||
         state == GuestPassState.notStarted;
-
-    return Container(
-      padding: const EdgeInsets.all(GarageTokens.space4),
-      decoration: BoxDecoration(
-        color: tokens.surface,
-        borderRadius: BorderRadius.circular(GarageTokens.radiusMd),
-        border: Border.all(color: tokens.border),
+    // The ⋮'s, and a right-click's on a desk, while the pass is open. Each
+    // item acts itself.
+    List<PopupMenuEntry<void>> items(BuildContext context) => [
+      // Extending beats reissuing: the holder keeps the code they already
+      // have, and what they logged stays on one loan.
+      PopupMenuItem(
+        onTap: () => _extend(context, ref, pass, format),
+        child: Text(l10n.guestPassExtend),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // A Wrap, not a Row: the status pill and an eight-character
-                // code do not fit beside each other on a 320px phone at 1.5x,
-                // and the code is the one thing on this card that has to be
-                // readable in full.
-                Wrap(
-                  spacing: GarageTokens.space3,
-                  runSpacing: GarageTokens.space2,
-                  crossAxisAlignment: WrapCrossAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: GarageTokens.space2,
-                        vertical: GarageTokens.space1,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colour.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(
-                          GarageTokens.radiusPill,
+      // Retroactive, on the code they already hold. Reissuing to change one
+      // switch loses the connection to everything they logged under the old
+      // code.
+      PopupMenuItem(
+        onTap: () => showEditPassSheet(context, pass),
+        child: Text(l10n.passEdit),
+      ),
+      PopupMenuItem(
+        onTap: () => _confirmRevoke(context, ref, pass),
+        child: Text(l10n.guestPassRevoke),
+      ),
+    ];
+
+    return ContextMenuRegion<void>(
+      enabled: open,
+      itemBuilder: items,
+      onSelected: (_) {},
+      child: Container(
+        padding: const EdgeInsets.all(GarageTokens.space4),
+        decoration: BoxDecoration(
+          color: tokens.surface,
+          borderRadius: BorderRadius.circular(GarageTokens.radiusMd),
+          border: Border.all(color: tokens.border),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // A Wrap, not a Row: the status pill and an eight-character
+                  // code do not fit beside each other on a 320px phone at 1.5x,
+                  // and the code is the one thing on this card that has to be
+                  // readable in full.
+                  Wrap(
+                    spacing: GarageTokens.space3,
+                    runSpacing: GarageTokens.space2,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: GarageTokens.space2,
+                          vertical: GarageTokens.space1,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colour.withValues(alpha: 0.12),
+                          borderRadius: BorderRadius.circular(
+                            GarageTokens.radiusPill,
+                          ),
+                        ),
+                        child: Text(
+                          label,
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: colour,
+                                fontWeight: FontWeight.w600,
+                              ),
                         ),
                       ),
-                      child: Text(
-                        label,
-                        style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: colour,
-                          fontWeight: FontWeight.w600,
+                      Text(
+                        pass.code,
+                        style: GarageTheme.numeric(
+                          Theme.of(context).textTheme.bodyMedium!,
                         ),
                       ),
-                    ),
-                    Text(
-                      pass.code,
-                      style: GarageTheme.numeric(
-                        Theme.of(context).textTheme.bodyMedium!,
-                      ),
-                    ),
+                    ],
+                  ),
+                  if (pass.label case final name?) ...[
+                    const SizedBox(height: GarageTokens.space2),
+                    Text(name),
                   ],
-                ),
-                if (pass.label case final name?) ...[
-                  const SizedBox(height: GarageTokens.space2),
-                  Text(name),
-                ],
-                const SizedBox(height: GarageTokens.space1),
-                Text(
-                  open
-                      ? (days == 0
-                            ? l10n.guestPassEndsToday
-                            : l10n.guestPassRemaining(days))
-                      : format.formatDate(pass.expiresAt.toLocal()),
-                  style: TextStyle(color: tokens.muted),
-                ),
-                // Both ends, for a pass that does not simply start now: "4
-                // days left" says nothing about a loan booked for next
-                // weekend, which is the case the window was added for.
-                if (pass.startsAt case final from?)
+                  const SizedBox(height: GarageTokens.space1),
                   Text(
-                    l10n.guestPassWindow(
-                      format.formatDate(from.toLocal()),
-                      format.formatDate(pass.expiresAt.toLocal()),
-                    ),
+                    open
+                        ? (days == 0
+                              ? l10n.guestPassEndsToday
+                              : l10n.guestPassRemaining(days))
+                        : format.formatDate(pass.expiresAt.toLocal()),
                     style: TextStyle(color: tokens.muted),
                   ),
-              ],
+                  // Both ends, for a pass that does not simply start now: "4
+                  // days left" says nothing about a loan booked for next
+                  // weekend, which is the case the window was added for.
+                  if (pass.startsAt case final from?)
+                    Text(
+                      l10n.guestPassWindow(
+                        format.formatDate(from.toLocal()),
+                        format.formatDate(pass.expiresAt.toLocal()),
+                      ),
+                      style: TextStyle(color: tokens.muted),
+                    ),
+                ],
+              ),
             ),
-          ),
-          // A menu, not two buttons: "Extend" and "Withdraw" side by side
-          // overflowed this row in English and had no chance in Croatian.
-          if (open)
-            PopupMenuButton<void>(
-              key: Key('pass-menu-${pass.id}'),
-              itemBuilder: (context) => [
-                // Extending beats reissuing: the holder keeps the code they
-                // already have, and what they logged stays on one loan.
-                PopupMenuItem(
-                  onTap: () => _extend(context, ref, pass, format),
-                  child: Text(l10n.guestPassExtend),
-                ),
-                // Retroactive, on the code they already hold. Reissuing to
-                // change one switch loses the connection to everything they
-                // logged under the old code.
-                PopupMenuItem(
-                  onTap: () => showEditPassSheet(context, pass),
-                  child: Text(l10n.passEdit),
-                ),
-                PopupMenuItem(
-                  onTap: () => _confirmRevoke(context, ref, pass),
-                  child: Text(l10n.guestPassRevoke),
-                ),
-              ],
-            ),
-        ],
+            // A menu, not two buttons: "Extend" and "Withdraw" side by side
+            // overflowed this row in English and had no chance in Croatian.
+            if (open)
+              PopupMenuButton<void>(
+                key: Key('pass-menu-${pass.id}'),
+                itemBuilder: items,
+              ),
+          ],
+        ),
       ),
     );
   }

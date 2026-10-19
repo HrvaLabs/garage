@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/garage_theme.dart';
+import '../web/browser_menu.dart';
 import '../web/update_notice.dart';
 import 'adaptive.dart';
 import 'focus_rings.dart';
@@ -11,9 +12,11 @@ import 'window_snackbars.dart';
 /// on a wide window ([GarageTheme.desktop]), with a ring round the button
 /// the keyboard reached ([FocusRings]), snackbars sized and placed for the
 /// window, the new-version notice, and the record of the last press that a
-/// popover on a desk hangs from ([PointerAnchor]). Whatever else every page
-/// should sit inside, the desktop layer's additions for a wide window
-/// included, goes here as well.
+/// popover on a desk hangs from ([PointerAnchor]). It also turns the
+/// browser's own right-click menu off as the window becomes wide and on as it
+/// narrows ([BrowserMenu]), the one place that sees the window's width.
+/// Whatever else every page should sit inside, the desktop layer's additions
+/// for a wide window included, goes here as well.
 ///
 /// One widget, used by `lib/main.dart` and by `test/support/pump_screen.dart`,
 /// so a screen test sees the window the app draws in. Before it, the harness
@@ -26,7 +29,8 @@ import 'window_snackbars.dart';
 /// who has been told of a new version would be told again. The press is
 /// recorded at every width and adds nothing to the tree: only a popover reads
 /// it, and a phone has none. The rings are heard at every width too, and
-/// change only the theme's data: a phone's theme has none to draw.
+/// change only the theme's data: a phone's theme has none to draw. The
+/// browser's menu is a call to the browser, and adds nothing to the tree.
 class GarageAppFrame extends StatefulWidget {
   const GarageAppFrame({required this.child, super.key});
 
@@ -42,6 +46,15 @@ class _GarageAppFrameState extends State<GarageAppFrame> {
     super.initState();
     PointerAnchor.install();
     FocusRings.install();
+  }
+
+  /// Told when the window's size changes, before anything under the frame is
+  /// built for it: the browser's menu follows the window across the line,
+  /// and only then (decision 199).
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    BrowserMenu.follow(wide: GarageBreakpoints.isWide(context));
   }
 
   @override

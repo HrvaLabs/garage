@@ -1,8 +1,10 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garage/core/links/url_opener.dart';
 import 'package:garage/core/widgets/garage_bottom_nav.dart';
 import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/page_scaffold.dart';
@@ -11,6 +13,7 @@ import 'package:garage/features/household/providers/current_household.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../support/browser.dart';
 import '../../support/fake_repositories.dart';
 import '../../support/pump_screen.dart';
 
@@ -383,5 +386,110 @@ void main() {
         expect(cut, isEmpty);
       });
     }
+  });
+
+  // A browser opens a link in a tab of its own on a middle click, or on a
+  // click with Ctrl or ⌘ held, and leaves the page where it was.
+  group('a link opened in a new tab', () {
+    late List<Uri> opened;
+
+    Future<NavigationLog> pumpWithTabs(WidgetTester tester) async {
+      opened = [];
+      final log = await pumpDesktop(
+        tester,
+        const GarageTabScaffold(
+          current: GarageTab.dashboard,
+          title: 'Page',
+          body: SizedBox(),
+        ),
+        overrides: [
+          newTabOpenerProvider.overrideWithValue(
+            (url) async => opened.add(url),
+          ),
+        ],
+      );
+      await tester.pumpAndSettle();
+      return log;
+    }
+
+    Future<void> clickHolding(
+      WidgetTester tester,
+      LogicalKeyboardKey key,
+    ) async {
+      await tester.sendKeyDownEvent(key);
+      await tester.tap(find.byKey(const Key('sidebar-/stats')));
+      await tester.sendKeyUpEvent(key);
+      await tester.pumpAndSettle();
+    }
+
+    group('in a browser', () {
+      testWidgets('by a middle click', (tester) async {
+        asTheWeb(tester);
+        final log = await pumpWithTabs(tester);
+
+        await tester.tap(
+          find.byKey(const Key('sidebar-/stats')),
+          buttons: kMiddleMouseButton,
+          kind: PointerDeviceKind.mouse,
+        );
+        await tester.pumpAndSettle();
+
+        expect(opened.single.path, '/stats');
+        expect(log.visited, isNot(contains('/stats')));
+      });
+
+      for (final (name, key) in [
+        ('Ctrl', LogicalKeyboardKey.controlLeft),
+        ('⌘', LogicalKeyboardKey.metaLeft),
+      ]) {
+        testWidgets('by a click with $name held', (tester) async {
+          asTheWeb(tester);
+          final log = await pumpWithTabs(tester);
+
+          await clickHolding(tester, key);
+
+          expect(opened.single.path, '/stats');
+          expect(log.visited, isNot(contains('/stats')));
+        });
+      }
+
+      testWidgets('and a plain click still goes there', (tester) async {
+        asTheWeb(tester);
+        final log = await pumpWithTabs(tester);
+
+        await tester.tap(find.byKey(const Key('sidebar-/stats')));
+        await tester.pumpAndSettle();
+
+        expect(opened, isEmpty);
+        expect(log.visited, contains('/stats'));
+      });
+    });
+
+    // Off the web there are no tabs to open: a tablet with a keyboard
+    // takes a click with Ctrl held as a click.
+    group('off the web', () {
+      testWidgets('a click with Ctrl held goes there', (tester) async {
+        final log = await pumpWithTabs(tester);
+
+        await clickHolding(tester, LogicalKeyboardKey.controlLeft);
+
+        expect(opened, isEmpty);
+        expect(log.visited, contains('/stats'));
+      });
+
+      testWidgets('a middle click does nothing', (tester) async {
+        final log = await pumpWithTabs(tester);
+
+        await tester.tap(
+          find.byKey(const Key('sidebar-/stats')),
+          buttons: kMiddleMouseButton,
+          kind: PointerDeviceKind.mouse,
+        );
+        await tester.pumpAndSettle();
+
+        expect(opened, isEmpty);
+        expect(log.visited, isNot(contains('/stats')));
+      });
+    });
   });
 }

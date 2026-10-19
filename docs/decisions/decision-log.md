@@ -4633,7 +4633,7 @@ second thing to get wrong.
 **Excluded runs are listed, not plotted.** The proposal wanted them "drawn as a
 hollow dot so it is not hidden". They are named instead, under the chart, with
 date and duration (`_Excluded`,
-`lib/features/trips/screens/route_trends_screen.dart:486`). A dot among the
+`lib/features/trips/screens/route_trends_screen.dart:493`). A dot among the
 boxes would put them back on an axis they were deliberately taken off, and the
 list answers the question the count provokes — *which ones* — which a dot does
 not.
@@ -6707,8 +6707,8 @@ used to disagree by a hundredth of a day.
 
 **18 September 2026.** Demoting yourself as the garage's only admin asks
 first and names who inherits — "the role passes to Ana"
-(`lib/features/household/screens/household_screen.dart:472`); leaving as the
-only admin says the same in its own question (`household_screen.dart:363`);
+(`lib/features/household/screens/household_screen.dart:473`); leaving as the
+only admin says the same in its own question (`household_screen.dart:399`);
 and the snackbar afterwards names who got the role rather than describing the
 rule. `successorOf` (`lib/features/household/admin_succession.dart:12`)
 mirrors `ensure_household_has_admin`: the longest-standing other member, ties
@@ -7847,7 +7847,7 @@ clicked and then confirmed.
 
 **Text can be selected.** In a browser at a wide window a page's content is
 one selection, as a web page is (`SelectablePage`,
-`lib/core/widgets/selectable_page.dart:20`): a mouse dragged across a
+`lib/core/widgets/selectable_page.dart:34`): a mouse dragged across a
 figure selects it, a click on the page's text takes the keyboard, and the
 system's keys select it all and copy it (⌘ on a Mac, Ctrl elsewhere). The
 sidebar, the top bar and a tab strip stay controls, and Tab passes over the
@@ -7861,10 +7861,9 @@ out between its sentences as a run of stray numbers. Its heading, legend and
 guidance, the words around the plot, are the page's and copy with it, a
 donut's amounts included. A drag across the economy trend stays its readout,
 the chart taking the drag before the selection does; the other five have
-none. A right-click is the
-browser's own menu, whose Copy takes the selection the click landed in, or
-the word under the pointer
-([12](../architecture/12-navigation.md#text-a-desk-can-select)).
+none. A right-click on the text shows the selection's own Copy and Select
+all, the browser's menu being off at a wide window (below,
+[12](../architecture/12-navigation.md#text-a-desk-can-select)).
 
 *Cost:* no row swipes to delete in a browser at a wide window, a touch
 screen's included. A `Dismissible` takes a sideways drag from any pointer and
@@ -7925,3 +7924,53 @@ after one, as a switch between light and dark builds it; nothing changes
 shape, so nothing is lost. *Cost:* only a button rings. A link in the
 sidebar, a crumb, a row and a segmented button keep the tint Flutter gives
 what has the focus after a key, and a field its border.
+
+**Right-click and middle-click.** On a wide window a row with a ⋮ opens the
+same menu on a right-click, at the pointer: the ⋮'s items and its handler,
+and only where the ⋮ is shown, so a driver's part, a member's row for
+somebody who is not an admin, a finished guest pass, a car with nothing to
+remove and a driver's tyre set offer nothing on a right-click either
+(`ContextMenuRegion`, `lib/core/widgets/context_menu_region.dart:22`). It is
+Material's menu, as the ⋮'s is, and a route, so the page's keys go quiet
+under it. The region is there at every width and does nothing on a phone,
+which has no right-click. In a browser the page's text is a selection, whose
+own right-click shows Copy and Select all once a press has been held long
+enough to be told from a tap, and a row's right-click held that long showed
+both menus. The row claims the press as the button goes down, so the
+selection never shows its menu over the row's, and the row's menu opens on
+the press. A sidebar link or a crumb opens in a new browser tab on a middle
+click or on a click with ⌘ held on a Mac and Ctrl elsewhere, and the page
+stays where it was (`newTabOpenerProvider`,
+`lib/core/links/url_opener.dart:24`); a Mac's browser turns a click with
+Ctrl held into a right-click. Off the web
+there are no tabs, and a click with Ctrl held on a tablet with a keyboard is
+a click.
+
+**The browser's own menu goes off at a wide window.** Over the canvas it
+offered little but saving the page as an image, and a right-click now has
+the app's to show: a row's menu, the selection's Copy, and in a field
+Flutter's own cut, copy and paste, which the framework draws only once the
+browser's menu is off. A phone-sized browser keeps the browser's: it has no
+row menus, and its fields keep the browser's spelling suggestions. The frame
+throws the switch (`BrowserMenu`, `lib/core/web/browser_menu.dart:23`, from
+`lib/core/widgets/app_frame.dart:57`), being where the window's width is
+seen, and only as the window crosses the line: a selection reads the switch
+as it is built, wrapping itself for the browser's menu while it is on, so
+the switch thrown under a selection already built changes its shape and
+builds the page under it again, and crossing the line builds the page again
+anyway. The framework is told the switch has been thrown only when the
+browser answers, which on the web comes after the frame that crossed the
+line has been built, so the switch cannot be in place before that frame
+builds the page. The page waits for the answer instead and is then built
+once, inside the selection (`lib/core/widgets/selectable_page.dart:63`).
+Built bare and moved into the selection under a key when the answer came, a
+list that builds its rows as it scrolls failed the framework's own checks,
+each row meeting the selection mid-life. The framework's switch also refuses
+to be thrown off the web, before it says anything to the browser, so a test
+of the web's half puts the same call to the browser in its place.
+
+*Cost:* in a browser at a wide window a text field has no spelling
+suggestions from the browser, nor anything else the browser's own menu
+offered there; Flutter's cut, copy and paste take its place. *Cost:* for a
+beat, at a desk's first frame in a browser and as a window widens across the
+line, a page's content pane is empty, until the browser answers.

@@ -15,6 +15,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../support/floating_button.dart';
 import '../../support/pump_screen.dart';
+import '../../support/right_click.dart';
 
 class RecordingGuestPassRepository implements GuestPassRepository {
   RecordingGuestPassRepository({this.passes = const []});
@@ -793,6 +794,59 @@ void main() {
         (await container.read(vehicleProvider('v9').future))?.nickname,
         'Sister Clio',
       );
+    });
+  });
+
+  // On a desk a right-click on a pass opens what its ⋮ does, and only while
+  // the pass is open: a finished one has no ⋮.
+  group('a right click on a pass on a desk', () {
+    testWidgets('offers what an open pass\'s ⋮ does', (tester) async {
+      await pumpPasses(
+        tester,
+        RecordingGuestPassRepository(passes: [livePass()]),
+        surface: desktopSurface,
+      );
+
+      await rightClick(tester, find.text('ABCD2345'));
+      expect(find.text('Extend'), findsOneWidget);
+      expect(find.text('Change what it allows'), findsOneWidget);
+      await tester.tap(find.text('Withdraw'));
+      await tester.pumpAndSettle();
+
+      expect(
+        find.textContaining('Everything they logged stays.'),
+        findsOneWidget,
+      );
+    });
+
+    testWidgets('offers nothing on a finished one, which shows no ⋮', (
+      tester,
+    ) async {
+      await pumpPasses(
+        tester,
+        RecordingGuestPassRepository(
+          passes: [
+            GuestPass(
+              id: 'p2',
+              vehicleId: 'v1',
+              code: 'OLDCODE1',
+              createdBy: 'u1',
+              createdAt: _now.subtract(const Duration(days: 30)),
+              expiresAt: _now.subtract(const Duration(days: 20)),
+              redeemedBy: 'g1',
+              redeemedAt: _now.subtract(const Duration(days: 29)),
+            ),
+          ],
+        ),
+        surface: desktopSurface,
+      );
+      await tester.tap(find.byKey(const Key('passes-finished')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('pass-menu-p2')), findsNothing);
+
+      await rightClick(tester, find.text('OLDCODE1'));
+
+      expect(find.byType(PopupMenuItem<void>), findsNothing);
     });
   });
 }

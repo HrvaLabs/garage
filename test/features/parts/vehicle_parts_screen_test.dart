@@ -11,6 +11,7 @@ import 'package:garage/features/parts/screens/vehicle_parts_screen.dart';
 
 import '../../support/floating_button.dart';
 import '../../support/pump_screen.dart';
+import '../../support/right_click.dart';
 
 class FakeVehiclePartRepository implements VehiclePartRepository {
   FakeVehiclePartRepository({this.parts = const [], this.failWith});
@@ -244,4 +245,41 @@ void main() {
       expect(tester.takeException(), isNull);
     });
   }
+
+  // On a desk a right-click on a part opens what its ⋮ does, and only where
+  // the ⋮ is: a driver reads what the car takes and changes none of it.
+  group('a right click on a part on a desk', () {
+    testWidgets('offers what its ⋮ does, and deleting still asks first', (
+      tester,
+    ) async {
+      final repository = FakeVehiclePartRepository(parts: [oil()]);
+      await pumpParts(tester, repository, surface: desktopSurface);
+
+      await rightClick(tester, find.text('5W-30 ACEA C3'));
+      expect(find.text('Edit'), findsOneWidget);
+      await tester.tap(find.text('Delete'));
+      await tester.pumpAndSettle();
+      expect(repository.deleted, isEmpty, reason: 'not before confirming');
+
+      await tester.tap(find.text('Delete').last);
+      await tester.pumpAndSettle();
+      expect(repository.deleted, ['p1']);
+    });
+
+    testWidgets('offers a driver nothing, as the row shows no ⋮', (
+      tester,
+    ) async {
+      await pumpParts(
+        tester,
+        FakeVehiclePartRepository(parts: [oil()]),
+        role: 'driver',
+        surface: desktopSurface,
+      );
+      expect(find.byKey(const Key('part-menu-p1')), findsNothing);
+
+      await rightClick(tester, find.text('5W-30 ACEA C3'));
+
+      expect(find.byType(PopupMenuItem<String>), findsNothing);
+    });
+  });
 }

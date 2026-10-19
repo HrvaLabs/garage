@@ -12,6 +12,7 @@ import '../../../core/theme/garage_theme.dart';
 import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/page_scaffold.dart';
 import '../../../core/widgets/async_value_view.dart';
+import '../../../core/widgets/context_menu_region.dart';
 import '../../../core/widgets/failure_message.dart';
 import '../data/household_repository.dart';
 import '../../../domain/entities/invite.dart';
@@ -591,6 +592,27 @@ class _HouseholdScreenState extends ConsumerState<HouseholdScreen> {
       preferences: ref.watch(unitPreferencesProvider),
     );
 
+    // A member's ⋮, and a right-click's on a desk: an admin's alone.
+    List<PopupMenuEntry<String>> memberItems(HouseholdMember member) => [
+      if (member.role != 'admin')
+        PopupMenuItem(value: 'admin', child: Text(l10n.householdMakeAdmin)),
+      if (member.role == 'admin')
+        PopupMenuItem(value: 'member', child: Text(l10n.householdRemoveAdmin)),
+      if (member.role == 'driver')
+        PopupMenuItem(value: 'member', child: Text(l10n.householdMakeMember)),
+      // A company feature, offered while the plan runs — a lapsed garage keeps
+      // its drivers and the policy refuses a new one — and never to yourself:
+      // an admin who became a driver would see nothing to undo it from.
+      if (companyEnabled &&
+          member.role != 'driver' &&
+          member.userId != currentUserId)
+        PopupMenuItem(value: 'driver', child: Text(l10n.householdMakeDriver)),
+      if (member.userId != currentUserId)
+        PopupMenuItem(value: 'remove', child: Text(l10n.householdRemoveMember)),
+    ];
+    void memberAct(HouseholdMember member, String value) =>
+        value == 'remove' ? _removeMember(member) : _setRole(member, value);
+
     return GaragePageScaffold(
       title: l10n.householdTitle,
       body: ListView(
@@ -625,61 +647,31 @@ class _HouseholdScreenState extends ConsumerState<HouseholdScreen> {
             data: (list) => Column(
               children: [
                 for (final member in list)
-                  Card(
-                    child: ListTile(
-                      leading: const Icon(Icons.person_outline),
-                      title: Text(member.displayName),
-                      subtitle: Text(
-                        member.role == 'driver'
-                            ? driverRow(member)
-                            : _roleLabel(l10n, member.role),
+                  ContextMenuRegion<String>(
+                    enabled: isAdmin,
+                    itemBuilder: (_) => memberItems(member),
+                    onSelected: (value) => memberAct(member, value),
+                    child: Card(
+                      child: ListTile(
+                        leading: const Icon(Icons.person_outline),
+                        title: Text(member.displayName),
+                        subtitle: Text(
+                          member.role == 'driver'
+                              ? driverRow(member)
+                              : _roleLabel(l10n, member.role),
+                        ),
+                        // An admin's to do. Removing somebody is never
+                        // yourself — leaving is the way out of your own
+                        // garage — but stepping down as admin is, so the role
+                        // menu is offered on your own row too.
+                        trailing: isAdmin
+                            ? PopupMenuButton<String>(
+                                key: Key('member-menu-${member.userId}'),
+                                itemBuilder: (_) => memberItems(member),
+                                onSelected: (value) => memberAct(member, value),
+                              )
+                            : null,
                       ),
-                      // An admin's to do. Removing somebody is never yourself
-                      // — leaving is the way out of your own garage — but
-                      // stepping down as admin is, so the role menu is offered
-                      // on your own row too.
-                      trailing: isAdmin
-                          ? PopupMenuButton<String>(
-                              key: Key('member-menu-${member.userId}'),
-                              itemBuilder: (context) => [
-                                if (member.role != 'admin')
-                                  PopupMenuItem(
-                                    value: 'admin',
-                                    child: Text(l10n.householdMakeAdmin),
-                                  ),
-                                if (member.role == 'admin')
-                                  PopupMenuItem(
-                                    value: 'member',
-                                    child: Text(l10n.householdRemoveAdmin),
-                                  ),
-                                if (member.role == 'driver')
-                                  PopupMenuItem(
-                                    value: 'member',
-                                    child: Text(l10n.householdMakeMember),
-                                  ),
-                                // A company feature, offered while the plan
-                                // runs — a lapsed garage keeps its drivers
-                                // and the policy refuses a new one — and
-                                // never to yourself: an admin who became a
-                                // driver would see nothing to undo it from.
-                                if (companyEnabled &&
-                                    member.role != 'driver' &&
-                                    member.userId != currentUserId)
-                                  PopupMenuItem(
-                                    value: 'driver',
-                                    child: Text(l10n.householdMakeDriver),
-                                  ),
-                                if (member.userId != currentUserId)
-                                  PopupMenuItem(
-                                    value: 'remove',
-                                    child: Text(l10n.householdRemoveMember),
-                                  ),
-                              ],
-                              onSelected: (value) => value == 'remove'
-                                  ? _removeMember(member)
-                                  : _setRole(member, value),
-                            )
-                          : null,
                     ),
                   ),
               ],

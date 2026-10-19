@@ -15,6 +15,7 @@ import 'package:garage/domain/entities/household.dart';
 import '../../support/floating_button.dart';
 import '../../support/browser.dart';
 import '../../support/pump_screen.dart';
+import '../../support/right_click.dart';
 
 final _today = DateTime(2026, 8, 15);
 
@@ -694,5 +695,23 @@ void main() {
       'calendar',
       'list',
     ]);
+  });
+
+  // On a desk a right-click on a reminder opens what its ⋮ does.
+  testWidgets('a right click on a reminder on a desk offers its ⋮', (
+    tester,
+  ) async {
+    await pumpMaintenance(
+      tester,
+      surface: desktopSurface,
+      projections: [projection(ruleId: 'r1')],
+    );
+    await tester.pumpAndSettle();
+
+    await rightClick(tester, find.text('Oil change').first);
+
+    expect(find.text('Log it as done'), findsOneWidget);
+    expect(find.text('Edit'), findsOneWidget);
+    expect(find.text('Delete'), findsOneWidget);
   });
 }

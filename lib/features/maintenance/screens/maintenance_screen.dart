@@ -13,6 +13,7 @@ import '../../../core/widgets/routed_tabs.dart';
 import '../../../core/widgets/empty_state_art.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/confirm_delete.dart';
+import '../../../core/widgets/context_menu_region.dart';
 import '../../../core/widgets/pick_one.dart';
 import '../../../core/widgets/state_chip.dart';
 import '../../../domain/maintenance/date_math.dart';
@@ -240,6 +241,49 @@ class MaintenanceProjectionList extends ConsumerWidget {
     final country =
         ref.watch(currentHouseholdProvider).value?.countryCode ?? 'HR';
 
+    // Each reminder's ⋮, and a right-click's on a desk.
+    List<PopupMenuEntry<String>> items(BuildContext context) => [
+      PopupMenuItem(value: 'log', child: Text(l10n.reminderLogIt)),
+      PopupMenuItem(value: 'edit', child: Text(l10n.commonEdit)),
+      PopupMenuItem(value: 'delete', child: Text(l10n.commonDelete)),
+    ];
+    Future<void> act(ReminderProjection projection, String action) async {
+      final rule = rulesById[projection.ruleId];
+      if (rule == null) {
+        return;
+      }
+      if (action == 'log') {
+        // A reminder raised by a cost is settled by recording the next
+        // payment, not by logging a service: nobody performs a vignette, and
+        // asking for one is why "log service → vignette expires" read as
+        // nonsense.
+        final category = RecurringCosts.categoryFor(projection.serviceTypeKey);
+        if (category != null) {
+          await showCostEntrySheet(
+            context,
+            vehicleId,
+            initialCategory: category,
+          );
+        } else {
+          await showServiceEntrySheet(
+            context,
+            vehicleId,
+            initialServiceTypeKeys: {projection.serviceTypeKey},
+          );
+        }
+        ref
+          ..invalidate(reminderRulesProvider(vehicleId))
+          ..invalidate(vehicleProjectionsProvider(vehicleId));
+      } else if (action == 'edit') {
+        await showReminderRuleSheet(context, vehicleId, existing: rule);
+      } else if (await confirmDelete(context)) {
+        await ref.read(maintenanceRepositoryProvider).deleteRule(rule.id);
+        ref
+          ..invalidate(reminderRulesProvider(vehicleId))
+          ..invalidate(vehicleProjectionsProvider(vehicleId));
+      }
+    }
+
     final children = [
       Padding(
         padding: const EdgeInsets.only(bottom: GarageTokens.space3),
@@ -262,149 +306,94 @@ class MaintenanceProjectionList extends ConsumerWidget {
       for (final state in order)
         if (grouped[state]!.isNotEmpty)
           for (final projection in grouped[state]!)
-            Card(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ListTile(
-                    // Only when it says something: "Upcoming" on every row
-                    // of a list of upcoming items was noise.
-                    leading: projection.state == ReminderState.upcoming
-                        ? null
-                        : StateChip(state: projection.state),
-                    trailing: PopupMenuButton<String>(
-                      onSelected: (action) async {
-                        final rule = rulesById[projection.ruleId];
-                        if (rule == null) {
-                          return;
-                        }
-                        if (action == 'log') {
-                          // A reminder raised by a cost is settled by
-                          // recording the next payment, not by logging a
-                          // service: nobody performs a vignette, and asking
-                          // for one is why "log service → vignette expires"
-                          // read as nonsense.
-                          final category = RecurringCosts.categoryFor(
-                            projection.serviceTypeKey,
-                          );
-                          if (category != null) {
-                            await showCostEntrySheet(
-                              context,
-                              vehicleId,
-                              initialCategory: category,
-                            );
-                          } else {
-                            await showServiceEntrySheet(
-                              context,
-                              vehicleId,
-                              initialServiceTypeKeys: {
-                                projection.serviceTypeKey,
-                              },
-                            );
-                          }
-                          ref
-                            ..invalidate(reminderRulesProvider(vehicleId))
-                            ..invalidate(vehicleProjectionsProvider(vehicleId));
-                        } else if (action == 'edit') {
-                          await showReminderRuleSheet(
-                            context,
-                            vehicleId,
-                            existing: rule,
-                          );
-                        } else if (await confirmDelete(context)) {
-                          await ref
-                              .read(maintenanceRepositoryProvider)
-                              .deleteRule(rule.id);
-                          ref
-                            ..invalidate(reminderRulesProvider(vehicleId))
-                            ..invalidate(vehicleProjectionsProvider(vehicleId));
-                        }
-                      },
-                      itemBuilder: (context) => [
-                        PopupMenuItem(
-                          value: 'log',
-                          child: Text(l10n.reminderLogIt),
-                        ),
-                        PopupMenuItem(
-                          value: 'edit',
-                          child: Text(l10n.commonEdit),
-                        ),
-                        PopupMenuItem(
-                          value: 'delete',
-                          child: Text(l10n.commonDelete),
-                        ),
-                      ],
-                    ),
-                    title: Text(
-                      serviceTypeLabel(l10n, projection.serviceTypeKey),
-                    ),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(_dueLabel(l10n, format, projection, today)),
-                        if (_otherDeadline(l10n, format, projection)
-                            case final String other)
-                          Text(
-                            other,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: context.tokens.muted),
-                          ),
-                        if (_winterTyreNote(l10n, format, projection, country)
-                            case final String window)
-                          Text(
-                            window,
-                            style: Theme.of(context).textTheme.bodySmall
-                                ?.copyWith(color: context.tokens.muted),
-                          ),
-                        if (lastByKey[projection.serviceTypeKey]
-                            case final ServiceEntry previous)
-                          Text(
-                            l10n.maintenancePreviously(
-                              _previousLabel(l10n, format, previous),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  // dueness, not fractionConsumed: the same number the
-                  // dashboard's gauge shows, and defined for a one-off with
-                  // only a date, which used to show no bar at all.
-                  if (projection.dueness(today) case final double fraction)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        GarageTokens.space4,
-                        0,
-                        GarageTokens.space4,
-                        GarageTokens.space4,
+            ContextMenuRegion<String>(
+              itemBuilder: items,
+              onSelected: (action) => act(projection, action),
+              child: Card(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    ListTile(
+                      // Only when it says something: "Upcoming" on every row
+                      // of a list of upcoming items was noise.
+                      leading: projection.state == ReminderState.upcoming
+                          ? null
+                          : StateChip(state: projection.state),
+                      trailing: PopupMenuButton<String>(
+                        onSelected: (action) => act(projection, action),
+                        itemBuilder: items,
                       ),
-                      child: Row(
+                      title: Text(
+                        serviceTypeLabel(l10n, projection.serviceTypeKey),
+                      ),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                GarageTokens.radiusPill,
-                              ),
-                              child: LinearProgressIndicator(
-                                value: fraction,
-                                minHeight: 5,
-                                backgroundColor: context.tokens.border,
-                                color: fraction >= 0.85
-                                    ? context.tokens.danger
-                                    : context.tokens.accent,
+                          Text(_dueLabel(l10n, format, projection, today)),
+                          if (_otherDeadline(l10n, format, projection)
+                              case final String other)
+                            Text(
+                              other,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: context.tokens.muted),
+                            ),
+                          if (_winterTyreNote(l10n, format, projection, country)
+                              case final String window)
+                            Text(
+                              window,
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: context.tokens.muted),
+                            ),
+                          if (lastByKey[projection.serviceTypeKey]
+                              case final ServiceEntry previous)
+                            Text(
+                              l10n.maintenancePreviously(
+                                _previousLabel(l10n, format, previous),
                               ),
                             ),
-                          ),
-                          const SizedBox(width: GarageTokens.space3),
-                          Text(
-                            '${(fraction * 100).round()}%',
-                            style: GarageTheme.numeric(
-                              Theme.of(context).textTheme.labelSmall!,
-                            ),
-                          ),
                         ],
                       ),
                     ),
-                ],
+                    // dueness, not fractionConsumed: the same number the
+                    // dashboard's gauge shows, and defined for a one-off with
+                    // only a date, which used to show no bar at all.
+                    if (projection.dueness(today) case final double fraction)
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(
+                          GarageTokens.space4,
+                          0,
+                          GarageTokens.space4,
+                          GarageTokens.space4,
+                        ),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                  GarageTokens.radiusPill,
+                                ),
+                                child: LinearProgressIndicator(
+                                  value: fraction,
+                                  minHeight: 5,
+                                  backgroundColor: context.tokens.border,
+                                  color: fraction >= 0.85
+                                      ? context.tokens.danger
+                                      : context.tokens.accent,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: GarageTokens.space3),
+                            Text(
+                              '${(fraction * 100).round()}%',
+                              style: GarageTheme.numeric(
+                                Theme.of(context).textTheme.labelSmall!,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
     ];

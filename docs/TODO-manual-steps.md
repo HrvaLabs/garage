@@ -365,7 +365,7 @@ to the people using it.
 `web/terms.html` the way `web/privacy.html` mirrors the policy; give
 `test/legal/` a terms twin of `privacy_policy_test.dart` (same headings, same
 date, never the word "draft"); add `GarageLinks.terms` beside
-`GarageLinks.privacyPolicy` (`lib/core/links/url_opener.dart:24`) and link it
+`GarageLinks.privacyPolicy` (`lib/core/links/url_opener.dart:68`) and link it
 from About, More and the footers under `web/`. Translate it afterwards, not
 before: a translation of a draft is two drafts.
 

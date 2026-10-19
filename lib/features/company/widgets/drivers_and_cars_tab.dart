@@ -9,6 +9,7 @@ import '../../../core/theme/garage_theme.dart';
 import '../../../core/theme/garage_tokens.dart';
 import '../../../core/widgets/async_value_view.dart';
 import '../../../core/widgets/confirm_delete.dart';
+import '../../../core/widgets/context_menu_region.dart';
 import '../../../core/widgets/failure_message.dart';
 import '../../../domain/company/assignment_resolution.dart';
 import '../../../domain/entities/vehicle.dart';
@@ -165,94 +166,103 @@ class _CarRow extends ConsumerWidget {
     // the row names, but a handover arranged on Friday for Monday is open
     // too, is not today's, and is the likelier mistake.
     final removable = known?.where((it) => it.isOpen).firstOrNull;
+    // The ⋮'s, and a right-click's on a desk: only with a window to remove.
+    List<PopupMenuEntry<String>> items(BuildContext context) => [
+      PopupMenuItem(value: 'remove', child: Text(l10n.companyRemoveAssignment)),
+    ];
+    void act(String _) {
+      if (removable != null) {
+        _remove(context, ref, removable);
+      }
+    }
 
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(GarageTokens.space4),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        [vehicle.nickname, ?vehicle.plate].join(' · '),
-                        style: Theme.of(context).textTheme.titleMedium,
-                      ),
-                      if (known != null) ...[
-                        const SizedBox(height: GarageTokens.space1),
+    return ContextMenuRegion<String>(
+      enabled: removable != null,
+      itemBuilder: items,
+      onSelected: act,
+      child: Card(
+        child: Padding(
+          padding: const EdgeInsets.all(GarageTokens.space4),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         Text(
-                          '${l10n.companyCurrentDriver}: '
-                          '${current == null ? l10n.companyNobody : _name(l10n, current.userId)}',
+                          [vehicle.nickname, ?vehicle.plate].join(' · '),
+                          style: Theme.of(context).textTheme.titleMedium,
                         ),
+                        if (known != null) ...[
+                          const SizedBox(height: GarageTokens.space1),
+                          Text(
+                            '${l10n.companyCurrentDriver}: '
+                            '${current == null ? l10n.companyNobody : _name(l10n, current.userId)}',
+                          ),
+                        ],
+                        if (current != null)
+                          Text(
+                            [
+                              l10n.companySince(
+                                format.formatDate(current.fromDate),
+                              ),
+                              current.isConfirmed
+                                  ? l10n.companyConfirmedOn(
+                                      format.formatDate(
+                                        current.confirmedAt!.toLocal(),
+                                      ),
+                                    )
+                                  : l10n.companyUnconfirmed,
+                            ].join(' · '),
+                            style: TextStyle(color: tokens.muted),
+                          ),
                       ],
-                      if (current != null)
-                        Text(
-                          [
-                            l10n.companySince(
-                              format.formatDate(current.fromDate),
-                            ),
-                            current.isConfirmed
-                                ? l10n.companyConfirmedOn(
-                                    format.formatDate(
-                                      current.confirmedAt!.toLocal(),
-                                    ),
-                                  )
-                                : l10n.companyUnconfirmed,
-                          ].join(' · '),
-                          style: TextStyle(color: tokens.muted),
-                        ),
-                    ],
+                    ),
                   ),
-                ),
-                const SizedBox(width: GarageTokens.space3),
-                FilledButton.tonal(
-                  style: GarageTheme.inlineButton,
-                  key: Key('company-handover-${vehicle.id}'),
-                  onPressed: () => showHandoverSheet(
-                    context,
-                    vehicle: vehicle,
-                    current: current,
+                  const SizedBox(width: GarageTokens.space3),
+                  FilledButton.tonal(
+                    style: GarageTheme.inlineButton,
+                    key: Key('company-handover-${vehicle.id}'),
+                    onPressed: () => showHandoverSheet(
+                      context,
+                      vehicle: vehicle,
+                      current: current,
+                    ),
+                    child: Text(l10n.companyHandOver),
                   ),
-                  child: Text(l10n.companyHandOver),
-                ),
-                if (removable != null)
-                  PopupMenuButton<String>(
-                    key: Key('company-car-menu-${vehicle.id}'),
-                    itemBuilder: (context) => [
-                      PopupMenuItem(
-                        value: 'remove',
-                        child: Text(l10n.companyRemoveAssignment),
-                      ),
-                    ],
-                    onSelected: (_) => _remove(context, ref, removable),
-                  ),
-              ],
-            ),
-            if (earlier.isNotEmpty) ...[
-              const SizedBox(height: GarageTokens.space3),
-              Text(
-                l10n.companyEarlierDrivers.toUpperCase(),
-                style: GarageTheme.eyebrow(context),
+                  if (removable != null)
+                    PopupMenuButton<String>(
+                      key: Key('company-car-menu-${vehicle.id}'),
+                      itemBuilder: items,
+                      onSelected: act,
+                    ),
+                ],
               ),
-              for (final assignment in earlier.take(5))
-                Text(switch (assignment.toDate) {
-                  final to? => l10n.companyAssignmentRange(
-                    format.formatDate(assignment.fromDate),
-                    _name(l10n, assignment.userId),
-                    format.formatDate(to),
-                  ),
-                  // Open and not today's: a handover arranged ahead.
-                  null => l10n.companyAssignmentFrom(
-                    format.formatDate(assignment.fromDate),
-                    _name(l10n, assignment.userId),
-                  ),
-                }, style: TextStyle(color: tokens.muted)),
+              if (earlier.isNotEmpty) ...[
+                const SizedBox(height: GarageTokens.space3),
+                Text(
+                  l10n.companyEarlierDrivers.toUpperCase(),
+                  style: GarageTheme.eyebrow(context),
+                ),
+                for (final assignment in earlier.take(5))
+                  Text(switch (assignment.toDate) {
+                    final to? => l10n.companyAssignmentRange(
+                      format.formatDate(assignment.fromDate),
+                      _name(l10n, assignment.userId),
+                      format.formatDate(to),
+                    ),
+                    // Open and not today's: a handover arranged ahead.
+                    null => l10n.companyAssignmentFrom(
+                      format.formatDate(assignment.fromDate),
+                      _name(l10n, assignment.userId),
+                    ),
+                  }, style: TextStyle(color: tokens.muted)),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );

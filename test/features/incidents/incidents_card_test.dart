@@ -8,6 +8,7 @@ import 'package:garage/features/incidents/providers/incident_providers.dart';
 import 'package:garage/features/incidents/widgets/incidents_card.dart';
 
 import '../../support/pump_screen.dart';
+import '../../support/right_click.dart';
 
 class RecordingIncidents implements IncidentRepository {
   RecordingIncidents({this.stored = const []});
@@ -63,14 +64,15 @@ final evening = DateTime(2026, 9, 18, 22, 15);
 
 Future<void> pumpCard(
   WidgetTester tester,
-  RecordingIncidents repository,
-) async {
+  RecordingIncidents repository, {
+  Size surface = const Size(420, 1400),
+}) async {
   await pumpScreen(
     tester,
     const Scaffold(
       body: SingleChildScrollView(child: IncidentsCard(vehicleId: 'v1')),
     ),
-    surface: const Size(420, 1400),
+    surface: surface,
     overrides: [
       incidentRepositoryProvider.overrideWithValue(repository),
       clockProvider.overrideWithValue(() => evening),
@@ -232,6 +234,28 @@ void main() {
 
     expect(find.text('Scratched the rear bumper'), findsOneWidget);
     expect(find.textContaining('You do not have access'), findsOneWidget);
+  });
+
+  // On a desk a right-click on one opens what its ⋮ does.
+  testWidgets('a right click on one on a desk offers what its ⋮ does', (
+    tester,
+  ) async {
+    final repository = RecordingIncidents(
+      stored: [
+        reported(
+          resolvedOn: DateTime.utc(2026, 9, 12),
+          status: IncidentStatus.paid,
+        ),
+      ],
+    );
+    await pumpCard(tester, repository, surface: desktopSurface);
+
+    await rightClick(tester, find.text('Scratched the rear bumper'));
+    expect(find.text('Edit'), findsOneWidget);
+    await tester.tap(find.text('Reopen').last);
+    await tester.pumpAndSettle();
+
+    expect(repository.saved!.status, IncidentStatus.open);
   });
 }
 

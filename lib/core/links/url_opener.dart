@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../router/app_redirect.dart';
@@ -14,6 +16,48 @@ final urlOpenerProvider = Provider<UrlOpener>((ref) {
     await launchUrl(url, mode: LaunchMode.externalApplication);
   };
 });
+
+/// Opens one of the app's own pages in a new tab of the browser: a middle
+/// click on a link, or a click with Ctrl or ⌘ held (decision 199). A seam as
+/// [urlOpenerProvider] is, so a test records the tab rather than opening it.
+/// Does nothing off the web, where there are no tabs.
+final newTabOpenerProvider = Provider<UrlOpener>((ref) {
+  return (url) async {
+    if (!NewTab.web) {
+      return;
+    }
+    await launchUrl(url, webOnlyWindowName: '_blank');
+  };
+});
+
+/// The browser's tabs, which a link on a page can open another page in.
+abstract final class NewTab {
+  /// Whether there are tabs to open: on the web, and in a test that asks.
+  @visibleForTesting
+  static bool web = kIsWeb;
+}
+
+/// Opens [route] in a new tab: a middle click on a link. Off the web it does
+/// nothing, and the press is no click either.
+void openInNewTab(WidgetRef ref, String route) {
+  if (!NewTab.web) {
+    return;
+  }
+  ref.read(newTabOpenerProvider)(Uri.base.resolve(route));
+}
+
+/// Whether a click on a link was meant for a new tab, Ctrl or ⌘ held, in
+/// which case [route] has been opened in one and the click should do nothing
+/// else. Off the web it is a click like any other: a tablet with a keyboard
+/// has no tabs to open.
+bool openedInNewTab(WidgetRef ref, String route) {
+  final keys = HardwareKeyboard.instance;
+  if (!NewTab.web || !(keys.isControlPressed || keys.isMetaPressed)) {
+    return false;
+  }
+  openInNewTab(ref, route);
+  return true;
+}
 
 /// The public pages the app links out to. Two are served by the web build
 /// (`web/privacy.html`, `web/delete-account.html`) and are the URLs declared

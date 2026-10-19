@@ -1,8 +1,16 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garage/core/links/url_opener.dart';
 import 'package:garage/core/theme/garage_tokens.dart';
 import 'package:garage/core/widgets/page_header.dart';
+import 'package:garage/core/widgets/page_scaffold.dart';
 import 'package:garage/l10n/app_localizations.dart';
+
+import '../../support/browser.dart';
+import '../../support/pump_screen.dart';
 
 Future<void> pumpHeader(
   WidgetTester tester,
@@ -17,14 +25,16 @@ Future<void> pumpHeader(
   addTearDown(tester.view.reset);
 
   await tester.pumpWidget(
-    MaterialApp(
-      home: Scaffold(
-        body: PageHeader(
-          title: 'Fuel',
-          actions: actions,
-          onBack: onBack,
-          crumbs: crumbs,
-          trailing: trailing,
+    ProviderScope(
+      child: MaterialApp(
+        home: Scaffold(
+          body: PageHeader(
+            title: 'Fuel',
+            actions: actions,
+            onBack: onBack,
+            crumbs: crumbs,
+            trailing: trailing,
+          ),
         ),
       ),
     ),
@@ -327,6 +337,85 @@ void main() {
         ).map((c) => c.label),
         ['Garage'],
       );
+    });
+  });
+
+  // A crumb is a link, and a browser opens a link in a tab of its own on a
+  // middle click, or on a click with Ctrl or ⌘ held.
+  group('a crumb opened in a new tab', () {
+    late List<Uri> opened;
+
+    Future<NavigationLog> pumpCrumbs(WidgetTester tester) async {
+      opened = [];
+      final log = await pumpDesktop(
+        tester,
+        const GaragePageScaffold(title: 'Fuel', body: SizedBox()),
+        initialLocation: '/vehicles/v1/fuel',
+        overrides: [
+          newTabOpenerProvider.overrideWithValue(
+            (url) async => opened.add(url),
+          ),
+        ],
+      );
+      await tester.pumpAndSettle();
+      return log;
+    }
+
+    Future<void> clickHoldingCtrl(WidgetTester tester) async {
+      await tester.sendKeyDownEvent(LogicalKeyboardKey.controlLeft);
+      await tester.tap(find.byKey(const Key('crumb-/vehicles')));
+      await tester.sendKeyUpEvent(LogicalKeyboardKey.controlLeft);
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('in a browser, by a middle click', (tester) async {
+      asTheWeb(tester);
+      final log = await pumpCrumbs(tester);
+
+      await tester.tap(
+        find.byKey(const Key('crumb-/vehicles')),
+        buttons: kMiddleMouseButton,
+        kind: PointerDeviceKind.mouse,
+      );
+      await tester.pumpAndSettle();
+
+      expect(opened.single.path, '/vehicles');
+      expect(log.visited, isNot(contains('/vehicles')));
+    });
+
+    testWidgets('in a browser, by a click with Ctrl held', (tester) async {
+      asTheWeb(tester);
+      final log = await pumpCrumbs(tester);
+
+      await clickHoldingCtrl(tester);
+
+      expect(opened.single.path, '/vehicles');
+      expect(log.visited, isNot(contains('/vehicles')));
+    });
+
+    testWidgets('off the web, a click with Ctrl held goes there', (
+      tester,
+    ) async {
+      final log = await pumpCrumbs(tester);
+
+      await clickHoldingCtrl(tester);
+
+      expect(opened, isEmpty);
+      expect(log.last, '/vehicles');
+    });
+
+    testWidgets('off the web, a middle click does nothing', (tester) async {
+      final log = await pumpCrumbs(tester);
+
+      await tester.tap(
+        find.byKey(const Key('crumb-/vehicles')),
+        buttons: kMiddleMouseButton,
+        kind: PointerDeviceKind.mouse,
+      );
+      await tester.pumpAndSettle();
+
+      expect(opened, isEmpty);
+      expect(log.visited, isNot(contains('/vehicles')));
     });
   });
 }
