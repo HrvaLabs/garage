@@ -732,12 +732,16 @@ export function makeHandler(deps: Deps) {
       })
     }
 
+    // Archiving leaves a car's rules as they were, still active. The phone
+    // schedules from the garage's cars without the archived ones, and so does
+    // this.
     const { data: rules, error: rulesError } = await admin
       .from('reminder_rules')
       .select(
-        'id, vehicle_id, service_type_key, interval_km, interval_months, one_time, due_date, due_odometer_km',
+        'id, vehicle_id, service_type_key, interval_km, interval_months, one_time, due_date, due_odometer_km, vehicles!inner(archived)',
       )
       .eq('active', true)
+      .eq('vehicles.archived', false)
     if (rulesError) {
       return json({ error: rulesError.message }, 500)
     }

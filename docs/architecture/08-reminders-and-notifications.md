@@ -147,7 +147,7 @@ refuse to start without the `FCM_SERVICE_ACCOUNT` secret, answering 500 before
 it had read a rule. It now reads the secret first and acts on it last
 (`supabase/functions/push-due-reminders/handler.ts:700`): the due items are
 worked out, the hooks are told, and only then are the pushes sent — or, with
-no secret, skipped (`supabase/functions/push-due-reminders/handler.ts:901`).
+no secret, skipped (`supabase/functions/push-due-reminders/handler.ts:905`).
 Hooks first because everything after needs Firebase and can fail for reasons
 of its own — a secret that does not parse, a token exchange Google refuses —
 and none of that is any business of a household's webhooks. Since 0079 the
@@ -166,7 +166,7 @@ is `driver`, who see only the cars the assignment log says are theirs, and
 the member list alone would tell every driver about every van. So the run
 asks `driver_on(car, due day)` for each visit and adds that one person, and
 only while they are still a member of the garage
-(`supabase/functions/push-due-reminders/handler.ts:937`): an assignment
+(`supabase/functions/push-due-reminders/handler.ts:941`): an assignment
 outlives a membership, and a person removed from the garage must not keep
 hearing about the car through the log of having had it.
 
@@ -268,6 +268,12 @@ gave when the car was added counts as a reading, and nothing dated after the
 day of the run does, so a year typed as 2062 cannot put every distance date
 decades out.
 
+Only the rules of cars that are not archived are read
+(`supabase/functions/push-due-reminders/handler.ts:744`). Archiving leaves a
+car's rules active, and until 16 October 2026 the run pushed them anyway,
+which the phone, scheduling from the garage's cars without the archived ones,
+never did.
+
 **What the run considers**, rule by rule:
 
 - A recurring rule by months: the matching service's date plus the interval.
@@ -277,7 +283,7 @@ decades out.
   interval, dated from the furthest reading as above. With both intervals, the
   earlier date.
 - A one-off: its own `due_date`, its own `due_odometer_km` dated the same way
-  (`supabase/functions/push-due-reminders/handler.ts:794`), or the earlier of
+  (`supabase/functions/push-due-reminders/handler.ts:798`), or the earlier of
   the two. The app takes the odometer beside a date only once it has measured
   how the car is driven, which the run never has. The odometer target was not
   read at all until September 2026, so a one-off due only at an odometer was

@@ -526,7 +526,7 @@ free text says who was at the wheel that day.
 
 The daily reminder run tells every member of the garage but its drivers, plus
 whoever `driver_on()` names for the due day, and only while that person is
-still a member (`supabase/functions/push-due-reminders/handler.ts:928`). A
+still a member (`supabase/functions/push-due-reminders/handler.ts:932`). A
 driver is a member whose role names their cars, so the member list alone would
 tell every driver about every van. The same run carries the receipt
 reminders. Both are in [08](08-reminders-and-notifications.md#the-same-run-tells-the-webhooks);

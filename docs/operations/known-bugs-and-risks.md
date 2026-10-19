@@ -1113,6 +1113,24 @@ several releases later.
 
 ## Recently fixed, worth remembering
 
+### An archived car was still reminded of what was due
+
+**Medium, fixed 16 October 2026; since the daily run was written.** The run
+read every active rule and never looked at the car, and archiving leaves a
+car's rules active. So whenever a rule of an archived car came due, every
+phone in its garage was told, and its webhooks were sent `reminder.due`. It
+showed on 16 October, thirty days before Croatia's winter-tyre date, when an
+archived car was told to fit winter tyres. The phone never did this: it
+schedules from `vehiclesProvider`, which leaves archived cars out
+(`lib/features/vehicles/providers/vehicle_providers.dart:95`). The run now
+joins each rule to its car and keeps the cars that are not archived
+(`supabase/functions/push-due-reminders/handler.ts:744`), as the outbox drain
+joins a delivery to its hook. `handler_test.ts` holds the archived car and the
+same car restored, because a join that matched nothing would pass the first
+alone. The fake only answers as PostgREST would, so the query was also run on
+the local stack: an active rule on a kept car and one on an archived car came
+back as the first alone, where the old query returned both.
+
 ### The app-icon shortcuts opened "Page Not Found"
 
 **High, fixed 4 October 2026; broken since each shortcut was added.**

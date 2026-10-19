@@ -505,6 +505,51 @@ Deno.test('a household with a winter set still is', async () => {
   assertEquals(sent.length, 1)
 })
 
+/// The swap tables with the car [archived] or not, and the rules answered as
+/// the database would: active only, and joined to their car, so a filter on
+/// the car is honoured rather than ignored.
+function swapTablesFor({ archived }: { archived: boolean }) {
+  const vehicles = garage.vehicles.map((v) => ({ ...v, archived }))
+  return {
+    ...swapTables('HR', [{ season: 'winter', retired_at: null }]),
+    vehicles,
+    reminder_rules: table([{ ...swapRule, active: true }], undefined, {
+      joins: {
+        vehicles: (rule) => vehicles.find((v) => v.id === rule.vehicle_id),
+      },
+    }),
+  }
+}
+
+Deno.test('an archived car is not reminded of anything', async () => {
+  // Archiving leaves a car's rules as they were, still active. On 16 October
+  // 2026 every archived Croatian car with a seasonal swap was told to fit
+  // winter tyres; the phone, which schedules from the garage's cars without
+  // the archived ones, never was.
+  const { handler, sent } = handlerWith(
+    swapTablesFor({ archived: true }),
+    () => new Response('{}', { status: 200 }),
+    MONTH_BEFORE_WINTER,
+  )
+
+  const response = await handler(run())
+
+  assertEquals(await response.json(), { pushed: 0 })
+  assertEquals(sent, [])
+})
+
+Deno.test('the same car out of the archive is', async () => {
+  const { handler, sent } = handlerWith(
+    swapTablesFor({ archived: false }),
+    () => new Response('{}', { status: 200 }),
+    MONTH_BEFORE_WINTER,
+  )
+
+  await handler(run())
+
+  assertEquals(sent.length, 1, 'a filter that drops every rule is no fix')
+})
+
 Deno.test('the country decides the date', async () => {
   // Slovenia comes out of winter on 15 March; 30 days before that is
   // 13 February, so on 16 October there is nothing yet to say.
