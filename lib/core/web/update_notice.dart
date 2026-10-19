@@ -51,9 +51,10 @@ bool isNewerBuild({required String running, required String? published}) {
 ///
 /// A browser runs the build it loaded until the page is loaded again, and a
 /// desk leaves the app open for days, so a fix shipped on Monday was still
-/// missing on Friday. The check runs when the tab comes back into view and
-/// every half hour; the notice waits for the reader to reload rather than
-/// reloading for them, because a half-typed fill-up would go with the page.
+/// missing on Friday. The check runs once the first frame is drawn, when the
+/// tab comes back into view and every half hour; the notice waits for the
+/// reader to reload rather than reloading for them, because a half-typed
+/// fill-up would go with the page.
 class UpdateNotice extends ConsumerStatefulWidget {
   const UpdateNotice({required this.child, super.key});
 

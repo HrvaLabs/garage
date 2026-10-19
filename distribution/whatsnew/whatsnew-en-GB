@@ -1,10 +1,9 @@
 A company garage can now invite someone straight in as a driver.
+A large tablet held sideways gets the computer layout: a sidebar, and a top bar with each page's main action and Add.
 Fixes:
 • Archived vehicles no longer get reminders
 • A driver's service closes its one-time reminder
 • An incident reported with no signal is sent later
 • Drivers see a Cars tab, and only buttons they can use
-• A problem noted after midnight is dated that day
-• A backup waits for a signal instead of saving old copies
 • Offline edits are no longer lost after a slow save
 • Old reminders the phone set itself no longer arrive

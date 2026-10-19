@@ -1,10 +1,9 @@
 Un garage aziendale ora può invitare qualcuno come autista.
+Un tablet grande in orizzontale ha il layout desktop: barra laterale e, in alto, l'azione principale e Aggiungi.
 Correzioni:
 • I veicoli archiviati non ricevono promemoria
 • Un intervento dell'autista chiude il promemoria una tantum
 • Un incidente offline parte col segnale
 • Per gli autisti: scheda Auto e solo i loro pulsanti
-• Un problema segnalato dopo mezzanotte ha la data giusta
-• Il backup aspetta il segnale, non salva dati vecchi
 • Le modifiche offline restano dopo un salvataggio lento
 • I vecchi promemoria del telefono non arrivano più

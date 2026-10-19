@@ -68,6 +68,12 @@ List<Crumb> sectionCrumbs(
 class Breadcrumbs extends StatelessWidget {
   const Breadcrumbs({required this.crumbs, super.key});
 
+  /// How far a crumb's target reaches past its text on every side. Bare, the
+  /// target was the small text alone, and on a tablet held sideways a crumb
+  /// is touched. [PageHeader] gives up as much of its margin, so the text
+  /// stays where it was.
+  static const double reach = GarageTokens.space1;
+
   final List<Crumb> crumbs;
 
   @override
@@ -79,7 +85,9 @@ class Breadcrumbs extends StatelessWidget {
       crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         for (final (index, crumb) in crumbs.indexed) ...[
-          if (index > 0) ExcludeSemantics(child: Text('  ›  ', style: style)),
+          // One space each side where there were two: the targets' own
+          // padding is the rest of the gap.
+          if (index > 0) ExcludeSemantics(child: Text(' › ', style: style)),
           Semantics(
             container: true,
             link: true,
@@ -90,7 +98,10 @@ class Breadcrumbs extends StatelessWidget {
               // the section on top of the page under it, and back would lead
               // down again.
               onTap: () => context.go(crumb.route),
-              child: Text(crumb.label, style: style),
+              child: Padding(
+                padding: const EdgeInsets.all(reach),
+                child: Text(crumb.label, style: style),
+              ),
             ),
           ),
         ],
@@ -139,23 +150,29 @@ class PageHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final materialL10n = MaterialLocalizations.of(context);
+    // A crumb's target reaches past its text, so the crumbs take that much of
+    // the bar's margin, at the left and, when there are crumbs, at the top,
+    // and the arrow and the title are inset by it: the crumbs' text, the
+    // title's start and the arrow stay where they were.
+    const reach = Breadcrumbs.reach;
 
     return Padding(
-      padding: const EdgeInsets.fromLTRB(
-        GarageTokens.space4,
-        GarageTokens.space4,
+      padding: EdgeInsets.fromLTRB(
+        GarageTokens.space4 - reach,
+        crumbs.isEmpty ? GarageTokens.space4 : GarageTokens.space4 - reach,
         GarageTokens.space4,
         GarageTokens.space3,
       ),
       child: Row(
         children: [
           if (onBack != null) ...[
+            const SizedBox(width: reach),
             IconButton(
               onPressed: onBack,
               tooltip: materialL10n.backButtonTooltip,
               icon: const Icon(Icons.arrow_back),
             ),
-            const SizedBox(width: GarageTokens.space2),
+            const SizedBox(width: GarageTokens.space2 - reach),
           ],
           Expanded(
             child: Column(
@@ -163,10 +180,13 @@ class PageHeader extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (crumbs.isNotEmpty) Breadcrumbs(crumbs: crumbs),
-                Text(
-                  title,
-                  style: theme.textTheme.headlineSmall,
-                  overflow: TextOverflow.ellipsis,
+                Padding(
+                  padding: const EdgeInsets.only(left: reach),
+                  child: Text(
+                    title,
+                    style: theme.textTheme.headlineSmall,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ],
             ),

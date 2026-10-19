@@ -69,21 +69,21 @@ Chrome or the load, and whether a person's Chrome ever does it, is not known.
 Until it is, a look that stops answering needs a new browser, not a fix to
 the page.
 
-### On a desk, the not-found page's pushed links do nothing
+### In a headless browser, the first load after signing in answers 401 until Retry
 
-**Low; found 18 October 2026.** At an address nothing matches, a wide window
-shows `NotFoundScreen` with the sidebar (decision 198). Its four tab links and
-"Go to the dashboard" work, because they go. Everything else in the sidebar
-pushes (`lib/core/widgets/garage_sidebar.dart:186`): Garage, the tools, the
-tour, Settings, Your data, About and the signed-in person's row. A push from
-that page leaves it on screen. In go_router 17.3.0, `RouteMatchList.push`
-builds the new configuration from the current one, its error included, and
-the router then draws only the error page. Nothing is thrown or logged; the
-click does nothing. The rail's links outside the tabs pushed too, so this is
-not new with the sidebar. The fix is for a link to go rather than push while
-the router's configuration is an error, which `pageLocation` already reads
-(`lib/core/router/page_location.dart:23`): there is nothing on that page to
-come back to.
+**Unknown for people; seen 18 October 2026.** Looking at the web build in a
+headless browser against the local stack, the first load after signing in
+through the form failed: `households`, `household_members` and the
+`guest_vehicles` RPC answered `401`, and the dashboard said "Something went
+wrong. Please try again." Retry loaded it, and the same token read
+`households` moments later, in the page and from a script. It happened on the
+build before decision 198's desktop shell and on the build with it alike, so
+the shell did not bring it. A script that signs in and makes the same three
+reads 34 to 134 ms after the token arrives got `200` on all of them, five
+times out of five, so it is not the server's clock or timing: whatever the
+page sends on its first fetch after the form is what is refused. It has not
+been seen on a device and has not been investigated; it is worth one look,
+against the real project too, before a first sign-in on the web is trusted.
 
 ### A second handover on the same day is refused
 
@@ -537,7 +537,7 @@ projections resolved, for exactly that reason.
 
 **Attempted again, 4 September 2026, and not reproduced — with a reason worth
 writing down.** The dashboard's own harness cannot produce it: `pumpDashboard`
-(`test/features/dashboard/dashboard_screen_test.dart:103`) overrides
+(`test/features/dashboard/dashboard_screen_test.dart:104`) overrides
 `bundlesProvider`, `householdProjectionsProvider`, `allVehiclesProvider` and
 every provider they derive from, so the listeners fire against futures the test
 supplies and never against the real graph being invalidated mid-build. Any
@@ -1000,6 +1000,26 @@ several releases later.
 
 ## Recently fixed, worth remembering
 
+### On a desk, the not-found page's pushed links did nothing
+
+**Low, fixed 18 October 2026; found the same day, and as old as the page.**
+At an address nothing matches, a wide window shows `NotFoundScreen` with the
+sidebar (decision 198). Its tab links and "Go to the dashboard" worked,
+because they go. Everything else in the sidebar pushed: Garage, the tools, the
+tour, Settings, Your data, About and the signed-in person's row, and a push
+from that page left it on screen. In go_router 17.3.0, `RouteMatchList.push`
+builds the new configuration from the current one, its error included, and
+the router then draws only the error page. Nothing was thrown or logged; the
+click did nothing. The rail's links outside the tabs pushed too, so it was not
+new with the sidebar. A link and the person's row now go rather than push
+while the router's configuration is an error
+(`lib/core/router/page_location.dart:41`, read at
+`lib/core/widgets/garage_sidebar.dart:188` and
+`lib/core/widgets/garage_sidebar.dart:434`): there is nothing on that page to
+come back to. `test/core/router/not_found_screen_test.dart:151` opens the
+app's own router at an unknown address on a desk and leaves it by the tour's
+link and by the person's row.
+
 ### A page's own act joining the top bar built its Add again
 
 **Low, caught before shipping, 18 October 2026.** The top bar wrapped each
@@ -1008,11 +1028,11 @@ joined the slot ahead of Add, as a car's documents or parts finished loading,
 Flutter paired the two wrappers by position and built Add again from nothing.
 A choice made in the quick-add dialog meanwhile then found its button gone and
 did nothing. Each widget now has a gap beside it instead
-(`lib/core/widgets/page_header.dart:178`), and Add carries a key of its own,
+(`lib/core/widgets/page_header.dart:198`), and Add carries a key of its own,
 so it is matched with itself whatever joins it.
-`test/core/widgets/page_header_test.dart:152` adds a widget ahead of another
+`test/core/widgets/page_header_test.dart:215` adds a widget ahead of another
 and takes it away, and the second stays the same element throughout;
-`test/core/widgets/page_header_test.dart:180` does it with two of a kind,
+`test/core/widgets/page_header_test.dart:243` does it with two of a kind,
 told apart by their keys.
 
 ### An edit made with no signal was lost when the save it changed had landed
@@ -1196,7 +1216,7 @@ auto" are not, so the word was the owner's to choose. On 20 September the
 owner chose "Cars", "Auti" and "Auto", for a driver only. The bottom bar and
 the sidebar read the role and take that label for the cars tab
 (`lib/core/widgets/garage_bottom_nav.dart:60`,
-`lib/core/widgets/garage_sidebar.dart:84`); everybody else keeps
+`lib/core/widgets/garage_sidebar.dart:85`); everybody else keeps
 "Vehicles". `test/core/widgets/garage_bottom_nav_test.dart` holds the new
 label to one word in every language with the others, and asks for both
 roles at phone and desktop width. Decision 194.
@@ -3326,13 +3346,14 @@ orphaned `flutter_tools` processes that make every subsequent run look slow —
 apparent hangs everywhere.
 
 ### Four features had one way in on a phone, and the fix shipped desktop-only
-`_SidebarLinks` gathered Garage, Statistics, the trip log, fuel stations and
-the calculator, under a comment stating the problem — "Width a phone does not
-have is width to stop hiding things: these are otherwise reachable only through
-Settings" — and rendered only above 1200px. On a phone, three of those were
-unlabelled dashboard icons and the **trip log had a single conditional entry
-point**: a timeline row that exists only once a trip has already been logged. A
-feature reachable only after you have used it is not reachable.
+`_SidebarLinks` (since replaced by `GarageSidebar`) gathered Garage,
+Statistics, the trip log, fuel stations and the calculator, under a comment
+stating the problem — "Width a phone does not have is width to stop hiding
+things: these are otherwise reachable only through Settings" — and rendered
+only above 1200px. On a phone, three of those were unlabelled dashboard icons
+and the **trip log had a single conditional entry point**: a timeline row that
+exists only once a trip has already been logged. A feature reachable only
+after you have used it is not reachable.
 
 The list now lives in one place (`lib/core/widgets/secondary_destinations.dart`)
 and feeds both the sidebar and the **More** tab, so the phone and desktop

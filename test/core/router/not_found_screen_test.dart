@@ -13,6 +13,8 @@ import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/features/household/data/garage_bootstrap_cache.dart';
 import 'package:garage/features/household/providers/household_providers.dart';
 import 'package:garage/l10n/app_localizations.dart';
+import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../support/fake_repositories.dart';
@@ -127,51 +129,7 @@ void main() {
   ) async {
     // go_router builds this page with no route state behind it, which is
     // what the sidebar reads to know where a page is.
-    tester.view.devicePixelRatio = 1;
-    tester.view.physicalSize = desktopSurface;
-    addTearDown(tester.view.reset);
-    tester.binding.platformDispatcher.defaultRouteNameTestValue =
-        '/no-such-page';
-    addTearDown(
-      tester.binding.platformDispatcher.clearDefaultRouteNameTestValue,
-    );
-    final container = ProviderContainer(
-      overrides: [
-        currentUserProvider.overrideWithValue(
-          const User(
-            id: 'u1',
-            appMetadata: {},
-            userMetadata: {},
-            aud: 'authenticated',
-            createdAt: '2026-01-01T00:00:00Z',
-          ),
-        ),
-        currentHouseholdProvider.overrideWith(
-          (ref) => Future.value(testHousehold),
-        ),
-        readCacheStoreProvider.overrideWithValue(const NoReadCacheStore()),
-        garageBootstrapRepositoryProvider.overrideWithValue(
-          FakeGarageBootstrapRepository(roles: {testHousehold.id: 'admin'}),
-        ),
-        garageBootstrapCacheProvider.overrideWithValue(
-          const NoGarageBootstrapCache(),
-        ),
-      ],
-    );
-    addTearDown(container.dispose);
-
-    await tester.pumpWidget(
-      UncontrolledProviderScope(
-        container: container,
-        child: MaterialApp.router(
-          localizationsDelegates: garageLocalizationsDelegates,
-          supportedLocales: AppLocalizations.supportedLocales,
-          routerConfig: container.read(appRouterProvider),
-          builder: (context, child) => GarageAppFrame(child: child!),
-        ),
-      ),
-    );
-    await tester.pumpAndSettle();
+    await pumpDeskAt(tester, '/no-such-page');
 
     expect(tester.takeException(), isNull);
     expect(find.byType(NotFoundScreen), findsOneWidget);
@@ -187,4 +145,79 @@ void main() {
     ];
     expect(lit, isEmpty, reason: 'no link holds an address nothing matches');
   });
+
+  // go_router builds a push from the configuration it is showing, its error
+  // included, and draws this page again: pushed, a link went nowhere.
+  group('on a desk the sidebar leads away from it', () {
+    testWidgets('by a link that is not a tab', (tester) async {
+      final router = await pumpDeskAt(tester, '/no-such-page');
+
+      await tester.tap(find.byKey(const Key('sidebar-/tour')));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(NotFoundScreen), findsNothing);
+      expect(router.routerDelegate.currentConfiguration.isError, isFalse);
+      expect(router.routerDelegate.currentConfiguration.uri.path, '/tour');
+    });
+
+    testWidgets('and by the person, to Settings', (tester) async {
+      SharedPreferences.setMockInitialValues({});
+      final router = await pumpDeskAt(tester, '/no-such-page');
+
+      await tester.tap(find.byKey(const Key('sidebar-account')));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(NotFoundScreen), findsNothing);
+      expect(router.routerDelegate.currentConfiguration.isError, isFalse);
+      expect(router.routerDelegate.currentConfiguration.uri.path, '/settings');
+    });
+  });
+}
+
+/// The app's own router and frame in a desk's window, opened at [address].
+Future<GoRouter> pumpDeskAt(WidgetTester tester, String address) async {
+  tester.view.devicePixelRatio = 1;
+  tester.view.physicalSize = desktopSurface;
+  addTearDown(tester.view.reset);
+  tester.binding.platformDispatcher.defaultRouteNameTestValue = address;
+  addTearDown(tester.binding.platformDispatcher.clearDefaultRouteNameTestValue);
+  final container = ProviderContainer(
+    overrides: [
+      currentUserProvider.overrideWithValue(
+        const User(
+          id: 'u1',
+          appMetadata: {},
+          userMetadata: {},
+          aud: 'authenticated',
+          createdAt: '2026-01-01T00:00:00Z',
+        ),
+      ),
+      currentHouseholdProvider.overrideWith(
+        (ref) => Future.value(testHousehold),
+      ),
+      readCacheStoreProvider.overrideWithValue(const NoReadCacheStore()),
+      garageBootstrapRepositoryProvider.overrideWithValue(
+        FakeGarageBootstrapRepository(roles: {testHousehold.id: 'admin'}),
+      ),
+      garageBootstrapCacheProvider.overrideWithValue(
+        const NoGarageBootstrapCache(),
+      ),
+    ],
+  );
+  addTearDown(container.dispose);
+  final router = container.read(appRouterProvider);
+
+  await tester.pumpWidget(
+    UncontrolledProviderScope(
+      container: container,
+      child: MaterialApp.router(
+        localizationsDelegates: garageLocalizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        routerConfig: router,
+        builder: (context, child) => GarageAppFrame(child: child!),
+      ),
+    ),
+  );
+  await tester.pumpAndSettle();
+  return router;
 }

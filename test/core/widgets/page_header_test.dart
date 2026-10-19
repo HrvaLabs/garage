@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:garage/core/theme/garage_tokens.dart';
 import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/l10n/app_localizations.dart';
 
@@ -119,6 +120,68 @@ void main() {
       tester.getSemantics(find.byKey(const Key('crumb-/vehicles'))),
       isSemantics(label: 'Vehicles', isLink: true, hasTapAction: true),
     );
+  });
+
+  group('a crumb', () {
+    const crumbs = [
+      Crumb('Vehicles', '/vehicles'),
+      Crumb('Golf', '/vehicles/v1'),
+    ];
+
+    // Bare, a crumb's target was its small text, 16 pixels high, and on a
+    // tablet held sideways a crumb is touched rather than clicked.
+    testWidgets('is a target bigger than its text', (tester) async {
+      await pumpHeader(tester, const Size(1500, 1000), crumbs: crumbs);
+
+      for (final crumb in crumbs) {
+        final target = tester.getSize(find.byKey(Key('crumb-${crumb.route}')));
+        final text = tester.getSize(find.text(crumb.label));
+        expect(
+          target.height,
+          greaterThanOrEqualTo(text.height + 2 * GarageTokens.space1),
+          reason: crumb.label,
+        );
+        expect(
+          target.width,
+          greaterThanOrEqualTo(text.width + 2 * GarageTokens.space1),
+          reason: crumb.label,
+        );
+      }
+    });
+
+    testWidgets('answers out to the edges of that target', (tester) async {
+      await pumpHeader(tester, const Size(1500, 1000), crumbs: crumbs);
+
+      final first = find.byKey(const Key('crumb-/vehicles'));
+      for (final at in const [Alignment.centerLeft, Alignment.topCenter]) {
+        expect(first.hitTestable(at: at), findsOneWidget, reason: '$at');
+      }
+    });
+
+    testWidgets('leaves its text, the title and the arrow where they were', (
+      tester,
+    ) async {
+      await pumpHeader(tester, const Size(1500, 1000), crumbs: crumbs);
+
+      expect(
+        tester.getTopLeft(find.text('Vehicles')),
+        const Offset(GarageTokens.space4, GarageTokens.space4),
+      );
+      expect(tester.getTopLeft(find.text('Fuel')).dx, GarageTokens.space4);
+
+      await pumpHeader(
+        tester,
+        const Size(1500, 1000),
+        crumbs: crumbs,
+        onBack: () {},
+      );
+
+      final arrow = find.byType(IconButton);
+      expect(tester.getTopLeft(arrow).dx, GarageTokens.space4);
+      final column = tester.getTopRight(arrow).dx + GarageTokens.space2;
+      expect(tester.getTopLeft(find.text('Fuel')).dx, column);
+      expect(tester.getTopLeft(find.text('Vehicles')).dx, column);
+    });
   });
 
   testWidgets('what every page offers comes after the page\'s own actions', (

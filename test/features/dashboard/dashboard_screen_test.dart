@@ -23,6 +23,7 @@ import 'package:garage/domain/maintenance/bundling.dart';
 import 'package:garage/domain/maintenance/reminder_projection.dart';
 import 'package:garage/features/costs/providers/cost_providers.dart';
 import 'package:garage/features/dashboard/providers/dashboard_providers.dart';
+import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/core/widgets/skeleton.dart';
 import 'package:garage/features/dashboard/screens/dashboard_screen.dart';
 import 'package:garage/features/fuel/providers/fuel_providers.dart';
@@ -453,6 +454,34 @@ void main() {
 
     expect(find.byTooltip('Statistics'), findsNothing);
     expect(find.byTooltip('Calculator'), findsNothing);
+  });
+
+  testWidgets('nor has a window where the sidebar is icons alone', (
+    tester,
+  ) async {
+    await pumpDashboard(
+      tester,
+      vehicles: [testVehicle('v1', nickname: 'Golf')],
+      surface: const Size(1000, 800),
+    );
+    await tester.pumpAndSettle();
+
+    // Scoped to the top bar: between 900 and 1200 the sidebar draws the same
+    // three links as icons, named in tooltips.
+    expect(find.byType(PageHeader), findsOneWidget);
+    for (final icon in const [
+      Icons.local_gas_station_outlined,
+      Icons.calculate_outlined,
+      Icons.query_stats,
+    ]) {
+      expect(
+        find.descendant(
+          of: find.byType(PageHeader),
+          matching: find.byIcon(icon),
+        ),
+        findsNothing,
+      );
+    }
   });
 
   testWidgets('an empty garage still says which garage it is', (tester) async {

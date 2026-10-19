@@ -2879,7 +2879,8 @@ way the total and the save do.
   lists come from `lib/core/widgets/secondary_destinations.dart`, which the
   More page also reads, so the two cannot drift.
 - The dashboard's app bar has no icons on desktop: the three it had were the
-  sidebar's own links a second time, unlabelled.
+  sidebar's own links a second time, unlabelled (from 900 pixels since
+  decision 198, whose compact sidebar names the same three in tooltips).
 - The metrics strip sits at its own width instead of spreading three
   figures across a thousand pixels, and the "What next" card lives in the
   left column rather than as a band across the page.
@@ -6619,7 +6620,7 @@ delete.
 
 - A row under "Recent activity" opens its entry as the Timeline does
   (`lib/features/timeline/open_timeline_entry.dart:22`,
-  `lib/features/dashboard/screens/dashboard_screen.dart:615`), and the heading
+  `lib/features/dashboard/screens/dashboard_screen.dart:616`), and the heading
   opens the Timeline.
 - The three figures open where each is explained: the cars, statistics on its
   costs tab, and statistics
@@ -7576,8 +7577,8 @@ keeps its 48. *Cost:* on a touch tablet, filled and outlined buttons go from
 48 to 40; a text button and `inlineButton`, 40 pixels to see with a padded
 48-pixel target, become 32 to see and 32 to touch, a target 16 pixels
 smaller, the console's Hand over and a webhook's Resume among them; and every
-other control loses its padded 48-pixel target, icon buttons, checkboxes and
-switches to 40 and a radio button to 32. The ripple that answers a tap goes
+other control with a padded 48-pixel target loses it, icon buttons, checkboxes
+and switches to 40 and a radio button to 32. The ripple that answers a tap goes
 too. Gating the density on the web alone would be a line or two in
 `GarageTheme.desktop`, should a tablet's owner mind.
 
@@ -7603,26 +7604,30 @@ floating button sat, and a notice covered it while it showed; a desk has none
 now, its main act being in the top bar (below).
 
 **A sidebar, not a rail.** `GarageSidebar` replaced `NavigationRail` in both
-scaffolds: five primaries (the four tabs and the garage's people), the tools
-(the console first for an admin on the plan), then the tour, Settings, Your
-data and About, then the signed-in person, who opens Settings. Labelled at 240
-pixels from 1200, icons with tooltips between 900 and 1200. The rail could not
-hold groups or a person, and its destinations had to be tabs, which is why
-Statistics was lit as nothing. Now the link a page sits under is lit, found
-from the page's own address. "More" is a phone's tab only: a sidebar with room
-for everything has nothing to fold.
+scaffolds: the garage on screen at the top, at either width a menu of them when
+there is more than one, then five primaries (the four tabs and the garage's
+people), the tools (the console first for an admin on the plan), then the tour,
+Settings, Your data and About, then the signed-in person, who opens Settings.
+Labelled at 240 pixels from 1200, icons with tooltips between 900 and 1200. The
+rail could not hold groups or a person, and its destinations had to be tabs,
+which is why Statistics was lit as nothing. Now the link a page sits under is
+lit, found from the page's own address. "More" is a phone's tab only: a sidebar
+with room for everything has nothing to fold.
 
 A link does nothing on the page it names; one lit because the page sits under
-it opens its section, so Vehicles on a car's fuel log goes to the list. A
-driver's Vehicles reads "Cars" here as on the bar (decision 194). The page for
-an address nothing matches is the one page go_router builds without route
-state, so it reads the router's address instead. *Cost:* between 900 and 1200
-the More tab goes with the rail, and More holds two rows the sidebar does not:
-Waiting to sync, which the tour opens, as does the banner while anything
-waits, and the privacy policy, which About opens. The sidebar is still drawn
-inside every page rather than around the router, which is what lets a page
-know its own address, and what the cross-fade between pages still has to
-hide.
+it goes to its section, as the crumb beside it does, so Vehicles on a car's
+fuel log goes to the list. Pushed, as it was at first, it put Garage on top of
+merging garages, and back led down again. A driver's Vehicles reads "Cars" here
+as on the bar (decision 194). The page for an address nothing matches is the
+one page go_router builds without route state, so it reads the router's address
+instead; and from it every link goes, the person's row too: go_router builds a
+push from the configuration it is showing, its error included, so a pushed link
+drew the same page again. *Cost:* between 900 and 1200 the More tab goes with
+the rail, and More holds two rows the sidebar does not: Waiting to sync, which
+the tour opens, as does the banner while anything waits, and the privacy
+policy, which About opens. The sidebar is still drawn inside every page rather
+than around the router, which is what lets a page know its own address, and
+what the cross-fade between pages still has to hide.
 
 **A top bar with a breadcrumb.** A page's title and its actions span the
 content pane above a rule, where they were a heading held to the text column:
@@ -7631,7 +7636,10 @@ column too (decision 32). The bar's far end has a slot for what a page offers
 beyond its own actions. A page below a section says where it sits, read from
 its address: `Vehicles › Golf` above a car's fuel log, `Garage` above merging
 garages. Each crumb is a link, and is gone to rather than pushed, since it
-leads up. A driver's Vehicles reads "Cars" there too (decision 194). The
+leads up. Its target reaches four pixels past its text on every side, since on
+a tablet held sideways a crumb is touched; the bar gives up as much of its
+margin, so the text keeps its place and a page with crumbs has a bar four
+pixels taller. A driver's Vehicles reads "Cars" there too (decision 194). The
 car's crumb waits for the car's name: while the car loads, or for a car the
 startup fetch does not know, the crumbs stop at Vehicles rather than read
 `Vehicles › Vehicles`, and when the name comes it joins the row the section's

@@ -21,8 +21,9 @@ class SidebarLink {
   final IconData icon;
   final String route;
 
-  /// A tab is gone to, replacing the page; anything else is pushed, so the
-  /// page's own back and the browser's return to where the reader was.
+  /// A tab is gone to, replacing the page. Anything else is pushed, so the
+  /// page's own back and the browser's return to where the reader was,
+  /// unless the page sits under it: then the link leads up, and is gone to.
   final bool tab;
 }
 
@@ -174,13 +175,17 @@ class _SidebarItem extends StatelessWidget {
   final bool here;
   final bool extended;
 
-  /// Nothing on the page the link names. A link lit because the page sits
-  /// under it, Vehicles on a car's fuel log, opens its section.
+  /// Nothing on the page the link names. A tab is gone to, and so is a link
+  /// lit because the page sits under it, Vehicles on a car's fuel log or
+  /// Garage on merging garages: it leads up to its section, as the crumb
+  /// beside it does, where a push would put the section on top of its own
+  /// page. Anything else is pushed, except from the page for an address
+  /// nothing matches, where a push goes nowhere ([atUnknownAddress]).
   void _open(BuildContext context) {
     if (here) {
       return;
     }
-    if (link.tab) {
+    if (link.tab || selected || atUnknownAddress(context)) {
       context.go(link.route);
     } else {
       context.push(link.route);
@@ -263,7 +268,8 @@ class _SidebarItem extends StatelessWidget {
 }
 
 /// Which garage you are looking at, at the top: the thing a phone has no
-/// room to show. A menu only where there is something to choose.
+/// room to show. A menu only where there is something to choose, labelled or
+/// not: the garage's name with an arrow from 1200 pixels, its icon below.
 class _GarageSwitcher extends ConsumerWidget {
   const _GarageSwitcher({required this.extended});
 
@@ -274,13 +280,57 @@ class _GarageSwitcher extends ConsumerWidget {
     final l10n = AppLocalizations.of(context)!;
     final household = ref.watch(currentHouseholdProvider).value;
     final households = ref.watch(myHouseholdsProvider).value ?? const [];
+
+    Widget menu({required String tooltip, required Widget child}) =>
+        PopupMenuButton<String>(
+          key: const Key('sidebar-garage-switcher'),
+          tooltip: tooltip,
+          position: PopupMenuPosition.under,
+          borderRadius: BorderRadius.circular(GarageTokens.radiusSm),
+          onSelected: (id) =>
+              ref.read(householdControllerProvider.notifier).switchTo(id),
+          itemBuilder: (context) => [
+            for (final option in households)
+              PopupMenuItem(
+                value: option.id,
+                child: Row(
+                  children: [
+                    Icon(
+                      option.id == household?.id
+                          ? Icons.radio_button_checked
+                          : Icons.radio_button_unchecked,
+                      size: 18,
+                    ),
+                    const SizedBox(width: GarageTokens.space3),
+                    Flexible(child: Text(option.name)),
+                  ],
+                ),
+              ),
+          ],
+          child: child,
+        );
+
     if (!extended) {
-      final icon = Icon(Icons.garage_outlined, color: context.tokens.muted);
+      // A link's tile in size, so the target and the shape a hover draws
+      // match the links' below.
+      final icon = SizedBox(
+        height: 40,
+        child: Center(
+          child: Icon(Icons.garage_outlined, color: context.tokens.muted),
+        ),
+      );
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: GarageTokens.space4),
-        child: household == null
-            ? icon
-            : Tooltip(message: household.name, child: icon),
+        padding: const EdgeInsets.all(GarageTokens.space2),
+        child: households.length < 2
+            ? household == null
+                  ? icon
+                  : Tooltip(message: household.name, child: icon)
+            // Named on hover, as with one garage: the name is what the
+            // icon cannot show, and the menu says the rest.
+            : menu(
+                tooltip: household?.name ?? l10n.householdSwitch,
+                child: icon,
+              ),
       );
     }
     final name = Text(
@@ -299,30 +349,8 @@ class _GarageSwitcher extends ConsumerWidget {
         alignment: Alignment.centerLeft,
         child: households.length < 2
             ? name
-            : PopupMenuButton<String>(
-                key: const Key('sidebar-garage-switcher'),
+            : menu(
                 tooltip: l10n.householdSwitch,
-                position: PopupMenuPosition.under,
-                onSelected: (id) =>
-                    ref.read(householdControllerProvider.notifier).switchTo(id),
-                itemBuilder: (context) => [
-                  for (final option in households)
-                    PopupMenuItem(
-                      value: option.id,
-                      child: Row(
-                        children: [
-                          Icon(
-                            option.id == household?.id
-                                ? Icons.radio_button_checked
-                                : Icons.radio_button_unchecked,
-                            size: 18,
-                          ),
-                          const SizedBox(width: GarageTokens.space3),
-                          Flexible(child: Text(option.name)),
-                        ],
-                      ),
-                    ),
-                ],
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -397,8 +425,15 @@ class _SignedIn extends ConsumerWidget {
     final tile = InkWell(
       key: const Key('sidebar-account'),
       borderRadius: BorderRadius.circular(GarageTokens.radiusSm),
+      // Pushed, as a link that is not a tab is, and gone to from the page for
+      // an address nothing matches, where a push goes nowhere.
       onTap: () {
-        if (!here) {
+        if (here) {
+          return;
+        }
+        if (atUnknownAddress(context)) {
+          context.go('/settings');
+        } else {
           context.push('/settings');
         }
       },

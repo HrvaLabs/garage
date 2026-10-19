@@ -62,7 +62,7 @@ Four rules explain most of the code:
 | [09-errors-and-diagnostics.md](architecture/09-errors-and-diagnostics.md) | Failure mapping, what a user sees, what gets recorded |
 | [10-localization-and-units.md](architecture/10-localization-and-units.md) | The ARB pair, Croatian plurals, where conversion happens |
 | [11-statistics.md](architecture/11-statistics.md) | Periods, rates, breakdowns, and why sections can be hidden |
-| [12-navigation.md](architecture/12-navigation.md) | The five tabs, the "More" tab, reachability, app-bar width, and the launcher's way in |
+| [12-navigation.md](architecture/12-navigation.md) | The five tabs, the "More" tab, the desktop sidebar and top bar, reachability, app-bar width, and the launcher's way in |
 | [13-company.md](architecture/13-company.md) | The company plan: drivers, the assignment log, attribution by resolution, the console, fleet deadlines, reimbursements, incidents, the accountant pack |
 
 ## Decisions and risks

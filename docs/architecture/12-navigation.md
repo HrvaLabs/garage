@@ -12,8 +12,8 @@ a maximum of five in a `NavigationBar`, and all five are spent:
 | Tab | Route | What it answers |
 |---|---|---|
 | Dashboard | `/` | What needs attention now |
-| Garage | `/vehicles` | Which cars, and one car in detail |
 | Timeline | `/timeline` | What happened, searchable |
+| Vehicles | `/vehicles` | Which cars, and one car in detail |
 | Planner | `/planner` | What is coming, and what to group into one visit |
 | More | `/more` | Everything the other four could not hold |
 
@@ -103,7 +103,7 @@ Material caps the bar at five, and the fleet is one thing, however many views
 it has. A driver's Vehicles tab is titled "My cars" on its own page
 (`lib/features/vehicles/screens/vehicles_screen.dart:96`) and labelled "Cars"
 in the bar (`lib/core/widgets/garage_bottom_nav.dart:60`) and the sidebar
-(`lib/core/widgets/garage_sidebar.dart:84`): the bar takes one-word labels by
+(`lib/core/widgets/garage_sidebar.dart:85`): the bar takes one-word labels by
 test, so the tab could not carry the title's two words, and the owner chose the
 word (decision 194).
 See [13](13-company.md#the-console).
@@ -483,10 +483,11 @@ first: somebody signed out is sent to sign in, wherever they were going.
 ## The desktop sidebar
 
 On a wide window both scaffolds draw `GarageSidebar`
-(`lib/core/widgets/garage_sidebar.dart:57`) beside the page in place of the
+(`lib/core/widgets/garage_sidebar.dart:58`) beside the page in place of the
 bottom bar (decisions 81 and 198). From the desktop breakpoint, 1200 pixels, it
 is labelled and 240 wide; between 900 and 1200 it is 72 wide, icons named in
-tooltips. Top to bottom: the garage on screen, a menu when there is more than
+tooltips. Top to bottom: the garage on screen, by name or, below 1200, as an
+icon named in a tooltip, and at either width a menu when there is more than
 one to choose; five primaries, the four tabs and the garage's own screen; the
 tools, from `secondaryDestinations()`, the console first for an admin on the
 plan; the tour, Settings, Your data and About, from `settingsDestinations()`;
@@ -500,20 +501,26 @@ and the privacy policy, which About opens.
 
 The link a page sits under is lit: the one whose route is the longest
 whole-segment prefix of the page's address (`currentLink`,
-`lib/core/widgets/garage_sidebar.dart:32`), so Statistics lights Statistics,
+`lib/core/widgets/garage_sidebar.dart:33`), so Statistics lights Statistics,
 a car's fuel log lights Vehicles, and an address no link holds lights nothing
 rather than the dashboard. `pageLocation`
 (`lib/core/router/page_location.dart:17`) reads that address from the page's
 own route rather than the router's top, so a page under a pushed one still
 knows where it is. A tab is gone to and anything else is pushed, so back
 returns to where the reader was. A link does nothing on the page it names, and
-a lit link on a page under it opens its section.
+a lit link on a page under it goes to its section, as the crumb beside it
+does (`lib/core/widgets/garage_sidebar.dart:188`): it leads up, and pushed, it
+put Garage on top of merging garages, with back leading down again.
 
 The page for an address nothing matches is the one go_router builds without
 route state, and asking for its state throws, so it reads the router's own
 address (`lib/core/router/page_location.dart:23`); as it leaves, still drawn
 while the next page arrives, it reads wherever the router has gone
-(`lib/core/router/page_location.dart:28`). The sidebar is drawn inside each
+(`lib/core/router/page_location.dart:28`). From that page every link goes,
+the signed-in person's row included, where it would otherwise push: go_router
+builds a push from the configuration it is showing, its error included, and
+draws the same page again, so a pushed link did nothing there
+(`lib/core/router/page_location.dart:41`). The sidebar is drawn inside each
 page rather than around the router, which is how a page knows its own address,
 and why the cross-fade between pages still has to hide two sidebars fading
 into each other.
@@ -521,7 +528,7 @@ into each other.
 ## The top bar
 
 On a wide window a page names itself in a top bar, `PageHeader`
-(`lib/core/widgets/page_header.dart:114`), where a phone has its app bar. Both
+(`lib/core/widgets/page_header.dart:125`), where a phone has its app bar. Both
 scaffolds draw it (`lib/core/widgets/page_scaffold.dart:99`,
 `lib/core/widgets/garage_bottom_nav.dart:166`) across the content pane beside
 the sidebar, above a rule; the content keeps its own column under it. The
@@ -557,7 +564,7 @@ choice of a service or a reminder, and on a desk its label names both,
 "Service or reminder", where "Add" read the same as the quick-add beside it;
 on documents and parts a driver is offered no add button there either. The
 slot puts its gap beside each widget rather than around it
-(`lib/core/widgets/page_header.dart:178`), and the quick-add carries a key of
+(`lib/core/widgets/page_header.dart:198`), and the quick-add carries a key of
 its own: wrapped alike, the quick-add was paired with a page's own act joining
 before it as a list loaded, and built again, losing a choice made in its
 dialog meanwhile.
@@ -578,11 +585,16 @@ says where they are. A page may pass its own (`GaragePageScaffold.crumbs`);
 none does.
 
 Each crumb is a link to a screen reader as well as to the pointer, and is
-gone to, not pushed (`lib/core/widgets/page_header.dart:92`). The sidebar
-pushes what is not a tab because that move is sideways and back should undo
-it; a crumb leads up, and pushing the section on top of the page under it
-would make back lead down again. The crumbs know only the address: a car's
-maintenance opened from the planner names Vehicles and the car, not the
-planner, which back returns to; and the page for an address nothing matches,
-under a car, is crumbed as that car's page, as the sidebar lights Vehicles for
-it.
+gone to, not pushed (`lib/core/widgets/page_header.dart:100`). The sidebar
+pushes a link that is neither a tab nor lit because that move is sideways and
+back should undo it; a crumb leads up, as a lit link does, and pushing the
+section on top of the page under it would make back lead down again. A
+crumb's target reaches four pixels past its text on every side
+(`lib/core/widgets/page_header.dart:75`), because on a tablet held sideways it
+is touched, and bare it was the small text alone. The bar gives up as much of
+its margin, so the crumbs' text, the title's start and the back arrow stay
+where they were; a page with crumbs has a bar four pixels taller. The crumbs
+know only the address: a car's maintenance opened from the planner names
+Vehicles and the car, not the planner, which back returns to; and the page for
+an address nothing matches, under a car, is crumbed as that car's page, as the
+sidebar lights Vehicles for it.

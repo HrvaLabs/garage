@@ -189,9 +189,9 @@ class FeaturesScreen extends ConsumerWidget {
 
     return GaragePageScaffold(
       title: l10n.featuresTitle,
-      // Read before signing up as well as after. Every rail destination would
-      // bounce a visitor to the sign-in form, so on that reading it is not
-      // offered.
+      // Read before signing up as well as after. Every link in the sidebar
+      // would bounce a visitor to the sign-in form, so on that reading it is
+      // not offered.
       showNavigation: signedIn,
       body: ListView(
         padding: const EdgeInsets.all(GarageTokens.space4),

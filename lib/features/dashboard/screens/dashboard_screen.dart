@@ -144,9 +144,10 @@ class DashboardScreen extends ConsumerWidget {
       // reading column of stacked cards on a 1500px monitor.
       contentWidth: ContentWidth.wide,
       title: l10n.dashboardTitle,
-      // On a desktop window the sidebar lists all three; the icons were the
-      // same links a second time, unlabelled.
-      actions: GarageBreakpoints.isDesktop(context)
+      // Wherever there is a sidebar it has all three, labelled from 1200 and
+      // named in tooltips below that; the icons were the same links a second
+      // time, unlabelled (decision 81).
+      actions: GarageBreakpoints.isWide(context)
           ? const []
           : [
               IconButton(

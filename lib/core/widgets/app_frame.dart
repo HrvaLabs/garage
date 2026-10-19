@@ -6,10 +6,10 @@ import 'adaptive.dart';
 import 'window_snackbars.dart';
 
 /// What the app puts between `MaterialApp` and every page: the desk's theme
-/// on a wide window ([GarageTheme.desktop]), snackbars sized to the window
-/// and the new-version notice. Whatever else every page should sit inside,
-/// the desktop layer's additions for a wide window included, goes here as
-/// well.
+/// on a wide window ([GarageTheme.desktop]), snackbars sized and placed for
+/// the window and the new-version notice. Whatever else every page should
+/// sit inside, the desktop layer's additions for a wide window included,
+/// goes here as well.
 ///
 /// One widget, used by `lib/main.dart` and by `test/support/pump_screen.dart`,
 /// so a screen test sees the window the app draws in. Before it, the harness

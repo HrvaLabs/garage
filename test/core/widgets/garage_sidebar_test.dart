@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/widgets/garage_bottom_nav.dart';
 import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/page_scaffold.dart';
 import 'package:garage/domain/entities/household.dart';
+import 'package:garage/features/household/providers/current_household.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../support/fake_repositories.dart';
 import '../../support/pump_screen.dart';
 
 const _company = Household(id: 'h1', name: 'Prijevoz', plan: 'company');
@@ -275,7 +279,68 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.text('stub:/household'), findsOneWidget);
+      expect(
+        GoRouter.of(tester.element(find.text('stub:/household'))).canPop(),
+        isFalse,
+        reason:
+            'gone to, as the crumb beside it is: it leads up, and pushed, '
+            'the section sat on top of its own page',
+      );
     });
+  });
+
+  group('with more than one garage', () {
+    const second = Household(id: 'h2', name: 'Vikendica');
+
+    Future<void> pumpTwoGarages(WidgetTester tester, Size surface) async {
+      await pumpScreen(
+        tester,
+        const GarageTabScaffold(
+          current: GarageTab.dashboard,
+          title: 'Page',
+          body: SizedBox(),
+        ),
+        surface: surface,
+        bootstrap: FakeGarageBootstrapRepository(
+          households: const [testHousehold, second],
+          roles: const {'h1': 'admin', 'h2': 'admin'},
+        ),
+      );
+      await tester.pumpAndSettle();
+    }
+
+    for (final surface in const [desktopSurface, Size(1000, 800)]) {
+      testWidgets('the top switches between them at '
+          '${surface.width.toInt()} wide', (tester) async {
+        SharedPreferences.setMockInitialValues({});
+        await pumpTwoGarages(tester, surface);
+
+        await tester.tap(find.byKey(const Key('sidebar-garage-switcher')));
+        await tester.pumpAndSettle();
+        await tester.tap(find.text(second.name));
+        await tester.pumpAndSettle();
+
+        final container = ProviderScope.containerOf(
+          tester.element(find.byType(GarageSidebar)),
+        );
+        expect(container.read(selectedHouseholdIdProvider), second.id);
+      });
+    }
+
+    testWidgets('and between 900 and 1200 still names the one on screen', (
+      tester,
+    ) async {
+      await pumpTwoGarages(tester, const Size(1000, 800));
+
+      expect(find.byTooltip(testHousehold.name), findsOneWidget);
+    });
+  });
+
+  testWidgets('with one garage the top is no menu', (tester) async {
+    await pumpTab(tester, surface: const Size(1000, 800));
+
+    expect(find.byKey(const Key('sidebar-garage-switcher')), findsNothing);
+    expect(find.byTooltip(testHousehold.name), findsOneWidget);
   });
 
   for (final surface in const [Size(1024, 768), Size(1280, 720)]) {

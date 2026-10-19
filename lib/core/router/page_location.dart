@@ -31,3 +31,13 @@ String pageLocation(BuildContext context) {
     return current.uri.path;
   }
 }
+
+/// Whether the router is showing the page for an address nothing matches.
+///
+/// A push from that page goes nowhere: go_router builds the new configuration
+/// from the one it is showing, its error included, and draws the same page
+/// again. What would push from there goes instead, which loses nothing, there
+/// being nothing on that page to come back to.
+bool atUnknownAddress(BuildContext context) =>
+    GoRouter.maybeOf(context)?.routerDelegate.currentConfiguration.isError ??
+    false;
