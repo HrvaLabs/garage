@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 /// desktop presentation.
 abstract final class GarageBreakpoints {
   /// At and above this window width the app drops phone chrome (bottom bar,
-  /// edge-to-edge lists, bottom sheets) for desktop chrome (rail, capped
+  /// edge-to-edge lists, bottom sheets) for desktop chrome (sidebar, capped
   /// column, dialogs).
   static const double wide = 900;
 
-  /// At and above this width the rail carries labels and the shell reads as a
-  /// desktop application rather than a phone app in a column.
+  /// At and above this width the sidebar carries labels and the shell reads as
+  /// a desktop application rather than a phone app in a column.
   static const double desktop = 1200;
 
   /// Reading-width cap. A form or a column of prose stretched across a monitor

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/widgets/garage_bottom_nav.dart';
+import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/page_header.dart';
 import 'package:garage/domain/entities/household.dart';
 import 'package:garage/l10n/app_localizations.dart';
@@ -56,37 +57,17 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(NavigationBar), findsOneWidget);
-    expect(find.byType(NavigationRail), findsNothing);
+    expect(find.byType(GarageSidebar), findsNothing);
   });
 
-  testWidgets('a desktop-width window uses the rail instead', (tester) async {
-    await pumpNav(tester, surface: const Size(1400, 900));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(NavigationRail), findsOneWidget);
-    expect(find.byType(NavigationBar), findsNothing);
-  });
-
-  testWidgets('the desktop sidebar lists what More holds, and no More', (
+  testWidgets('a desktop-width window uses the sidebar instead', (
     tester,
   ) async {
-    // A sidebar with room for every link has nothing to fold: the rail
-    // repeated the whole More list under a "More" that led to it again.
     await pumpNav(tester, surface: const Size(1400, 900));
     await tester.pumpAndSettle();
 
-    expect(find.text('More'), findsNothing);
-    expect(find.text('Settings'), findsOneWidget);
-    expect(find.text('About'), findsOneWidget);
-    expect(find.text('Statistics'), findsOneWidget);
-  });
-
-  testWidgets('the compact rail keeps More', (tester) async {
-    await pumpNav(tester, surface: const Size(1000, 900));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(NavigationRail), findsOneWidget);
-    expect(find.text('More'), findsOneWidget);
+    expect(find.byType(GarageSidebar), findsOneWidget);
+    expect(find.byType(NavigationBar), findsNothing);
   });
 
   group('a driver\'s cars tab', () {
@@ -129,7 +110,13 @@ void main() {
     testWidgets('in the sidebar too', (tester) async {
       await pumpAs(tester, 'driver', surface: const Size(1400, 900));
 
-      expect(find.text('Cars'), findsOneWidget);
+      expect(
+        find.descendant(
+          of: find.byType(GarageSidebar),
+          matching: find.text('Cars'),
+        ),
+        findsOneWidget,
+      );
       expect(find.text('Vehicles'), findsNothing);
     });
   });
@@ -173,92 +160,6 @@ void main() {
         }
       });
     }
-  });
-
-  group('the desktop sidebar', () {
-    testWidgets('carries labels, not bare icons', (tester) async {
-      await pumpNav(tester, surface: const Size(1400, 900));
-      await tester.pumpAndSettle();
-
-      final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-
-      expect(
-        rail.extended,
-        isTrue,
-        reason:
-            'an icon strip beside a narrow column is what made the web '
-            'build read as a phone app',
-      );
-    });
-
-    testWidgets('names the garage you are looking at', (tester) async {
-      await pumpNav(tester, surface: const Size(1400, 900));
-      await tester.pumpAndSettle();
-
-      // The garage's own name. Which one you are in is the question a second
-      // garage makes worth answering at a glance.
-      expect(find.text(testHousehold.name), findsOneWidget);
-    });
-
-    testWidgets('offers what is otherwise buried in settings', (tester) async {
-      await pumpNav(tester, surface: const Size(1400, 900));
-      await tester.pumpAndSettle();
-
-      // Room a phone does not have is room to stop hiding things.
-      expect(find.text('Garage'), findsOneWidget);
-      expect(find.text('Statistics'), findsOneWidget);
-    });
-
-    testWidgets('a tablet-width window keeps the compact rail', (tester) async {
-      await pumpNav(tester, surface: const Size(1000, 900));
-      await tester.pumpAndSettle();
-
-      final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-
-      expect(rail.extended, isFalse);
-      expect(find.text('Garage'), findsNothing);
-    });
-
-    testWidgets('leads with the company console for an admin on the plan', (
-      tester,
-    ) async {
-      await pumpScreen(
-        tester,
-        GarageTabScaffold(
-          current: GarageTab.dashboard,
-          appBar: AppBar(title: const Text('Screen')),
-          body: const SizedBox(),
-        ),
-        surface: const Size(1400, 900),
-        household: const Household(id: 'h1', name: 'Prijevoz', plan: 'company'),
-      );
-      await tester.pumpAndSettle();
-
-      final links = tester
-          .widgetList<ListTile>(find.byType(ListTile))
-          .map((tile) => (tile.title! as Text).data)
-          .toList(growable: false);
-      expect(links.first, 'Company');
-      expect(links, contains('Garage'));
-    });
-
-    testWidgets('keeps the console off a driver\'s sidebar', (tester) async {
-      await pumpScreen(
-        tester,
-        GarageTabScaffold(
-          current: GarageTab.dashboard,
-          appBar: AppBar(title: const Text('Screen')),
-          body: const SizedBox(),
-        ),
-        surface: const Size(1400, 900),
-        household: const Household(id: 'h1', name: 'Prijevoz', plan: 'company'),
-        role: 'driver',
-      );
-      await tester.pumpAndSettle();
-
-      expect(find.text('Company'), findsNothing);
-      expect(find.text('Garage'), findsOneWidget);
-    });
   });
 
   group('page chrome', () {

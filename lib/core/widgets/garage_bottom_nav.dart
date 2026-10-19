@@ -4,10 +4,8 @@ import 'package:garage/l10n/app_localizations.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../features/company/providers/company_providers.dart';
-import '../../features/household/providers/household_providers.dart';
-import '../theme/garage_tokens.dart';
-import 'secondary_destinations.dart';
 import 'adaptive.dart';
+import 'garage_sidebar.dart';
 import 'page_header.dart';
 import 'stale_reads_banner.dart';
 
@@ -76,7 +74,7 @@ List<_Destination> _destinations(
   ),
 ];
 
-void _goTo(BuildContext context, GarageTab? current, int index) {
+void _goTo(BuildContext context, GarageTab current, int index) {
   final tab = GarageTab.values[index];
   if (tab != current) {
     context.go(tabRoutes[tab]!);
@@ -84,8 +82,8 @@ void _goTo(BuildContext context, GarageTab? current, int index) {
 }
 
 /// Scaffold for the four top-level tab screens. Adapts the navigation to the
-/// window: bottom bar on phones, left rail with a centered content column on
-/// desktop-width windows.
+/// window: bottom bar on phones, [GarageSidebar] beside a centred content
+/// column on wide windows.
 class GarageTabScaffold extends StatelessWidget {
   const GarageTabScaffold({
     super.key,
@@ -144,7 +142,7 @@ class GarageTabScaffold extends StatelessWidget {
       appBar: title == null ? appBar : null,
       body: Row(
         children: [
-          GarageNavigationRail(current: current),
+          const GarageSidebar(),
           const VerticalDivider(width: 1),
           Expanded(
             // The content pane is a scaffold of its own, so the floating
@@ -176,69 +174,6 @@ class GarageTabScaffold extends StatelessWidget {
   }
 }
 
-/// The sidebar, shared by the tab scaffold and by pushed pages.
-///
-/// A pushed page passes null: Statistics and the calculator are not tabs, and
-/// highlighting one would claim the reader is somewhere they are not. They
-/// still get the sidebar, because a window with room for it losing its
-/// navigation is a phone's model on a desktop screen — the reader's only way
-/// out was the browser's back button.
-class GarageNavigationRail extends ConsumerWidget {
-  const GarageNavigationRail({required this.current, super.key});
-
-  final GarageTab? current;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    // A labelled sidebar above the desktop breakpoint, a compact icon rail
-    // between that and phone width. An icon strip beside a narrow column was
-    // what made a 1400px window read as a phone app rather than a web app.
-    final desktop = GarageBreakpoints.isDesktop(context);
-
-    // A sidebar with room for every link has nothing to fold: on desktop
-    // "More" is not a destination, and what it holds is listed below the
-    // primaries instead. The compact rail keeps it, as the phone does.
-    final destinations = [
-      for (final destination in _destinations(
-        l10n,
-        driver: ref.watch(isDriverProvider),
-      ))
-        if (!desktop || destination.tab != GarageTab.more) destination,
-    ];
-    final selected = current == null
-        ? null
-        : destinations.indexWhere((d) => d.tab == current);
-
-    return NavigationRail(
-      // Nine links plus five destinations do not fit a 1366x768 laptop's
-      // maximised window, and an unscrollable rail simply overflows.
-      scrollable: true,
-      selectedIndex: selected == null || selected < 0 ? null : selected,
-      onDestinationSelected: (index) => _goTo(
-        context,
-        current,
-        GarageTab.values.indexOf(destinations[index].tab),
-      ),
-      extended: desktop,
-      minExtendedWidth: _sidebarWidth,
-      labelType: desktop ? null : NavigationRailLabelType.all,
-      leading: desktop ? const _SidebarHeader() : null,
-      // Width a phone does not have is width to stop hiding things: these are
-      // otherwise reachable only through More.
-      trailing: desktop ? const _SidebarLinks() : null,
-      destinations: [
-        for (final destination in destinations)
-          NavigationRailDestination(
-            icon: Icon(destination.icon),
-            selectedIcon: Icon(destination.selectedIcon),
-            label: Text(destination.label),
-          ),
-      ],
-    );
-  }
-}
-
 class GarageBottomNav extends ConsumerWidget {
   const GarageBottomNav({required this.current, super.key});
 
@@ -265,126 +200,6 @@ class GarageBottomNav extends ConsumerWidget {
             tooltip: '',
           ),
       ],
-    );
-  }
-}
-
-/// The sidebar's width when extended. The leading and trailing slots are laid
-/// out with unbounded width, so anything put in them has to be constrained to
-/// this or it fails to lay out at all.
-const double _sidebarWidth = 240;
-
-/// Which household you are looking at, at the top of the desktop sidebar.
-///
-/// Not the app's name: the dashboard destination is already called "Garage",
-/// so a header repeating it would say the same word twice. The household is
-/// the thing a phone has no room to show and a desktop does.
-class _SidebarHeader extends ConsumerWidget {
-  const _SidebarHeader();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final household = ref.watch(currentHouseholdProvider).value;
-    final households = ref.watch(myHouseholdsProvider).value ?? const [];
-    final name = Text(
-      household?.name ?? '',
-      style: Theme.of(context).textTheme.titleLarge,
-      overflow: TextOverflow.ellipsis,
-    );
-
-    return SizedBox(
-      width: _sidebarWidth,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          GarageTokens.space4,
-          GarageTokens.space4,
-          GarageTokens.space4,
-          GarageTokens.space6,
-        ),
-        child: Align(
-          alignment: Alignment.centerLeft,
-          // A menu only where there is something to choose. Belonging to one
-          // garage is the ordinary case, and a dropdown arrow beside a name
-          // that cannot change is a promise the app does not keep.
-          child: households.length < 2
-              ? name
-              : PopupMenuButton<String>(
-                  key: const Key('sidebar-garage-switcher'),
-                  tooltip: AppLocalizations.of(context)!.householdSwitch,
-                  position: PopupMenuPosition.under,
-                  onSelected: (id) => ref
-                      .read(householdControllerProvider.notifier)
-                      .switchTo(id),
-                  itemBuilder: (context) => [
-                    for (final option in households)
-                      PopupMenuItem(
-                        value: option.id,
-                        child: Row(
-                          children: [
-                            Icon(
-                              option.id == household?.id
-                                  ? Icons.radio_button_checked
-                                  : Icons.radio_button_unchecked,
-                              size: 18,
-                            ),
-                            const SizedBox(width: GarageTokens.space3),
-                            Flexible(child: Text(option.name)),
-                          ],
-                        ),
-                      ),
-                  ],
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Flexible(child: name),
-                      const Icon(Icons.arrow_drop_down),
-                    ],
-                  ),
-                ),
-        ),
-      ),
-    );
-  }
-}
-
-/// Secondary destinations in the sidebar, from the one list that also feeds
-/// the "More" section in Settings — so a phone and a desktop offer the same
-/// set rather than drifting apart, which is what happened before.
-class _SidebarLinks extends ConsumerWidget {
-  const _SidebarLinks();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l10n = AppLocalizations.of(context)!;
-    final links = secondaryDestinations(
-      l10n,
-      company: ref.watch(companyConsoleVisibleProvider),
-    );
-    final settings = settingsDestinations(l10n);
-
-    Widget row(SecondaryDestination link) => ListTile(
-      dense: true,
-      leading: Icon(link.icon, size: 20),
-      title: Text(link.label),
-      onTap: () => context.push(link.route),
-    );
-    const divider = Divider(
-      indent: GarageTokens.space4,
-      endIndent: GarageTokens.space4,
-    );
-
-    return SizedBox(
-      width: _sidebarWidth,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          divider,
-          for (final link in links) row(link),
-          divider,
-          for (final link in settings) row(link),
-        ],
-      ),
     );
   }
 }

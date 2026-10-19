@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:garage/core/widgets/garage_sidebar.dart';
 import 'package:garage/core/widgets/page_header.dart';
+import 'package:garage/domain/account/account_identity.dart';
+import 'package:garage/features/auth/providers/auth_providers.dart';
 import 'package:garage/features/household/providers/household_providers.dart';
 import 'package:garage/l10n/app_localizations.dart';
 import 'package:garage/core/widgets/page_scaffold.dart';
@@ -12,11 +15,12 @@ Future<NavigationLog> pumpPage(
   WidgetTester tester, {
   required Size surface,
   List<Widget> actions = const [],
+  String initialLocation = '/vehicles/v1/fuel',
 }) {
   return pumpScreen(
     tester,
     GaragePageScaffold(title: 'Fuel', actions: actions, body: const SizedBox()),
-    initialLocation: '/vehicles/v1/fuel',
+    initialLocation: initialLocation,
     surface: surface,
   );
 }
@@ -47,14 +51,18 @@ void main() {
 
     await tester.pumpWidget(
       ProviderScope(
-        // The sidebar names the household, so it needs a scope that answers
-        // for one rather than reaching for a real Supabase client.
+        // The sidebar names the household and the signed-in account, so it
+        // needs a scope that answers for both rather than reaching for a real
+        // Supabase client.
         overrides: [
           currentHouseholdProvider.overrideWith((ref) async => testHousehold),
+          accountIdentityProvider.overrideWithValue(
+            const AccountIdentity(name: 'Karlo', email: 'karlo@example.com'),
+          ),
         ],
         child: MaterialApp(
           // The sidebar is localized, and the real app always has these;
-          // without them the rail throws rather than rendering.
+          // without them it throws rather than rendering.
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: AppLocalizations.supportedLocales,
           home: Builder(
@@ -132,18 +140,36 @@ void main() {
     await pumpPage(tester, surface: const Size(1400, 900));
     await tester.pumpAndSettle();
 
-    expect(find.byType(NavigationRail), findsOneWidget);
+    expect(find.byType(GarageSidebar), findsOneWidget);
   });
 
-  testWidgets('and marks no tab as current, because none of them is', (
+  testWidgets('and lights the section it sits under, not a tab', (
     tester,
   ) async {
-    await pumpPage(tester, surface: const Size(1400, 900));
+    // Merging garages is part of the garage's own screen, a section that is
+    // not one of the tabs.
+    await pumpPage(
+      tester,
+      surface: const Size(1400, 900),
+      initialLocation: '/household/merge',
+    );
     await tester.pumpAndSettle();
 
-    final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-
-    expect(rail.selectedIndex, isNull);
+    bool lit(String route) => tester
+        .widget<Semantics>(
+          find
+              .ancestor(
+                of: find.byKey(Key('sidebar-$route')),
+                matching: find.byType(Semantics),
+              )
+              .first,
+        )
+        .properties
+        .selected!;
+    expect(lit('/household'), isTrue);
+    for (final tab in ['/', '/timeline', '/vehicles', '/planner']) {
+      expect(lit(tab), isFalse, reason: tab);
+    }
   });
 
   testWidgets('a phone keeps the back arrow instead, having no room', (
@@ -152,6 +178,6 @@ void main() {
     await pumpPage(tester, surface: const Size(400, 900));
     await tester.pumpAndSettle();
 
-    expect(find.byType(NavigationRail), findsNothing);
+    expect(find.byType(GarageSidebar), findsNothing);
   });
 }

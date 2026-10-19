@@ -8,10 +8,14 @@ import 'package:garage/core/router/not_found_screen.dart';
 import 'package:garage/core/supabase/supabase_client_provider.dart';
 import 'package:garage/core/sync/read_cache_providers.dart';
 import 'package:garage/core/sync/read_cache_store.dart';
+import 'package:garage/core/widgets/app_frame.dart';
+import 'package:garage/core/widgets/garage_sidebar.dart';
+import 'package:garage/features/household/data/garage_bootstrap_cache.dart';
 import 'package:garage/features/household/providers/household_providers.dart';
 import 'package:garage/l10n/app_localizations.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../../support/fake_repositories.dart';
 import '../../support/pump_screen.dart';
 
 /// An address nothing in the route table matches: a mistyped web address, a
@@ -116,5 +120,71 @@ void main() {
 
     final page = tester.widget<NotFoundScreen>(find.byType(NotFoundScreen));
     expect(page.path, '/no-such-page', reason: 'the path, never the query');
+  });
+
+  testWidgets('on a desk it keeps the sidebar and lights nothing in it', (
+    tester,
+  ) async {
+    // go_router builds this page with no route state behind it, which is
+    // what the sidebar reads to know where a page is.
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = desktopSurface;
+    addTearDown(tester.view.reset);
+    tester.binding.platformDispatcher.defaultRouteNameTestValue =
+        '/no-such-page';
+    addTearDown(
+      tester.binding.platformDispatcher.clearDefaultRouteNameTestValue,
+    );
+    final container = ProviderContainer(
+      overrides: [
+        currentUserProvider.overrideWithValue(
+          const User(
+            id: 'u1',
+            appMetadata: {},
+            userMetadata: {},
+            aud: 'authenticated',
+            createdAt: '2026-01-01T00:00:00Z',
+          ),
+        ),
+        currentHouseholdProvider.overrideWith(
+          (ref) => Future.value(testHousehold),
+        ),
+        readCacheStoreProvider.overrideWithValue(const NoReadCacheStore()),
+        garageBootstrapRepositoryProvider.overrideWithValue(
+          FakeGarageBootstrapRepository(roles: {testHousehold.id: 'admin'}),
+        ),
+        garageBootstrapCacheProvider.overrideWithValue(
+          const NoGarageBootstrapCache(),
+        ),
+      ],
+    );
+    addTearDown(container.dispose);
+
+    await tester.pumpWidget(
+      UncontrolledProviderScope(
+        container: container,
+        child: MaterialApp.router(
+          localizationsDelegates: garageLocalizationsDelegates,
+          supportedLocales: AppLocalizations.supportedLocales,
+          routerConfig: container.read(appRouterProvider),
+          builder: (context, child) => GarageAppFrame(child: child!),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(tester.takeException(), isNull);
+    expect(find.byType(NotFoundScreen), findsOneWidget);
+    expect(find.byType(GarageSidebar), findsOneWidget);
+    final lit = [
+      for (final semantics in tester.widgetList<Semantics>(
+        find.descendant(
+          of: find.byType(GarageSidebar),
+          matching: find.byType(Semantics),
+        ),
+      ))
+        if (semantics.properties.selected ?? false) semantics.properties.label,
+    ];
+    expect(lit, isEmpty, reason: 'no link holds an address nothing matches');
   });
 }

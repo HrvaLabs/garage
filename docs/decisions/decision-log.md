@@ -2874,7 +2874,8 @@ way the total and the save do.
 - The sidebar lists everything the More page holds, under two dividers:
   Garage, Statistics, Trips, Fuel stations, Calculator, then the tour,
   Settings, Your data, About. "More" is not a destination there; the compact
-  rail between phone and desktop width keeps it, as the phone does. Both
+  rail between phone and desktop width keeps it, as the phone does
+  (superseded by decision 198, whose compact sidebar has no More either). Both
   lists come from `lib/core/widgets/secondary_destinations.dart`, which the
   More page also reads, so the two cannot drift.
 - The dashboard's app bar has no icons on desktop: the three it had were the
@@ -7598,3 +7599,25 @@ click through to the page beside the notice
 (`lib/core/widgets/window_snackbars.dart`). *Trade-off:* the corner is where
 a page's floating button sits, so on a desk page that still has one, a notice
 covers it while it shows.
+
+**A sidebar, not a rail.** `GarageSidebar` replaced `NavigationRail` in both
+scaffolds: five primaries (the four tabs and the garage's people), the tools
+(the console first for an admin on the plan), then the tour, Settings, Your
+data and About, then the signed-in person, who opens Settings. Labelled at 240
+pixels from 1200, icons with tooltips between 900 and 1200. The rail could not
+hold groups or a person, and its destinations had to be tabs, which is why
+Statistics was lit as nothing. Now the link a page sits under is lit, found
+from the page's own address. "More" is a phone's tab only: a sidebar with room
+for everything has nothing to fold.
+
+A link does nothing on the page it names; one lit because the page sits under
+it opens its section, so Vehicles on a car's fuel log goes to the list. A
+driver's Vehicles reads "Cars" here as on the bar (decision 194). The page for
+an address nothing matches is the one page go_router builds without route
+state, so it reads the router's address instead. *Cost:* between 900 and 1200
+the More tab goes with the rail, and More holds two rows the sidebar does not:
+Waiting to sync, which the tour opens, as does the banner while anything
+waits, and the privacy policy, which About opens. The sidebar is still drawn
+inside every page rather than around the router, which is what lets a page
+know its own address, and what the cross-fade between pages still has to
+hide.

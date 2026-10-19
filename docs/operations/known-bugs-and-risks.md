@@ -69,6 +69,22 @@ Chrome or the load, and whether a person's Chrome ever does it, is not known.
 Until it is, a look that stops answering needs a new browser, not a fix to
 the page.
 
+### On a desk, the not-found page's pushed links do nothing
+
+**Low; found 18 October 2026.** At an address nothing matches, a wide window
+shows `NotFoundScreen` with the sidebar (decision 198). Its four tab links and
+"Go to the dashboard" work, because they go. Everything else in the sidebar
+pushes (`lib/core/widgets/garage_sidebar.dart:186`): Garage, the tools, the
+tour, Settings, Your data, About and the signed-in person's row. A push from
+that page leaves it on screen. In go_router 17.3.0, `RouteMatchList.push`
+builds the new configuration from the current one, its error included, and
+the router then draws only the error page. Nothing is thrown or logged; the
+click does nothing. The rail's links outside the tabs pushed too, so this is
+not new with the sidebar. The fix is for a link to go rather than push while
+the router's configuration is an error, which `pageLocation` already reads
+(`lib/core/router/page_location.dart:23`): there is nothing on that page to
+come back to.
+
 ### A second handover on the same day is refused
 
 **Low.** `hand_over_vehicle()` closes the open window on the day before the
@@ -1068,7 +1084,7 @@ first (`lib/features/tyres/screens/tyres_screen.dart:543`,
 `lib/features/documents/screens/documents_screen.dart:40`,
 `lib/features/parts/screens/vehicle_parts_screen.dart:38`); the Car tab's row
 for what the car takes says the same. `test/features/tyres/tyres_screen_test.dart:253`,
-`test/features/documents/documents_screen_test.dart:104` and
+`test/features/documents/documents_screen_test.dart:111` and
 `test/features/parts/vehicle_parts_screen_test.dart:80` pump each as a driver.
 
 ### A backup made with no signal was made from copies
@@ -1162,7 +1178,8 @@ take one-word labels by test, which "My cars", "Moja vozila" and "Le mie
 auto" are not, so the word was the owner's to choose. On 20 September the
 owner chose "Cars", "Auti" and "Auto", for a driver only. The bottom bar and
 the sidebar read the role and take that label for the cars tab
-(`lib/core/widgets/garage_bottom_nav.dart:60`); everybody else keeps
+(`lib/core/widgets/garage_bottom_nav.dart:58`,
+`lib/core/widgets/garage_sidebar.dart:84`); everybody else keeps
 "Vehicles". `test/core/widgets/garage_bottom_nav_test.dart` holds the new
 label to one word in every language with the others, and asks for both
 roles at phone and desktop width. Decision 194.

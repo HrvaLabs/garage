@@ -4,9 +4,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/format/unit_format.dart';
 import 'package:garage/core/theme/garage_tokens.dart';
 import 'package:garage/core/widgets/adaptive.dart';
+import 'package:garage/domain/account/account_identity.dart';
 import 'package:garage/domain/entities/fuel_entry.dart';
 import 'package:garage/features/fuel/data/fuel_repository.dart';
 import 'package:garage/domain/entities/vehicle.dart';
+import 'package:garage/features/auth/providers/auth_providers.dart';
 import 'package:garage/features/attachments/providers/attachment_providers.dart';
 import 'package:garage/features/fuel/providers/fuel_providers.dart';
 import 'package:garage/features/vehicles/providers/vehicle_providers.dart';
@@ -85,6 +87,11 @@ Future<void> pumpFuelLog(
   return tester.pumpWidget(
     ProviderScope(
       overrides: [
+        // A wide window's sidebar names the signed-in account, which would
+        // otherwise reach for a real Supabase client, which no widget test has.
+        accountIdentityProvider.overrideWithValue(
+          const AccountIdentity(name: 'Karlo', email: 'karlo@example.com'),
+        ),
         if (repository != null)
           fuelRepositoryProvider.overrideWithValue(repository),
         rawFuelEntriesProvider('v1').overrideWith((ref) async => entries),

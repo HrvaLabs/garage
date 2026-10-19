@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'adaptive.dart';
 import 'garage_bottom_nav.dart';
+import 'garage_sidebar.dart';
 import 'page_header.dart';
 import 'stale_reads_banner.dart';
 
@@ -37,9 +38,9 @@ class GaragePageScaffold extends StatelessWidget {
   final ContentWidth contentWidth;
 
   /// Whether the desktop sidebar belongs on this page. False for a screen
-  /// reachable before signing in: every destination in that rail bounces a
-  /// visitor to the sign-in form, which reads as the app being broken rather
-  /// than as a gate.
+  /// reachable before signing in: every destination in that sidebar bounces
+  /// a visitor to the sign-in form, which reads as the app being broken
+  /// rather than as a gate.
   final bool showNavigation;
 
   @override
@@ -63,12 +64,11 @@ class GaragePageScaffold extends StatelessWidget {
 
     // The sidebar stays. These pages are pushed, but a desktop window that
     // loses its navigation the moment you open Statistics leaves the browser's
-    // back button as the only way out, which is a phone's model on a screen
-    // with room for better. No tab is marked current, because none of them is.
+    // back button as the only way out. The link the page sits under is lit.
     return Scaffold(
       body: Row(
         children: [
-          const GarageNavigationRail(current: null),
+          const GarageSidebar(),
           const VerticalDivider(width: 1),
           Expanded(
             // A scaffold of its own, so the floating button stays within the

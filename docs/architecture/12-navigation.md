@@ -17,10 +17,11 @@ a maximum of five in a `NavigationBar`, and all five are spent:
 | Planner | `/planner` | What is coming, and what to group into one visit |
 | More | `/more` | Everything the other four could not hold |
 
-On a wide window the same list becomes a `GarageNavigationRail`; a pushed screen
-keeps the rail rather than swapping it for a back button, because a browser
-window that loses its navigation on every push leaves the back button as the only
-way out (`lib/core/widgets/page_scaffold.dart:64`).
+On a wide window the tabs lead a sidebar instead, `GarageSidebar` (see
+[The desktop sidebar](#the-desktop-sidebar)); a pushed screen keeps the sidebar
+rather than swapping it for a back button, because a browser window that loses
+its navigation on every push leaves the back button as the only way out
+(`lib/core/widgets/page_scaffold.dart:65`).
 
 ## Tabs cross-fade; pushed pages slide
 
@@ -84,9 +85,9 @@ they came for. See decision 137, and `test/docs/menu_paths_test.dart`, which
 holds every menu path printed in a public document to rows that exist.
 
 `secondaryDestinations()` in `lib/core/widgets/secondary_destinations.dart` is the
-single list of non-tab destinations, feeding both the desktop rail and the More
-screen. It is one list because the two had already drifted: the rail's own
-comment said "on a phone these live under Settings", and only the garage did.
+single list of non-tab destinations, feeding both the desktop sidebar and the
+More screen. It is one list because the two had already drifted: the old rail's
+own comment said "on a phone these live under Settings", and only the garage did.
 
 **The Company destination** leads the secondary list for an admin of a garage
 on the company plan and is absent for everybody else — a driver never sees
@@ -99,9 +100,10 @@ screen. The console is a pushed page with its own tab strip, not a sixth tab:
 Material caps the bar at five, and the fleet is one thing, however many views
 it has. A driver's Vehicles tab is titled "My cars" on its own page
 (`lib/features/vehicles/screens/vehicles_screen.dart:95`) and labelled "Cars"
-in the bar and the sidebar (`lib/core/widgets/garage_bottom_nav.dart:60`):
-both navigation widgets take one-word labels by test, so the tab could not
-carry the title's two words, and the owner chose the word (decision 194).
+in the bar (`lib/core/widgets/garage_bottom_nav.dart:58`) and the sidebar
+(`lib/core/widgets/garage_sidebar.dart:84`): the bar takes one-word labels by
+test, so the tab could not carry the title's two words, and the owner chose the
+word (decision 194).
 See [13](13-company.md#the-console).
 
 **The tour.** `/features` (`lib/features/settings/screens/features_screen.dart`)
@@ -475,8 +477,38 @@ first: somebody signed out is sent to sign in, wherever they were going.
 
 ## The desktop sidebar
 
-Above the desktop breakpoint the rail is a labelled sidebar and carries the
-More page's contents itself (decision 81): the secondary destinations, a
-divider, then the tour, Settings, Your data and About. "More" is not a
-destination at that width. Between phone and desktop width the compact rail
-keeps the More tab; `/more` remains routable at every width.
+On a wide window both scaffolds draw `GarageSidebar`
+(`lib/core/widgets/garage_sidebar.dart:57`) beside the page in place of the
+bottom bar (decisions 81 and 198). From the desktop breakpoint, 1200 pixels, it
+is labelled and 240 wide; between 900 and 1200 it is 72 wide, icons named in
+tooltips. Top to bottom: the garage on screen, a menu when there is more than
+one to choose; five primaries, the four tabs and the garage's own screen; the
+tools, from `secondaryDestinations()`, the console first for an admin on the
+plan; the tour, Settings, Your data and About, from `settingsDestinations()`;
+and last the signed-in person, whose row opens Settings. Only the middle
+scrolls, so a short window scrolls the links and not the frame.
+
+"More" is in it at no width: a sidebar with room for everything has nothing to
+fold, and `/more` stays routable. Two rows on More are not in the sidebar:
+Waiting to sync, which the tour opens, as does the banner while anything waits,
+and the privacy policy, which About opens.
+
+The link a page sits under is lit: the one whose route is the longest
+whole-segment prefix of the page's address (`currentLink`,
+`lib/core/widgets/garage_sidebar.dart:32`), so Statistics lights Statistics,
+a car's fuel log lights Vehicles, and an address no link holds lights nothing
+rather than the dashboard. `pageLocation`
+(`lib/core/router/page_location.dart:17`) reads that address from the page's
+own route rather than the router's top, so a page under a pushed one still
+knows where it is. A tab is gone to and anything else is pushed, so back
+returns to where the reader was. A link does nothing on the page it names, and
+a lit link on a page under it opens its section.
+
+The page for an address nothing matches is the one go_router builds without
+route state, and asking for its state throws, so it reads the router's own
+address (`lib/core/router/page_location.dart:23`); as it leaves, still drawn
+while the next page arrives, it reads wherever the router has gone
+(`lib/core/router/page_location.dart:28`). The sidebar is drawn inside each
+page rather than around the router, which is how a page knows its own address,
+and why the cross-fade between pages still has to hide two sidebars fading
+into each other.

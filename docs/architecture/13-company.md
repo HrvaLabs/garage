@@ -133,9 +133,10 @@ rather than refused.
 
 **"My cars"** is the vehicles screen wearing a driver's presentation
 (`lib/features/vehicles/screens/vehicles_screen.dart:77`), under a tab that
-reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:60`): the title, no Add
-button, no archived section, an empty state that names the administrator as
-the one who hands a car over, and two cards above the grid. The dashboard
+reads "Cars" (`lib/core/widgets/garage_bottom_nav.dart:58`, and in the sidebar
+`lib/core/widgets/garage_sidebar.dart:84`): the title, no Add button, no
+archived section, an empty state that names the administrator as the one who
+hands a car over, and two cards above the grid. The dashboard
 says the same to a driver with no car yet
 (`lib/features/dashboard/screens/dashboard_screen.dart:213`) in place of the
 "add your first vehicle" card, whose every way in is refused for a driver,
@@ -263,7 +264,7 @@ entry keeps its place when its author goes, and resolves to nobody.
 ## The console
 
 `/company` (`lib/features/company/screens/company_screen.dart:24`) is an
-admin's, on the rail's secondary links and under More on a phone, leading the
+admin's, among the sidebar's tools and under More on a phone, leading the
 list while there is one (`lib/core/widgets/secondary_destinations.dart:36`).
 It refuses, in words, a garage off the plan and a member who is not its admin,
 and shows progress rather than either refusal while the household is still

@@ -103,8 +103,8 @@ class NavigationLog {
 /// bottom navigation, `context.go`, and `context.push` to work.
 ///
 /// Screens are rendered in a phone-sized window by default: the tab scaffold
-/// switches to a navigation rail above the wide breakpoint, and every screen
-/// test would otherwise depend on the test surface's default size.
+/// switches to the sidebar above the wide breakpoint, and every screen test
+/// would otherwise depend on the test surface's default size.
 Future<NavigationLog> pumpScreen(
   WidgetTester tester,
   Widget screen, {

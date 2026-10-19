@@ -4,7 +4,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:garage/core/clock.dart';
 import 'package:garage/core/widgets/adaptive.dart';
 import 'package:garage/core/format/unit_format.dart';
+import 'package:garage/domain/account/account_identity.dart';
 import 'package:garage/domain/entities/vehicle_document.dart';
+import 'package:garage/features/auth/providers/auth_providers.dart';
 import 'package:garage/features/company/providers/company_providers.dart';
 import 'package:garage/features/documents/providers/document_providers.dart';
 import 'package:garage/features/documents/screens/documents_screen.dart';
@@ -49,6 +51,11 @@ Future<void> pumpScreen(
   await tester.pumpWidget(
     ProviderScope(
       overrides: [
+        // A wide window's sidebar names the signed-in account, which would
+        // otherwise reach for a real Supabase client, which no widget test has.
+        accountIdentityProvider.overrideWithValue(
+          const AccountIdentity(name: 'Karlo', email: 'karlo@example.com'),
+        ),
         documentRepositoryProvider.overrideWithValue(repository),
         todayProvider.overrideWithValue(_today),
         isDriverForVehicleProvider('v1').overrideWithValue(driver),
@@ -381,8 +388,8 @@ void main() {
       );
 
       // Centred in the *content area*, not in the window: a wide window puts
-      // a navigation rail down the left, so the two centres are 120 pixels
-      // apart and only one of them is the right answer.
+      // the sidebar down the left, so the two centres are 120 pixels apart
+      // and only one of them is the right answer.
       final button = find.widgetWithText(FilledButton, 'Add document');
       final content = find.ancestor(
         of: button,
