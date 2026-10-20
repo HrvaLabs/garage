@@ -1357,6 +1357,12 @@ thing that gets forgotten and left behind.
 `readAsString` *is still wrong* — the day it starts passing is the day this can
 go.
 
+That day came with cross_file 0.3.5+5, taken on 21 October 2026 (decision
+201): `readAsString` decodes bytes with the encoding it is given, and the two
+tests that asserted otherwise went. The helper stayed. It still drops a
+byte-order mark, and it still reads past a byte that is not UTF-8, where
+`readAsString` now throws.
+
 ---
 
 ## 50. A suggestion nobody can act on for two years is not a suggestion
@@ -8062,3 +8068,59 @@ dialog grew under a popover and a menu too, since fixed.
 working, desk tests beside the phone's, and a guard that has to be told of a
 new adaptive file. *What it did not:* a second client, a second set of
 screens, or a second place for a bug to be fixed.
+
+## 201. Dependencies at their newest, three a major behind on purpose
+
+**21 October 2026.** Every Dart package, the Android build and the edge
+functions' lock were moved to their newest stable releases, majors included
+(file_picker 13, cached_network_image 4, cupertino_icons 2, Gradle 9.5.1,
+AGP 9.3.3, Kotlin 2.4.21, supabase-js 2.118.0). Three majors were left
+behind, each because taking it was a change of its own rather than an upgrade.
+
+**go_router stays on 17.** 18 builds its pages from `material_ui`, the
+Material library that has moved out of the framework into a package, and
+picks a route's page by looking for `material_ui`'s `MaterialApp` above it.
+The app's `MaterialApp.router` (`lib/main.dart:140`) is `flutter/material`'s,
+a different class, so 18 finds none and gives every `builder:` route a
+`NoTransitionPage`. That is most of the routes (`lib/core/router/app_router.dart:98`
+on), and it would have dropped decision 18's transitions
+(`lib/core/theme/garage_theme.dart:324`), iOS's swipe back with them, while
+everything compiled and passed. Checked in a scratch app on 18.1.1, which
+built a `NoTransitionPage`, against 17.5.0, which built a `MaterialPage`.
+Moving to 18 means moving the app to `material_ui` first
+(`dart fix --apply --code=migrate_design_widgets`, the localizations, and a
+bridge for packages still on `flutter/material`), across 145 files in `lib/`
+and 119 in `test/`.
+
+**Firebase stays on core 4 and messaging 16.** Messaging 17 deprecates
+`getToken` and `onTokenRefresh` for `register()` and `onRegistered`, which
+hand back a Firebase Installation ID rather than a registration token. The
+app stores the token (`lib/core/notifications/push_registration.dart:83`)
+and `push-due-reminders` addresses it as `token`
+(`supabase/functions/push-due-reminders/handler.ts:561`); an installation ID
+is sent to as `fid`. Taking 17 without an analyzer ignore therefore means
+changing what a device registers, the send, and the rows already stored,
+and push cannot be exercised without a phone. Core stays on 4 because
+messaging 16 requires it.
+
+**The Android build is the newest trio whose pairings are documented.** AGP
+9.3 needs Gradle 9.5. AGP 9.4 needs Gradle 9.6, which is past the range
+Flutter's tooling holds Kotlin 2.4 to (below 9.6), and Kotlin 2.5 is still a
+beta. Flutter 3.47.7 itself knows AGP up to 9.2, tests Gradle up to 9.3.1 and
+treats anything newer as valid. The debug build reports no compatibility
+warning on Gradle 9.5.1, AGP 9.3.3 and Kotlin 2.4.21.
+
+**Not moved:** the Dart SDK floor stays `^3.12.2`. The newest stable, 3.13.5,
+is what CI and every local build already run; raising the floor to 3.13
+changes the formatter's style and rewrites 141 files, which is its own
+change. cross_file stays on 0.3 because file_picker 13 requires it, and
+`test` because `flutter_test` pins its `test_api`.
+
+**One workaround's proof came due.** cross_file 0.3.5+5 fixed the UTF-8 bug
+`readTextFile` was written for (decision 49), and the two tests that asserted
+the bug failed, as they were written to. They went, as known-bugs had said
+they would; the helper stayed.
+
+*What it cost:* a comment beside each held package in `pubspec.yaml`, and a
+backlog of two migrations, `material_ui` and installation IDs, that the next
+majors of go_router and Firebase will not wait for.

@@ -43,7 +43,7 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
+  cupertino_icons: ^2.0.0
   intl: ^0.20.2
   # For @visibleForTesting in unit_format.dart, which stays pure Dart plus
   # intl on purpose: a Flutter import there would make it unusable from any
@@ -51,51 +51,58 @@ dependencies:
   meta: ^1.17.0
   flutter_localizations:
     sdk: flutter
-  supabase_flutter: ^2.16.0
-  flutter_riverpod: ^3.3.2
+  supabase_flutter: ^2.18.3
+  flutter_riverpod: ^3.4.3
   # flutter_riverpod does not re-export Override, which the screen-test
   # harness needs to type its list of provider overrides, nor
   # ProviderOrFamily, which the console's Retry helper takes its leaves as.
   # Pinned to what flutter_riverpod itself depends on.
-  riverpod: 3.3.2
-  go_router: ^17.3.0
+  riverpod: 3.4.3
+  # Held at 17 on purpose. 18 builds its pages from material_ui, whose
+  # MaterialApp is not the flutter/material one in main.dart, so every
+  # `builder:` route would get a NoTransitionPage. See decision 201.
+  go_router: ^17.5.0
   google_sign_in: ^7.2.0
   fl_chart: ^1.2.0
-  flutter_local_notifications: ^22.1.0
-  timezone: ^0.11.1
+  flutter_local_notifications: ^22.3.2
+  timezone: ^0.11.2
   csv: ^8.0.0
   http: ^1.5.0
-  share_plus: ^13.2.1
-  shared_preferences: ^2.5.5
+  share_plus: ^13.3.1
+  shared_preferences: ^2.5.6
   path_provider: ^2.1.5
-  geolocator: ^14.0.3
-  archive: ^4.0.9
-  url_launcher: ^6.3.2
+  geolocator: ^14.1.2
+  archive: ^4.5.2
+  url_launcher: ^6.3.3
   file_selector: ^1.1.0
   # XFile. Comes in transitively via file_selector, and named here because
   # lib/ reads picked files through it — see core/files/file_text.dart, which
   # decodes the bytes itself rather than trusting XFile.readAsString.
-  cross_file: ^0.3.4
-  pdf: ^3.13.0
+  cross_file: ^0.3.5+5
+  pdf: ^3.13.1
   # Downscales a photo before it leaves the device — see
   # core/files/image_compression.dart. Comes in transitively via pdf already;
   # named here because that code imports it directly.
-  image: ^4.9.1
+  image: ^4.12.0
   # SHA-256 for API key hashing: the key itself is shown once and never stored.
   crypto: ^3.0.6
-  firebase_core: ^4.13.0
-  firebase_messaging: ^16.5.0
-  file_picker: ^12.0.0
-  saf_util: ^3.1.0
-  saf_stream: ^4.0.1
+  # Held at 4 and 16 on purpose. Messaging 17 deprecates getToken for
+  # registering by Firebase Installation ID, which push-due-reminders would
+  # have to address as `fid` rather than `token`, and messaging 16 needs
+  # core 4. See decision 201.
+  firebase_core: ^4.15.0
+  firebase_messaging: ^16.7.0
+  file_picker: ^13.1.0
+  saf_util: ^3.1.1
+  saf_stream: ^4.0.2
   # A vehicle photo's link is signed and rotates every fetch, so caching by
   # URL would never hit; this caches by the vehicle's id instead. See
   # core/widgets/vehicle_photo.dart.
-  cached_network_image: ^3.4.1
+  cached_network_image: ^4.0.4
   # Lets a household frame the vehicle photo before it uploads, rather than
   # sending whatever the camera pointed at. Pure Dart, so it works on web —
   # see features/vehicles/screens/photo_crop_screen.dart.
-  crop_your_image: ^2.0.0
+  crop_your_image: ^2.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -107,7 +114,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
   test: ^1.31.0
-  supabase: ^2.14.0
+  supabase: ^2.16.5
   flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the

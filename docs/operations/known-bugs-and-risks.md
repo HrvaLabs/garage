@@ -78,6 +78,21 @@ second key, so the app sees no shortcut. A chord dispatched from the page as
 a person's keys do. And the wheel scrolls nothing at any width, as the store
 listing's screenshot notes say; a taller viewport shows what is below.
 
+### firebase_core applies the Kotlin Gradle plugin, which a later Flutter will refuse
+
+**Low for the next developer; found 21 October 2026.** Since firebase_core
+4.14 its Android half is Kotlin, and it applies `kotlin-android` itself
+whenever the app has opted out of AGP's built-in Kotlin, which this one has
+(`android.builtInKotlin=false` in `android/gradle.properties`, line 6, as
+Flutter's template wrote it). Every Android build now prints "Your app uses
+the following plugins that apply Kotlin Gradle Plugin (KGP): firebase_core"
+and that future versions of Flutter will fail to build such an app. It builds
+today on 4.15.0, and 5.0.0 applies the plugin the same way. What closes it is
+the app moving to built-in Kotlin, Flutter's template flags with it, or a
+firebase_core that stops applying the plugin; until then, a Flutter upgrade
+that turns the warning into an error stops the Android build in CI, which
+blocks the web deploy behind it.
+
 ### In a headless browser, the first load after signing in answers 401 until Retry
 
 **Unknown for people; seen 18 October 2026.** Looking at the web build in a
@@ -1109,6 +1124,19 @@ several releases later.
 ---
 
 ## Recently fixed, worth remembering
+
+### go_router 18 would have taken every page's transition away
+
+**Low, caught before shipping, 21 October 2026, by reading go_router's
+source.** go_router 18 decides how to build a `builder:` route's page by
+looking for a `MaterialApp` above it, and since 18 that is `material_ui`'s
+class, not the `flutter/material` one the app is built on
+(`lib/main.dart:140`). Finding none, it builds a `NoTransitionPage`: no push
+transition at all, decision 18's included, and on iOS no swipe back. Nothing
+fails, as nothing is thrown and no test measures a route's transition. A
+scratch app on 18.1.1 got a `NoTransitionPage` where 17.5.0 gave a
+`MaterialPage`. go_router is held at 17 until the app moves to `material_ui`
+(decision 201), and `pubspec.yaml` says so beside it.
 
 ### A page with nothing under it grew a back arrow while a dialog was open
 
@@ -3396,7 +3424,9 @@ affected.
 `XFile.fromData(utf8.encode(csv))`, which is precisely the broken path — but
 every CSV in them was pure ASCII. `test/core/files/file_text_test.dart` now
 pins both directions, including a test asserting that `readAsString` still gets
-it wrong, so the workaround can be removed when cross_file fixes it.
+it wrong, so the workaround can be removed when cross_file fixes it. It did, in
+0.3.5+5, and those tests went when it was taken; see "`cross_file` has fixed
+the UTF-8 bug the app works around" below.
 
 
 ### The Fuelio import hung forever, and lost the tail of the work
@@ -4781,6 +4811,11 @@ packages with it (`file_picker` 12.0.0 → 12.2.0 among them).
 Taking it deliberately means: bump, delete those two tests, keep the helper
 (it also strips a byte-order mark, which nothing upstream does), and re-run the
 import fixtures.
+
+**Taken 21 October 2026**, with every other dependency (decision 201):
+`cross_file` is 0.3.5+5, the two tests that asserted the bug are gone, and the
+helper stays for the byte-order mark and for bytes that are not UTF-8, which
+`readAsString` would throw on. The import fixtures pass on it.
 
 ### Fixed: lending was broken in five ways at once
 

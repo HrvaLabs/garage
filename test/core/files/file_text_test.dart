@@ -8,14 +8,14 @@ import 'package:garage/domain/import/fuelio_backup.dart';
 
 void main() {
   group('reading a picked file as text', () {
-    // The bug this exists for. `XFile.readAsString` looks like it decodes as
-    // UTF-8 — it even takes an `encoding` parameter — but when the XFile was
-    // built from bytes rather than a path it runs `String.fromCharCodes`,
-    // which is Latin-1, and ignores the parameter entirely. Android's picker
-    // hands back bytes, so every Croatian diacritic in an imported file came
-    // out as mojibake: "svjećica" as "svjeÄica". Nothing threw; the text was
-    // simply wrong, and a Fuelio reminder whose name no longer matched any
-    // known service silently imported as nothing.
+    // The bug this exists for. Until cross_file 0.3.5+5, `XFile.readAsString`
+    // looked like it decoded as UTF-8 — it even takes an `encoding` parameter
+    // — but when the XFile was built from bytes rather than a path it ran
+    // `String.fromCharCodes`, which is Latin-1, and ignored the parameter
+    // entirely. Android's picker hands back bytes, so every Croatian diacritic
+    // in an imported file came out as mojibake: "svjećica" as "svjeÄica".
+    // Nothing threw; the text was simply wrong, and a Fuelio reminder whose
+    // name no longer matched any known service silently imported as nothing.
     test('a file made of bytes keeps its diacritics', () async {
       final file = XFile.fromData(
         utf8.encode('Zamjena svjećica, kočione tekućine, putničkog prostora'),
@@ -26,14 +26,6 @@ void main() {
         await readTextFile(file),
         'Zamjena svjećica, kočione tekućine, putničkog prostora',
       );
-    });
-
-    test('and readAsString is what gets this wrong', () async {
-      // Kept as the proof: if a future cross_file fixes this, the helper is
-      // still correct and this test is what says the workaround can go.
-      final file = XFile.fromData(utf8.encode('svjećica'), name: 'a.csv');
-
-      expect(await file.readAsString(), isNot('svjećica'));
     });
 
     test('a byte-order mark is not part of the text', () async {
@@ -133,19 +125,6 @@ void main() {
         'service_brake_fluid',
         'service_cabin_filter',
       ]);
-    });
-
-    test('and readAsString loses all three', () async {
-      // The proof that the helper is what fixes it, not the mapping.
-      final file = XFile.fromData(utf8.encode(csv), name: 'fuelio.csv');
-
-      final backup = parseFuelioBackup(await file.readAsString());
-
-      expect(
-        backup.reminders.map((r) => r.serviceTypeKey),
-        everyElement(isNull),
-        reason: 'mojibake matches no needle, and nothing throws to say so',
-      );
     });
   });
 }
