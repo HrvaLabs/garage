@@ -49,7 +49,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get errorNoConnection =>
-      'Nema veze. Provjeri mrežu i pokušaj ponovno.';
+      'Nema internetske veze. Provjeri mrežu i pokušaj ponovno.';
 
   @override
   String get errorTimeout =>
@@ -63,7 +63,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get errorTransferCode =>
-      'Taj kod za predaju nije valjan ili je već iskorišten.';
+      'Taj kod za prijenos nije valjan ili je već iskorišten.';
 
   @override
   String get errorTransferHere => 'To vozilo je već u ovoj garaži.';
@@ -98,11 +98,11 @@ class AppLocalizationsHr extends AppLocalizations {
       'Ovaj kod je za vozača, a poslovni plan garaže je istekao. Javi se onome tko ti ga je poslao.';
 
   @override
-  String get errorAuth => 'Prijava nije uspjela. Provjeri e-mail i lozinku.';
+  String get errorAuth => 'Prijava nije uspjela. Provjeri e-adresu i lozinku.';
 
   @override
   String get errorEmailNotConfirmed =>
-      'Najprije potvrdi svoju e-mail adresu. Poveznicu smo poslali pri otvaranju računa.';
+      'Najprije potvrdi svoju e-adresu. Poveznicu za potvrdu poslali smo ti pri otvaranju računa.';
 
   @override
   String get authWhatIsThis => 'Što Garaža nudi';
@@ -111,7 +111,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get authPrivacyPolicy => 'Pravila privatnosti';
 
   @override
-  String get authTagline => 'Gorivo i održavanje, zabilježeno.';
+  String get authTagline => 'Gorivo i održavanje, sve zabilježeno.';
 
   @override
   String get authSignInTitle => 'Prijava';
@@ -120,7 +120,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get authSignUpTitle => 'Otvori račun';
 
   @override
-  String get authEmail => 'E-mail';
+  String get authEmail => 'E-adresa';
 
   @override
   String get authPassword => 'Lozinka';
@@ -142,7 +142,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String authConfirmEmailBody(String email) {
-    return 'Poslali smo poveznicu za potvrdu na $email. Otvori je, pa se vrati i prijavi.';
+    return 'Poslali smo poveznicu za potvrdu na $email. Otvori je, a zatim se vrati i prijavi.';
   }
 
   @override
@@ -171,10 +171,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get authPasswordUpdated => 'Lozinka je promijenjena.';
 
   @override
-  String get authInvalidEmail => 'Unesi ispravnu e-mail adresu';
+  String get authInvalidEmail => 'Unesi ispravnu e-adresu';
 
   @override
-  String get authPasswordTooShort => 'Koristi barem 8 znakova';
+  String get authPasswordTooShort => 'Lozinka mora imati najmanje 8 znakova';
 
   @override
   String get authNameRequired => 'Unesi svoje ime';
@@ -199,7 +199,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get onboardingJoinHint =>
-      'Zatraži kod od nekoga iz garaže: ima osam znakova';
+      'Zatraži od nekoga iz garaže kod pozivnice od osam znakova';
 
   @override
   String get onboardingInviteCode => 'Kod pozivnice';
@@ -244,45 +244,45 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get joinInvited =>
-      'Netko te pozvao u svoju garažu. Prijavi se ili otvori račun i pozivnica će te odmah pridružiti.';
+      'Stigla ti je pozivnica u zajedničku garažu. Prijavi se ili otvori račun i odmah ćeš joj se pridružiti.';
 
   @override
   String get joinJoining => 'Pridruživanje…';
 
   @override
   String get joinDone =>
-      'Sad si unutra. Sve što se u garaži bilježi sada je i tvoje.';
+      'Unutra si. Sve što se bilježi u garaži sad je i tvoje.';
 
   @override
   String get joinOpenGarage => 'Otvori moju garažu';
 
   @override
-  String get householdShareInvite => 'Podijeli poveznicu';
+  String get householdShareInvite => 'Podijeli pozivnicu';
 
   @override
   String get householdInviteLinkCopied => 'Poruka s pozivnicom je kopirana';
 
   @override
   String householdInviteMessageNoExpiry(String code, String link) {
-    return 'Pridruži se mojoj garaži u aplikaciji Garage: instaliraj aplikaciju, napravi račun, dodirni „Pridruži se kodom“ i upiši $code, ili samo otvori $link.';
+    return 'Pridruži se mojoj garaži u aplikaciji Garaža: instaliraj aplikaciju, otvori račun, dodirni „Pridruži se kodom” i upiši $code. Može i jednostavnije: otvori $link.';
   }
 
   @override
   String householdInviteMessage(String code, String link, String until) {
-    return 'Pridruži se mojoj garaži u aplikaciji Garage: instaliraj aplikaciju, napravi račun, dodirni „Pridruži se kodom“ i upiši $code, ili samo otvori $link. Kod vrijedi do $until.';
+    return 'Pridruži se mojoj garaži u aplikaciji Garaža: instaliraj aplikaciju, otvori račun, dodirni „Pridruži se kodom” i upiši $code. Može i jednostavnije: otvori $link. Kod vrijedi do $until.';
   }
 
   @override
   String get transferVehicleLocked =>
-      'Ovo je vozilo koje će kod predati. Vrati se i odaberi drugo.';
+      'Ovim se kodom prenosi ovo vozilo. Vrati se ako želiš odabrati drugo.';
 
   @override
   String householdTransferNamed(String vehicle) {
-    return 'Predaj $vehicle drugoj garaži';
+    return 'Prenesi vozilo $vehicle u drugu garažu';
   }
 
   @override
-  String get householdTransferPick => 'Predaj vozilo drugoj garaži…';
+  String get householdTransferPick => 'Prenesi vozilo u drugu garažu…';
 
   @override
   String get householdDangerZone => 'Napuštanje ili brisanje';
@@ -317,11 +317,11 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get householdSpendHint =>
-      'Sve zabilježeno na vozilima ove garaže, po tome tko je što unio';
+      'Svi troškovi vozila ove garaže, po tome tko ih je unio';
 
   @override
   String householdUnattributed(String amount) {
-    return 'S izbrisanog računa: $amount';
+    return 'S obrisanog računa: $amount';
   }
 
   @override
@@ -334,7 +334,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String householdOwes(String from, String to, String amount) {
-    return '$from duguje $to $amount';
+    return '$from duguje $amount (prima $to)';
   }
 
   @override
@@ -357,7 +357,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get settingsDistance => 'Udaljenost';
 
   @override
-  String get settingsVolume => 'Volumen';
+  String get settingsVolume => 'Obujam';
 
   @override
   String get settingsCurrency => 'Valuta';
@@ -430,7 +430,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get stationsGradesCountry => 'Vrste goriva u zemlji';
 
   @override
-  String get stationsGradesNote => 'Prvo najraširenije';
+  String get stationsGradesNote => 'Poredano od najraširenijih';
 
   @override
   String get stationsFavourite => 'Omiljena';
@@ -443,19 +443,19 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String stationsTrendUp(String amount) {
-    return '$amount više nego prošli tjedan';
+    return '$amount više nego prošlog tjedna';
   }
 
   @override
   String stationsTrendDown(String amount) {
-    return '$amount manje nego prošli tjedan';
+    return '$amount manje nego prošlog tjedna';
   }
 
   @override
   String get stationsTrendSteady => 'Bez promjene u odnosu na prošli tjedan';
 
   @override
-  String get stationsEmpty => 'Nema pronađenih postaja.';
+  String get stationsEmpty => 'Nije pronađena nijedna postaja.';
 
   @override
   String stationsOutOfRange(String distance) {
@@ -559,7 +559,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get statsDistanceNeedsSecond => 'Treba još jedno očitanje';
 
   @override
-  String get statsLastOdometer => 'Zadnje stanje brojila';
+  String get statsLastOdometer => 'Posljednja kilometraža';
 
   @override
   String get statsEmpty => 'Još nema dovoljno podataka.';
@@ -591,7 +591,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String settingsImportDone(int fills, int services, int costs, int reminders) {
-    return 'Uvezeno: $fills točenja, $services servisa, $costs troškova, $reminders podsjetnika.';
+    return 'Uvezeno: točenja $fills, servisi $services, troškovi $costs, podsjetnici $reminders.';
   }
 
   @override
@@ -633,19 +633,19 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get reportScheduleHint =>
-      'Intervali postavljeni za ovaj auto, kao list za ispis ili predaju';
+      'Intervali postavljeni za ovaj auto, na listu koji možeš ispisati ili nekome dati';
 
   @override
   String get reportScheduleItem => 'Stavka';
 
   @override
-  String get reportScheduleEvery => 'Svakih';
+  String get reportScheduleEvery => 'Interval';
 
   @override
-  String get reportScheduleLastDone => 'Zadnji put';
+  String get reportScheduleLastDone => 'Posljednji put';
 
   @override
-  String get reportScheduleNextDue => 'Sljedeće';
+  String get reportScheduleNextDue => 'Sljedeći rok';
 
   @override
   String get reportScheduleNone =>
@@ -733,7 +733,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get reportSellersHint =>
-      'Ono što kupac traži: povijest, kilometraža i trošak održavanja';
+      'Ono što kupca zanima: povijest, kilometraža i troškovi';
 
   @override
   String get reportMaintenanceHint =>
@@ -741,7 +741,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get reportAnnualHint =>
-      'Godina dana goriva, servisa i ostalih troškova';
+      'Gorivo, servisi i ostali troškovi za jednu godinu';
 
   @override
   String get costsTitle => 'Troškovi';
@@ -851,7 +851,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String costVignetteBuy(String operator) {
-    return 'Kupi kod $operator';
+    return 'Kupi na stranici $operator';
   }
 
   @override
@@ -860,7 +860,7 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get costVignetteRemind => 'Podsjeti me zadnji dan valjanosti';
+  String get costVignetteRemind => 'Podsjeti me posljednjeg dana valjanosti';
 
   @override
   String get costCategoryWash => 'Pranje auta';
@@ -899,14 +899,14 @@ class AppLocalizationsHr extends AppLocalizations {
   String get settingsBundling => 'Objedinjavanje podsjetnika';
 
   @override
-  String get settingsBundlingWindowDays => 'Grupiraj stavke unutar (dana)';
+  String get settingsBundlingWindowDays => 'Najveći razmak (dani)';
 
   @override
-  String get settingsBundlingWindowKm => 'Grupiraj stavke unutar (kilometara)';
+  String get settingsBundlingWindowKm => 'Najveći razmak (udaljenost)';
 
   @override
   String get settingsBundlingHint =>
-      'Stavke koje dolaze na red u kratkom razmaku predlažu se kao jedan odlazak';
+      'Stavke koje dospijevaju u kratkom razmaku predlažu se kao jedan odlazak u servis';
 
   @override
   String get settingsReminders => 'Podsjetnici';
@@ -917,7 +917,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get settingsRemindersThisDeviceHint =>
-      'Svaki telefon sam raspoređuje svoje podsjetnike, pa onaj tko ga nije postavio neće ništa čuti.';
+      'Svaki telefon sam zakazuje svoje podsjetnike, pa tko podsjetnik nije postavio, neće ni dobiti obavijest.';
 
   @override
   String get settingsRemindersEveryone => 'Obavijest stiže svima u ovoj garaži';
@@ -928,7 +928,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get settingsRemindersSchedule =>
-      'Stižu 30 i 7 dana prije roka, i čim stanje brojača pokaže da je ostalo manje od 500 km';
+      'Stižu 30 i 7 dana prije roka te čim očitanje kilometraže pokaže da je do roka ostalo manje od 500 km';
 
   @override
   String get settingsRemindersScheduleDevice =>
@@ -997,16 +997,16 @@ class AppLocalizationsHr extends AppLocalizations {
   String get measurementBrakeDiscFront => 'Prednji diskovi';
 
   @override
-  String get measurementTreadFrontLeft => 'Šara, prednja lijeva';
+  String get measurementTreadFrontLeft => 'Profil, prednja lijeva';
 
   @override
-  String get measurementTreadFrontRight => 'Šara, prednja desna';
+  String get measurementTreadFrontRight => 'Profil, prednja desna';
 
   @override
-  String get measurementTreadRearLeft => 'Šara, stražnja lijeva';
+  String get measurementTreadRearLeft => 'Profil, stražnja lijeva';
 
   @override
-  String get measurementTreadRearRight => 'Šara, stražnja desna';
+  String get measurementTreadRearRight => 'Profil, stražnja desna';
 
   @override
   String get measurementBatteryVolts => 'Napon akumulatora';
@@ -1029,11 +1029,11 @@ class AppLocalizationsHr extends AppLocalizations {
   String get settingsDeleteAccount => 'Obriši račun';
 
   @override
-  String get settingsDeleteConfirmTitle => 'Obrisati tvoj račun?';
+  String get settingsDeleteConfirmTitle => 'Obrisati svoj račun?';
 
   @override
   String get settingsDeleteConfirmBody =>
-      'Ovo trajno briše tvoj račun. Ako si posljednji član garaže, brišu se i njezina vozila te sva povijest. Ovo se ne može poništiti.';
+      'Ovo trajno briše tvoj račun. Ako si posljednji član garaže, brišu se i njezina vozila sa svom poviješću. Ovo se ne može poništiti.';
 
   @override
   String get settingsDeleteConfirmAction => 'Trajno obriši';
@@ -1077,7 +1077,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String apiKeyLastUsed(String date) {
-    return 'Zadnje korišten $date';
+    return 'Posljednji put korišten $date';
   }
 
   @override
@@ -1095,7 +1095,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get apiWebhookFormatHint =>
-      'Čita se iz adrese, osim ako primatelja držiš sam';
+      'Prepoznaje se iz adrese, osim ako primatelj radi na tvom poslužitelju';
 
   @override
   String get apiWebhookEvents => 'Šalje';
@@ -1109,7 +1109,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get apiWebhookEventCars =>
-      'Vozila dodana, arhivirana, posuđena ili predana';
+      'Vozila dodana, arhivirana, posuđena ili prenesena';
 
   @override
   String get apiWebhookEventMembers => 'Članovi koji se pridružuju ili odlaze';
@@ -1141,14 +1141,14 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String apiWebhookFailing(int status) {
-    return 'Zadnja isporuka nije uspjela ($status)';
+    return 'Posljednja isporuka nije uspjela ($status)';
   }
 
   @override
   String get apiWebhookName => 'Naziv';
 
   @override
-  String get apiWebhookNameHint => 'Neobavezno. Prikazuje se umjesto adrese';
+  String get apiWebhookNameHint => 'Neobvezno. Prikazuje se umjesto adrese';
 
   @override
   String get apiWebhookCars => 'Vozila';
@@ -1176,7 +1176,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get apiWebhookLanguageHint =>
-      'Za chat servise. Potpisani JSON ne ovisi o jeziku';
+      'Za chat aplikacije. Potpisani JSON ne ovisi o jeziku';
 
   @override
   String get apiWebhookFormatTeams => 'Microsoft Teams';
@@ -1195,7 +1195,7 @@ class AppLocalizationsHr extends AppLocalizations {
       'Zalijepi adresu s tokenom i korisničkim ključem';
 
   @override
-  String get apiWebhookCopied => 'Adresa kopirana';
+  String get apiWebhookCopied => 'Adresa je kopirana';
 
   @override
   String apiWebhookDelivered(String when) {
@@ -1204,28 +1204,30 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String apiWebhookRetrying(int attempt, int most) {
-    return 'Ponavlja se, pokušaj $attempt od $most';
+    return 'Ponovni pokušaj $attempt od $most';
   }
 
   @override
   String apiWebhookGivenUp(int most) {
-    return 'Odustalo se nakon $most pokušaja';
+    return 'Prekinuto nakon $most pokušaja';
   }
 
   @override
   String get apiWebhookQueued => 'U redu čekanja';
 
   @override
-  String get apiWebhookPaused => 'Pauzirano: zadnje isporuke nisu uspjele';
+  String get apiWebhookPaused =>
+      'Pauzirano: nijedna od posljednjih isporuka nije uspjela';
 
   @override
   String get apiWebhookResume => 'Nastavi';
 
   @override
-  String get apiWebhookSendTest => 'Pošalji test';
+  String get apiWebhookSendTest => 'Pošalji probnu poruku';
 
   @override
-  String get apiWebhookTestSent => 'Test poslan. Prati dnevnik ispod.';
+  String get apiWebhookTestSent =>
+      'Probna poruka je poslana. Prati dnevnik ispod.';
 
   @override
   String get apiWebhookLog => 'Nedavne isporuke';
@@ -1298,7 +1300,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get sheetVehicleLockedByFile =>
-      'Ukloni prilog da bi se ovo moglo premjestiti na drugi auto';
+      'Ukloni prilog ako ovo želiš premjestiti na drugi auto';
 
   @override
   String get sheetVehicleTapToChange => 'Dodirni za promjenu';
@@ -1316,7 +1318,8 @@ class AppLocalizationsHr extends AppLocalizations {
   String get vehicleVinHint => 'Iz broja popunjava marku, model i godinu';
 
   @override
-  String get vehicleVinNotFound => 'Broj šasije nije moguće dohvatiti';
+  String get vehicleVinNotFound =>
+      'Podatke za taj broj šasije nije moguće dohvatiti';
 
   @override
   String get vehicleVinDecoded => 'Popunjeno prema broju šasije';
@@ -1329,7 +1332,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String fuelCheaperNearby(String amount, String distance, String station) {
-    return '$amount jeftinije $distance dalje, na $station';
+    return '$amount jeftinije na postaji $station, $distance dalje';
   }
 
   @override
@@ -1346,7 +1349,7 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get vehicleTankCapacity => 'Zapremina spremnika';
+  String get vehicleTankCapacity => 'Obujam spremnika';
 
   @override
   String get vehicleTankCapacityHint =>
@@ -1357,7 +1360,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get vehicleCurrentValueHint =>
-      'Tvoja procjena. Uz nabavnu cijenu daje koliko auto košta držati, a ne samo voziti: gubitak vrijednosti najveći je trošak vlasništva.';
+      'Tvoja procjena. Uz kupovnu cijenu pokazuje koliko auto košta držati, a ne samo voziti: gubitak vrijednosti najveći je trošak vlasništva.';
 
   @override
   String get vehiclePurchasePrice => 'Kupovna cijena';
@@ -1401,20 +1404,20 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get vehicleTyresHint =>
-      'Setovi, sezonska zamjena, dubina profila i starost';
+      'Kompleti, sezonska zamjena, dubina profila i starost';
 
   @override
-  String get tyresEmpty => 'Dodaj garniture koje ovo vozilo koristi';
+  String get tyresEmpty => 'Dodaj komplete guma koje ovo vozilo koristi';
 
   @override
-  String get tyresAdd => 'Dodaj garnituru';
+  String get tyresAdd => 'Dodaj komplet';
 
   @override
-  String get tyresEdit => 'Uredi set';
+  String get tyresEdit => 'Uredi komplet';
 
   @override
   String tyresAgeAgeing(Object years) {
-    return 'Stare $years god. Provjeri ih svake godine';
+    return 'Stare $years god. Provjeravaj ih svake godine';
   }
 
   @override
@@ -1424,19 +1427,19 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String tyresAgeExpired(Object years) {
-    return 'Stare $years god. Zamijeni ih bez obzira na šaru';
+    return 'Stare $years god. Zamijeni ih bez obzira na profil';
   }
 
   @override
   String tyresAgeExpiredEstimated(Object years) {
-    return 'Stare otprilike $years god., procijenjeno prema ugradnji. Zamijeni ih bez obzira na šaru';
+    return 'Stare otprilike $years god., procijenjeno prema ugradnji. Zamijeni ih bez obzira na profil';
   }
 
   @override
   String get tyresDotCode => 'DOT oznaka';
 
   @override
-  String get tyresDotPerCorner => 'Kodovi su različiti na svakoj gumi';
+  String get tyresDotPerCorner => 'Svaka guma ima drukčiju oznaku';
 
   @override
   String get tyresDotSame => 'Sve su iste';
@@ -1446,7 +1449,8 @@ class AppLocalizationsHr extends AppLocalizations {
       'Četiri znamenke na boku gume, npr. 3419 za 34. tjedan 2019.';
 
   @override
-  String get tyresDotCodeInvalid => 'Četiri znamenke: tjedan 01-53, pa godina';
+  String get tyresDotCodeInvalid =>
+      'Četiri znamenke: tjedan od 01 do 53, pa godina';
 
   @override
   String get tyresName => 'Naziv';
@@ -1458,7 +1462,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tyresSize => 'Dimenzija';
 
   @override
-  String get tyresStorage => 'Spremljeno u';
+  String get tyresStorage => 'Mjesto čuvanja';
 
   @override
   String get tyresFitted => 'Na vozilu';
@@ -1486,10 +1490,10 @@ class AppLocalizationsHr extends AppLocalizations {
       'Ostaje na popisu sa svojim mjerenjima i više se ne nudi za montažu.';
 
   @override
-  String get tyresDelete => 'Izbriši komplet';
+  String get tyresDelete => 'Obriši komplet';
 
   @override
-  String get tyresDeleteConfirmTitle => 'Izbrisati ovaj komplet?';
+  String get tyresDeleteConfirmTitle => 'Obrisati ovaj komplet?';
 
   @override
   String get tyresDeleteConfirmBody =>
@@ -1499,16 +1503,16 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tyresRetired => 'Izvan uporabe';
 
   @override
-  String get tyresAddReading => 'Zabilježi šaru';
+  String get tyresAddReading => 'Zabilježi profil';
 
   @override
-  String get tyresTread => 'Šara';
+  String get tyresTread => 'Profil';
 
   @override
-  String get tyresTreadNone => 'Šara nije zabilježena';
+  String get tyresTreadNone => 'Profil nije zabilježen';
 
   @override
-  String get tyresReadingSaved => 'Šara je zabilježena';
+  String get tyresReadingSaved => 'Profil je zabilježen';
 
   @override
   String tyresMeasuredOn(String date) {
@@ -1536,7 +1540,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String tyresUneven(String low, String high) {
-    return 'Neravnomjerno: $low do $high';
+    return 'Neravnomjerno: od $low do $high';
   }
 
   @override
@@ -1609,7 +1613,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get vehicleNoEconomyYet =>
-      'Unesi dva puna točenja za prikaz potrošnje';
+      'Zabilježi dva točenja do punog spremnika i pojavit će se potrošnja';
 
   @override
   String economyTanksProgress(int count) {
@@ -1625,7 +1629,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get vehicleTrendNeedsMore =>
-      'Zabilježi još punih točenja za prikaz trenda';
+      'Zabilježi još točenja do punog spremnika i pojavit će se trend';
 
   @override
   String get plannerRestoreExcluded => 'Vrati isključene stavke';
@@ -1640,7 +1644,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get fuelDiesel => 'Dizel';
 
   @override
-  String get fuelLpg => 'Plin';
+  String get fuelLpg => 'Autoplin';
 
   @override
   String get fuelElectric => 'Struja';
@@ -1665,23 +1669,23 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get fuelSavedPlain => 'Točenje spremljeno.';
+  String get fuelSavedPlain => 'Točenje je spremljeno.';
 
   @override
-  String get serviceSaved => 'Servis zabilježen.';
+  String get serviceSaved => 'Servis je zabilježen.';
 
   @override
   String get costDuplicateWarning =>
-      'Isti iznos u istoj kategoriji već je zabilježen na taj dan';
+      'Isti iznos u istoj kategoriji već je zabilježen tog dana';
 
   @override
-  String get costSaved => 'Trošak spremljen.';
+  String get costSaved => 'Trošak je spremljen.';
 
   @override
   String get fuelAdd => 'Zabilježi točenje';
 
   @override
-  String get fuelLatest => 'Zadnja točenja';
+  String get fuelLatest => 'Posljednja točenja';
 
   @override
   String fuelAllFillUps(num count) {
@@ -1750,10 +1754,10 @@ class AppLocalizationsHr extends AppLocalizations {
       'Prekida lanac izračuna kako se ne bi prikazao pogrešan podatak';
 
   @override
-  String get fuelStation => 'Benzinska';
+  String get fuelStation => 'Postaja';
 
   @override
-  String get attachmentsTitle => 'Privici';
+  String get attachmentsTitle => 'Prilozi';
 
   @override
   String get attachmentsAdd => 'Dodaj račun ili dokument';
@@ -1765,11 +1769,11 @@ class AppLocalizationsHr extends AppLocalizations {
   String get fuelAverage => 'Prosjek';
 
   @override
-  String get fuelCostPerDistance => 'Trošak goriva, zadnje točenje';
+  String get fuelCostPerDistance => 'Trošak goriva, posljednje točenje';
 
   @override
   String get fuelNeedTwoValues =>
-      'Unesi barem dvije vrijednosti: količinu, cijenu ili ukupno';
+      'Unesi barem dva podatka: količinu, cijenu ili ukupan iznos';
 
   @override
   String get amountNotANumber => 'Nije broj';
@@ -1789,7 +1793,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String fuelOdometerLast(String previous) {
-    return 'Zadnje očitanje: $previous';
+    return 'Posljednje očitanje: $previous';
   }
 
   @override
@@ -1799,7 +1803,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String fuelImpliedConsumption(String rate) {
-    return 'To ispada $rate: provjeri kilometražu i količinu';
+    return 'To bi značilo $rate: provjeri kilometražu i količinu';
   }
 
   @override
@@ -1828,10 +1832,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get maintenanceEditService => 'Uredi servis';
 
   @override
-  String get maintenanceIntervalKm => 'Svakih (kilometara)';
+  String get maintenanceIntervalKm => 'Interval (udaljenost)';
 
   @override
-  String get maintenanceIntervalMonths => 'Svakih (mjeseci)';
+  String get maintenanceIntervalMonths => 'Interval (mjeseci)';
 
   @override
   String intervalNoteMake(String make) {
@@ -1860,7 +1864,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get intervalNoteAdvisory =>
-      'Proizvođači često kažu \"doživotno\", nezavisni serviseri ipak mijenjaju';
+      'Proizvođači često kažu „doživotno”, ali ga nezavisni serviseri ipak mijenjaju';
 
   @override
   String get maintenanceIntervalHint =>
@@ -1868,7 +1872,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String maintenanceDueAt(String odometer) {
-    return 'pri $odometer';
+    return 'na $odometer';
   }
 
   @override
@@ -1886,7 +1890,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String maintenanceOtherDeadlineByDate(String date) {
-    return 'Po roku tek $date';
+    return 'Po datumu tek $date';
   }
 
   @override
@@ -1901,14 +1905,14 @@ class AppLocalizationsHr extends AppLocalizations {
       locale: localeName,
       other: '$days dana',
       few: '$days dana',
-      one: '$days dan',
+      one: '$days dana',
     );
-    return 'Datumi dolje procijenjeni su po $rate/dan iz očitanja kroz $_temp0';
+    return 'Datumi ispod procijenjeni su prema $rate/dan iz očitanja tijekom $_temp0';
   }
 
   @override
   String maintenanceRateUnmeasured(String rate) {
-    return 'Još ne znamo koliko voziš: datumi ispod temelje se na vremenskom intervalu. Nakon par tjedana očitanja pojavit će se i procjena po kilometraži; pravilo samo s kilometrima do tada računa $rate/dan.';
+    return 'Još ne znamo koliko voziš pa se datumi ispod temelje na vremenskom intervalu. Nakon nekoliko tjedana očitanja pojavit će se i procjena po kilometraži; podsjetnik zadan samo udaljenošću dotad računa s $rate/dan.';
   }
 
   @override
@@ -1953,14 +1957,14 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get serviceDuplicateWarning =>
-      'Isti zahvat na istoj kilometraži već je zabilježen na taj dan';
+      'Isti zahvat na istoj kilometraži već je zabilježen tog dana';
 
   @override
   String get documentsTitle => 'Dokumenti';
 
   @override
   String get documentsSubtitle =>
-      'Registracija, tehnički, osiguranje i kada svakome ističe rok';
+      'Registracija, tehnički pregled, osiguranje i kada kojem ističe rok';
 
   @override
   String get documentsEmpty =>
@@ -1982,10 +1986,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get documentType => 'Vrsta';
 
   @override
-  String get documentLabel => 'Što je to';
+  String get documentLabel => 'Naziv';
 
   @override
-  String get documentLabelHint => 'Samo za dokument koji ovaj popis ne imenuje';
+  String get documentLabelHint => 'Samo za dokument kojeg nema na popisu';
 
   @override
   String get documentNumber => 'Broj';
@@ -2041,11 +2045,11 @@ class AppLocalizationsHr extends AppLocalizations {
   String get documentLabelRequired => 'Napiši o kojem se dokumentu radi';
 
   @override
-  String get documentSaved => 'Dokument spremljen.';
+  String get documentSaved => 'Dokument je spremljen.';
 
   @override
   String get documentReminderNote =>
-      'Podsjetnik se postavlja prema roku, pa se stavka pojavi u planeru prije isteka.';
+      'Podsjetnik se postavlja prema roku, pa će se stavka pojaviti u planeru prije isteka.';
 
   @override
   String get documentNoReminderNote =>
@@ -2082,7 +2086,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get serviceTypeSearch => 'Pretraži';
 
   @override
-  String get serviceTypeCommon => 'Uobičajeno';
+  String get serviceTypeCommon => 'Najčešće';
 
   @override
   String get serviceTypeOthers => 'Sve ostalo';
@@ -2175,7 +2179,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get serviceVignette => 'Vinjeta ističe';
 
   @override
-  String get maintenanceStateUpcoming => 'Nadolazi';
+  String get maintenanceStateUpcoming => 'Uskoro';
 
   @override
   String get maintenanceStateDue => 'Dospijeva';
@@ -2200,7 +2204,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get plannerOverdueNote =>
-      'Sve što kasni prikazano je pod današnjim danom jer to treba obaviti sada';
+      'Sve što kasni prikazano je pod današnjim danom jer to treba obaviti danas';
 
   @override
   String get plannerFurtherOut => 'Kasnije';
@@ -2241,7 +2245,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get dashboardDueByDateOnly =>
-      'po datumu; nakon par tjedana vožnje pojavit će se procjena po kilometraži';
+      'po datumu; nakon nekoliko tjedana vožnje pojavit će se procjena po kilometraži';
 
   @override
   String dashboardVehicleCount(int count) {
@@ -2257,7 +2261,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String bundleVisitOn(String date) {
-    return 'Jedan posjet $date';
+    return 'Jedan odlazak u servis $date';
   }
 
   @override
@@ -2273,25 +2277,25 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get bundleLogVisit => 'Zabilježi ovaj posjet';
+  String get bundleLogVisit => 'Zabilježi ovaj odlazak';
 
   @override
   String get bundleExcludeHint =>
-      'Izbacivanje stavke mijenja samo prijedlog iznad; ništa se ne bilježi ni ne otkazuje.';
+      'Izbačena stavka mijenja samo prijedlog iznad: ništa se ne bilježi ni ne otkazuje.';
 
   @override
   String get bundlePutBack => 'Vrati';
 
   @override
   String get bundleOneVehicleOnly =>
-      'Bilježi po vozilu: ove su stavke na više njih.';
+      'Zabilježi zasebno za svako vozilo: ove stavke pripadaju različitim vozilima.';
 
   @override
   String get bundleExclude => 'Preskoči';
 
   @override
   String get bundleExplain =>
-      'Ove stavke dolaze na red otprilike u isto vrijeme, pa ih obavi u jednom posjetu i uštedi još jedan odlazak';
+      'Ove stavke dospijevaju otprilike u isto vrijeme: obavi ih u jednom odlasku i uštedi si još jedan put';
 
   @override
   String notificationDueTitle(String service) {
@@ -2305,7 +2309,7 @@ class AppLocalizationsHr extends AppLocalizations {
       locale: localeName,
       other: '$count stavki dospijeva zajedno',
       few: '$count stavke dospijevaju zajedno',
-      one: '$count stavka dospijeva',
+      one: '$count stavka dospijeva zajedno',
     );
     return '$_temp0';
   }
@@ -2351,9 +2355,9 @@ class AppLocalizationsHr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Objedini $count stavki u jedan posjet',
-      few: 'Objedini $count stavke u jedan posjet',
-      one: 'Objedini $count stavku u jedan posjet',
+      other: 'Objedini $count stavki u jedan odlazak',
+      few: 'Objedini $count stavke u jedan odlazak',
+      one: 'Objedini $count stavku u jedan odlazak',
     );
     return '$_temp0';
   }
@@ -2379,11 +2383,11 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get aboutPromiseData =>
-      'Tvoji su zapisi tvoji. Sve možeš izvesti u CSV kad god želiš: otvara se u bilo kojem programu za tablice.';
+      'Tvoji zapisi pripadaju tebi. Sve možeš izvesti u CSV kad god želiš: otvara se u bilo kojem programu za tablice.';
 
   @override
   String get aboutPromiseLeave =>
-      'Odlazak je namjerno jednostavan. Obrišeš račun i tvoja garaža nestaje s njim. Garaža koju dijeliš ostaje ostalima, a u njoj i tvoji unosi, bez tvog imena.';
+      'Odlazak je namjerno jednostavan. Obrišeš li račun, nestaje i tvoja garaža. Garaža koju dijeliš ostaje ostalima, s tvojim unosima, ali bez tvog imena.';
 
   @override
   String get aboutPromisePrivacy =>
@@ -2409,7 +2413,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get aboutSendFeedback => 'Pošalji povratnu informaciju';
 
   @override
-  String get aboutSendFeedbackHint => 'Bug, ideja, ili samo da se javiš';
+  String get aboutSendFeedbackHint => 'Pogreška, ideja ili samo pozdrav';
 
   @override
   String get aboutFeedbackSubject => 'Povratna informacija za Garažu';
@@ -2429,7 +2433,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get diagnosticsExplain =>
-      'Čuva se samo na ovom uređaju. Ništa se nikamo ne šalje dok to sam ne podijeliš.';
+      'Čuva se samo na ovom uređaju. Ništa se nikamo ne šalje dok to ti ne podijeliš.';
 
   @override
   String get diagnosticsShare => 'Podijeli';
@@ -2438,11 +2442,11 @@ class AppLocalizationsHr extends AppLocalizations {
   String get diagnosticsClear => 'Obriši';
 
   @override
-  String get diagnosticsCleared => 'Dijagnostika obrisana';
+  String get diagnosticsCleared => 'Dijagnostika je obrisana';
 
   @override
   String get settingsTrackingBasicHint =>
-      'Datum, kilometraža, što je napravljeno i koliko je stajalo';
+      'Datum, kilometraža, što je obavljeno i koliko je koštalo';
 
   @override
   String get settingsTrackingDetailedHint =>
@@ -2454,29 +2458,29 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String settingsImportCreates(String name) {
-    return 'Ovo će dodati $name u tvoju garažu';
+    return 'U tvoju garažu dodat će se $name';
   }
 
   @override
   String get settingsImportNoVehicle =>
-      'Ta sigurnosna kopija ne sadrži vozilo. Prvo dodaj vozilo, pa uvezi u njega.';
+      'Ta sigurnosna kopija ne sadrži vozilo. Najprije dodaj vozilo, a zatim uvezi podatke u njega.';
 
   @override
   String get settingsImportStation => 'Benzinska postaja';
 
   @override
   String get settingsImportStationHint =>
-      'Nije obavezno: ova datoteka ne piše gdje je točeno';
+      'Neobvezno: u ovoj datoteci ne piše gdje je točeno';
 
   @override
   String get settingsImportFuelType => 'Gorivo koje koristi';
 
   @override
   String get settingsExportNothing =>
-      'Još nema ničega za izvoz; prvo zabilježi točenje ili servis';
+      'Još nema ničega za izvoz: najprije zabilježi točenje ili servis';
 
   @override
-  String get householdInvites => 'Pozivni kodovi';
+  String get householdInvites => 'Kodovi pozivnica';
 
   @override
   String get householdInvitesHint =>
@@ -2501,7 +2505,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get householdInviteRevokeBody =>
-      'Nitko se više neće moći pridružiti s tim kodom. Možeš napraviti novi.';
+      'Tim se kodom više nitko neće moći pridružiti. Možeš napraviti novi.';
 
   @override
   String get householdInviteRevoked => 'Kod je povučen';
@@ -2541,7 +2545,7 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get maintenanceLastDone => 'Zadnji put obavljeno (nije obavezno)';
+  String get maintenanceLastDone => 'Posljednji put obavljeno (neobvezno)';
 
   @override
   String get maintenanceLastDoneHint =>
@@ -2581,11 +2585,11 @@ class AppLocalizationsHr extends AppLocalizations {
   String get runningCostPerYear => 'Godišnje';
 
   @override
-  String get runningCostTotal => 'Otkad je dodan';
+  String get runningCostTotal => 'Otkad je dodano';
 
   @override
   String get runningCostSpread =>
-      'Godišnje stavke poput osiguranja i registracije raspoređene su kroz svoju godinu za iznose po mjesecu i po godini.';
+      'U mjesečnim i godišnjim iznosima godišnje stavke, poput osiguranja i registracije, raspoređene su na godinu koju pokrivaju.';
 
   @override
   String runningCostToOwn(String rate) {
@@ -2597,7 +2601,7 @@ class AppLocalizationsHr extends AppLocalizations {
       'Procjena je starija od godinu dana. Osvježi je na stranici vozila.';
 
   @override
-  String get runningCostOwnership => 'Ukupan trošak vlasništva do sad';
+  String get runningCostOwnership => 'Ukupni trošak vlasništva dosad';
 
   @override
   String get runningCostNotEnough =>
@@ -2655,7 +2659,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get settingsPumpAutofill => 'Popuni postaju i cijenu umjesto mene';
 
   @override
-  String get settingsDataBringIn => 'Unos podataka';
+  String get settingsDataBringIn => 'Uvoz podataka';
 
   @override
   String get settingsDataTakeOut => 'Izvoz podataka';
@@ -2668,7 +2672,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get settingsPumpAutofillHint =>
-      'Koristi tvoju lokaciju na pumpi da prepozna postaju na kojoj si i popuni današnju objavljenu cijenu tvojeg goriva. Ništa se ne šalje: lokacija se uspoređuje s cijenama koje su već na telefonu.';
+      'Kad si na pumpi, prema tvojoj lokaciji prepoznaje postaju i upisuje današnju objavljenu cijenu tvog goriva. Ništa se ne šalje: lokacija se uspoređuje s cijenama koje su već na telefonu.';
 
   @override
   String get settingsPumpAutofillOn =>
@@ -2679,22 +2683,22 @@ class AppLocalizationsHr extends AppLocalizations {
       'Lokacija je isključena za Garažu. Uključi je u postavkama sustava.';
 
   @override
-  String get settingsSampleData => 'Učitaj primjer podataka';
+  String get settingsSampleData => 'Učitaj ogledne podatke';
 
   @override
   String get settingsSampleDataHint =>
-      'Dodaje jedno vozilo s godinom točenja, servisa i troškova, da svaki ekran ima što pokazati. Uklanja se preko Više → Postavke → Obriši sve podatke.';
+      'Dodaje jedno vozilo s godinom točenja, servisa i troškova, da svaki zaslon ima što pokazati. Uklanja se preko Više → Postavke → Obriši sve podatke.';
 
   @override
   String get settingsSampleDataConfirmTitle => 'Učitati ogledne podatke?';
 
   @override
   String settingsSampleDataConfirmBody(String vehicle) {
-    return 'Ovo u ovu garažu dodaje ogledni auto ($vehicle) s godinom dana povijesti, uz ono što već imaš. Možeš ga poslije obrisati.';
+    return 'U ovu garažu dodaje se ogledni auto ($vehicle) s godinom dana povijesti, uz ono što već imaš. Poslije ga možeš obrisati.';
   }
 
   @override
-  String get settingsSampleDataDone => 'Primjer vozila je dodan';
+  String get settingsSampleDataDone => 'Ogledno vozilo je dodano';
 
   @override
   String get gettingStarted => 'Za početak';
@@ -2720,20 +2724,20 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get gettingStartedSample =>
-      'Ili učitaj primjer podataka da prvo razgledaš';
+      'Ili najprije učitaj ogledne podatke i razgledaj';
 
   @override
-  String get gettingStartedTour => 'Pogledaj što sve Garage može';
+  String get gettingStartedTour => 'Pogledaj što sve Garaža može';
 
   @override
   String get gettingStartedHide => 'Sakrij';
 
   @override
-  String get featuresTitle => 'Što Garage može';
+  String get featuresTitle => 'Što Garaža može';
 
   @override
   String get featuresHint =>
-      'Kratki vodič kroz glavne mogućnosti i gdje se svaka nalazi';
+      'Kratak vodič kroz glavne mogućnosti i gdje se koja nalazi';
 
   @override
   String get featureAddVehicle => 'Dodaj vozilo';
@@ -2747,7 +2751,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get featureFuelBlurb =>
-      'Točenje zabilježi u par sekundi s početnog zaslona. Potrošnja, cijena po kilometru i koliko prijeđeš s punim spremnikom izračunaju se sami.';
+      'Točenje zabilježi u nekoliko sekundi s Pregleda. Potrošnja, cijena po kilometru i domet s punim spremnikom izračunavaju se automatski.';
 
   @override
   String get featurePlannerBlurb =>
@@ -2767,7 +2771,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get featureTripsBlurb =>
-      'Bilježi privatna i poslovna putovanja; udaljenost dolazi s brojača kilometara.';
+      'Bilježi privatna i poslovna putovanja; udaljenost se računa iz kilometraže.';
 
   @override
   String get featureCalculatorBlurb =>
@@ -2778,14 +2782,14 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get featureTyresBlurb =>
-      'Setovi guma, sezonska zamjena, dubina profila i starost, na stranici svakog vozila.';
+      'Kompleti guma, sezonska zamjena, dubina profila i starost, na stranici svakog vozila.';
 
   @override
   String get featureDocuments => 'Dokumenti';
 
   @override
   String get featureDocumentsBlurb =>
-      'Registracija, tehnički, osiguranje i zelena karta, svaki sa svojim rokom i podsjetnikom prije isteka.';
+      'Registracija, tehnički pregled, osiguranje i zelena karta, svaki dokument sa svojim rokom i podsjetnikom prije isteka.';
 
   @override
   String get featureReceipts => 'Računi i fakture';
@@ -2813,7 +2817,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get featureDataBlurb =>
-      'Prenesi povijest iz Fuelia ili bilo kojeg CSV-a; izvezi je ili napravi kopiju kad god želiš.';
+      'Prenesi povijest iz Fuelija ili bilo kojeg CSV-a; izvezi je ili napravi sigurnosnu kopiju kad god želiš.';
 
   @override
   String get featureApiBlurb =>
@@ -2823,26 +2827,26 @@ class AppLocalizationsHr extends AppLocalizations {
   String get odometerTitle => 'Kilometraža';
 
   @override
-  String get odometerAdd => 'Zabilježi stanje';
+  String get odometerAdd => 'Zabilježi očitanje';
 
   @override
-  String get odometerEdit => 'Uredi stanje';
+  String get odometerEdit => 'Uredi očitanje';
 
   @override
-  String get odometerReading => 'Stanje brojača';
+  String get odometerReading => 'Kilometraža';
 
   @override
   String get odometerHint =>
-      'Stanje brojača bez troška, da održavanje zna koliko je vozilo prešlo.';
+      'Očitanje kilometraže bez troška, da održavanje zna koliko je vozilo prešlo.';
 
   @override
   String get quickAddOdometer => 'Kilometraža';
 
   @override
-  String get statsPeriodAllTime => 'Sve';
+  String get statsPeriodAllTime => 'Od početka';
 
   @override
-  String get statsPeriodLastTwelve => 'Zadnjih 12 mjeseci';
+  String get statsPeriodLastTwelve => 'Posljednjih 12 mjeseci';
 
   @override
   String get statsPeriodCustom => 'Odaberi datume';
@@ -2878,13 +2882,13 @@ class AppLocalizationsHr extends AppLocalizations {
   String get statsByCategory => 'Po kategoriji';
 
   @override
-  String get statsByStation => 'Plaćeno po benzinskoj';
+  String get statsByStation => 'Troškovi po postaji';
 
   @override
-  String get statsMonthlySpend => 'Potrošnja po mjesecu';
+  String get statsMonthlySpend => 'Troškovi po mjesecu';
 
   @override
-  String get statsEconomyByStation => 'Potrošnja po benzinskoj';
+  String get statsEconomyByStation => 'Potrošnja po postaji';
 
   @override
   String get statsEconomyByStationNote =>
@@ -2903,7 +2907,7 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get statsOdometerChart => 'Kilometraža kroz vrijeme';
+  String get statsOdometerChart => 'Kilometraža tijekom vremena';
 
   @override
   String get statsFullTankRange => 'S punim spremnikom';
@@ -2925,9 +2929,9 @@ class AppLocalizationsHr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'Iz $count punih spremnika, ukupno',
-      few: 'Iz $count puna spremnika, ukupno',
-      one: 'Iz $count punog spremnika, ukupno',
+      other: 'Iz $count punih spremnika, od početka',
+      few: 'Iz $count puna spremnika, od početka',
+      one: 'Iz $count punog spremnika, od početka',
     );
     return '$_temp0';
   }
@@ -2952,14 +2956,14 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get statsCustomiseHint =>
-      'Isključeno ovdje, maknuto s puta. Ništa se ne briše.';
+      'Ono što ovdje isključiš samo se skriva. Ništa se ne briše.';
 
   @override
   String get statsShowAll => 'Prikaži sve';
 
   @override
   String get statsNothingShown =>
-      'Sve je skriveno. Odaberi što prikazati iz izbornika.';
+      'Sve je skriveno. U izborniku odaberi što želiš vidjeti.';
 
   @override
   String get tripsTitle => 'Putovanja';
@@ -2987,7 +2991,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String tripImpliedSpeed(String speed) {
-    return 'To ispada $speed: provjeri udaljenost i vrijeme';
+    return 'To bi značilo $speed: provjeri udaljenost i vrijeme';
   }
 
   @override
@@ -2995,23 +2999,24 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get tripDriverHint =>
-      'Tko je vozio: putni nalog traži ime, a nije uvijek onaj tko je unio zapis.';
+      'Tko je vozio: putni nalog traži ime vozača, a to nije uvijek onaj tko je upisao unos.';
 
   @override
-  String get tripDistanceRequired => 'Unesi udaljenost ili oba stanja brojača.';
+  String get tripDistanceRequired =>
+      'Unesi udaljenost ili kilometražu na početku i na kraju.';
 
   @override
-  String get tripStartOdometer => 'Brojač na početku';
+  String get tripStartOdometer => 'Kilometraža na početku';
 
   @override
-  String get tripEndOdometer => 'Brojač na kraju';
+  String get tripEndOdometer => 'Kilometraža na kraju';
 
   @override
   String get tripOdometerOrder =>
-      'Stanje na kraju ne može biti manje od početnog.';
+      'Kilometraža na kraju ne može biti manja od početne.';
 
   @override
-  String get tripMinutes => 'Minuta';
+  String get tripMinutes => 'Minute';
 
   @override
   String get tripPurpose => 'Svrha';
@@ -3047,7 +3052,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String tripDriveSince(String time) {
-    return 'Krenuli u $time';
+    return 'Polazak u $time';
   }
 
   @override
@@ -3070,14 +3075,14 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get tripDriveOdometerNowHint =>
-      'Ono što piše na brojaču. Ostavi prazno ako ne vidiš.';
+      'Stanje na brojaču kilometara. Ostavi prazno ako ga ne vidiš.';
 
   @override
   String get tripDriveStarted => 'Vožnja je započela. Završi je kad parkiraš.';
 
   @override
   String tripDriveFinished(String distance) {
-    return 'Vožnja zabilježena: $distance';
+    return 'Vožnja je zabilježena: $distance';
   }
 
   @override
@@ -3088,7 +3093,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String tripDriveStartedBy(String name) {
-    return 'Započeo/la $name';
+    return 'Vožnju bilježi $name';
   }
 
   @override
@@ -3176,32 +3181,33 @@ class AppLocalizationsHr extends AppLocalizations {
   String get transferTitle => 'Prijenos vozila';
 
   @override
-  String get transferCodeCancel => 'Otkaži ovu predaju';
+  String get transferCodeCancel => 'Otkaži ovaj prijenos';
 
   @override
-  String get transferCodeCancelled => 'Predaja je otkazana. Kod više ne radi.';
+  String get transferCodeCancelled =>
+      'Prijenos je otkazan. Kod više ne vrijedi.';
 
   @override
   String get transferSellHint =>
-      'Daj kupcu ovaj kod. Vozilo i cijela povijest prelaze u njegovu garažu, a iz tvoje više nisu.';
+      'Daj kupcu ovaj kod. Vozilo i cijela njegova povijest prelaze iz tvoje garaže u njegovu.';
 
   @override
-  String get transferBought => 'Kupnja vozila?';
+  String get transferBought => 'Kupuješ vozilo?';
 
   @override
   String get transferBoughtHint => 'Unesi kod koji ti je dao prodavatelj.';
 
   @override
-  String get transferGenerate => 'Dohvati kod za prijenos';
+  String get transferGenerate => 'Izradi kod za prijenos';
 
   @override
-  String get transferConfirmTitle => 'Predati ovo vozilo?';
+  String get transferConfirmTitle => 'Prenijeti ovo vozilo?';
 
   @override
   String get transferRedeem => 'Iskoristi kod';
 
   @override
-  String get transferCompletedTitle => 'Predano';
+  String get transferCompletedTitle => 'Preneseno';
 
   @override
   String transferCompletedNamed(String nickname) {
@@ -3216,13 +3222,13 @@ class AppLocalizationsHr extends AppLocalizations {
   String get transferCompletedDismiss => 'U redu';
 
   @override
-  String get transferSell => 'Prodaja vozila?';
+  String get transferSell => 'Prodaješ vozilo?';
 
   @override
   String get transferCode => 'Kod za prijenos';
 
   @override
-  String get transferCopied => 'Kod kopiran';
+  String get transferCopied => 'Kod je kopiran';
 
   @override
   String get transferDone => 'Vozilo je sada u tvojoj garaži.';
@@ -3233,14 +3239,14 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get transferPhotoNote =>
-      'Fotografija ostaje kod tebe; sve ostalo ide.';
+      'Fotografija ostaje tebi, a sve ostalo prelazi novom vlasniku.';
 
   @override
   String get vehicleSecondFuel => 'Drugo gorivo';
 
   @override
   String get vehicleSecondFuelHint =>
-      'Za vozilo koje vozi na dva goriva, na primjer plin uz benzin. Kod svakog točenja odabereš koje je gorivo ušlo.';
+      'Za vozilo na dva goriva, na primjer autoplin uz benzin. Pri svakom točenju odabereš koje je gorivo natočeno.';
 
   @override
   String get vehicleSecondFuelNone => 'Bez drugog goriva';
@@ -3252,7 +3258,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get vehicleSectionEngine => 'Motor i gorivo';
 
   @override
-  String get vehicleSectionOptional => 'Neobavezni podaci';
+  String get vehicleSectionOptional => 'Neobvezni podaci';
 
   @override
   String get vehicleKindCar => 'Automobil';
@@ -3322,7 +3328,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get fuelWhichFuel => 'Gorivo';
 
   @override
-  String get fuelCng => 'SPP';
+  String get fuelCng => 'CNG';
 
   @override
   String get fuelEthanol => 'Etanol';
@@ -3341,7 +3347,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get csvImportIntro =>
-      'Iz Drivva, tablice ili bilo čega drugog što izvozi tablicu. Odaberi datoteku, reci koji je stupac što, i provjeri pregled prije upisa.';
+      'Iz Drivva, proračunske tablice ili bilo koje aplikacije koja izvozi tablicu. Odaberi datoteku, odredi koji je stupac što i provjeri pregled prije upisa.';
 
   @override
   String get csvPickFile => 'Odaberi datoteku';
@@ -3354,7 +3360,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get csvWhatIsIt => 'Što je u datoteci';
 
   @override
-  String get csvKindFuel => 'Točenja goriva';
+  String get csvKindFuel => 'Točenja';
 
   @override
   String get csvKindCost => 'Troškovi';
@@ -3363,7 +3369,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get csvKindService => 'Servisi';
 
   @override
-  String get csvKindOdometer => 'Stanja brojača';
+  String get csvKindOdometer => 'Očitanja kilometraže';
 
   @override
   String get csvKindTrip => 'Putovanja';
@@ -3381,10 +3387,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get csvColumnNone => 'Nije u datoteci';
 
   @override
-  String get csvRequired => 'obavezno';
+  String get csvRequired => 'obvezno';
 
   @override
-  String get csvDayFirst => 'Datumi počinju danom (31.12.)';
+  String get csvDayFirst => 'Datumi počinju danom (31. 12.)';
 
   @override
   String get csvMiles => 'Udaljenosti su u miljama';
@@ -3427,7 +3433,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String csvRowProblem(int line, String field) {
-    return 'Redak $line: $field se ne može pročitati';
+    return 'Redak $line: nije moguće pročitati polje $field';
   }
 
   @override
@@ -3442,7 +3448,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get csvFieldDate => 'Datum';
 
   @override
-  String get csvFieldOdometer => 'Brojač';
+  String get csvFieldOdometer => 'Kilometraža';
 
   @override
   String get csvFieldVolume => 'Količina';
@@ -3454,10 +3460,10 @@ class AppLocalizationsHr extends AppLocalizations {
   String get csvFieldTotal => 'Ukupno';
 
   @override
-  String get csvFieldFullTank => 'Puni spremnik';
+  String get csvFieldFullTank => 'Pun spremnik';
 
   @override
-  String get csvFieldStation => 'Benzinska';
+  String get csvFieldStation => 'Postaja';
 
   @override
   String get csvFieldNotes => 'Bilješke';
@@ -3475,7 +3481,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get csvFieldCost => 'Trošak';
 
   @override
-  String get csvFieldShop => 'Servis';
+  String get csvFieldShop => 'Radionica';
 
   @override
   String get csvFieldDistance => 'Udaljenost';
@@ -3493,7 +3499,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get csvFieldBusiness => 'Poslovno putovanje';
 
   @override
-  String get csvFieldMinutes => 'Minuta';
+  String get csvFieldMinutes => 'Minute';
 
   @override
   String get settingsImportCsv => 'Uvezi CSV (bilo koja aplikacija)';
@@ -3503,51 +3509,51 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get settingsAutoBackupOff =>
-      'Isključeno: odaberi mapu za kopiju jednom dnevno';
+      'Isključeno: odaberi mapu u koju će se kopija spremati jednom dnevno';
 
   @override
   String settingsAutoBackupOn(String when) {
-    return 'Jednom dnevno, zadnja kopija $when';
+    return 'Jednom dnevno, posljednja kopija $when';
   }
 
   @override
-  String get settingsAutoBackupJustRan => 'Automatski spremljena kopija';
+  String get settingsAutoBackupJustRan => 'Kopija je automatski spremljena';
 
   @override
   String get settingsAutoBackupNever => 'Jednom dnevno, još nije pokrenuto';
 
   @override
   String get settingsAutoBackupFailed =>
-      'Zadnja kopija nije uspjela. Dodirni i ponovno odaberi mapu';
+      'Posljednja kopija nije uspjela. Dodirni i ponovno odaberi mapu';
 
   @override
-  String get settingsAutoBackupStop => 'Prekini kopiranje';
+  String get settingsAutoBackupStop => 'Isključi automatsko kopiranje';
 
   @override
   String get settingsExportHint =>
-      'Zip s tablicama, po jedna datoteka za svaki auto i svaku vrstu. Čita se svugdje; za vraćanje podataka koristi sigurnosnu kopiju.';
+      'ZIP s tablicama, po jedna datoteka za svaki auto i svaku vrstu. Otvara se bilo gdje; za vraćanje podataka koristi sigurnosnu kopiju.';
 
   @override
   String get settingsImportCsvHint =>
-      'Iz Drivva, tablice ili bilo čega što izvozi tablicu. Dodaje ono što nedostaje, ništa se ne prepisuje.';
+      'Iz Drivva, proračunske tablice ili bilo koje aplikacije koja izvozi tablicu. Dodaje ono što nedostaje, a postojeće ne mijenja.';
 
   @override
   String get settingsBackup => 'Napravi sigurnosnu kopiju svega';
 
   @override
   String get settingsBackupHint =>
-      'Datoteka koja se može vratiti, za razliku od CSV izvoza';
+      'Datoteka iz koje se podaci mogu vratiti, za razliku od CSV izvoza';
 
   @override
   String get settingsRestore => 'Vrati iz sigurnosne kopije';
 
   @override
   String get settingsRestoreHint =>
-      'Dodaje ono što nedostaje. Ništa se ne briše niti prepisuje.';
+      'Dodaje ono što nedostaje. Ništa se ne briše ni ne mijenja.';
 
   @override
   String settingsBackupDone(String file) {
-    return 'Sigurnosna kopija spremljena: $file';
+    return 'Sigurnosna kopija je spremljena: $file';
   }
 
   @override
@@ -3557,7 +3563,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get settingsRestoreNotABackup =>
-      'Ta datoteka nije Garage sigurnosna kopija.';
+      'Ta datoteka nije sigurnosna kopija Garaže.';
 
   @override
   String get stationsPickNearest => 'Najbliža';
@@ -3623,10 +3629,10 @@ class AppLocalizationsHr extends AppLocalizations {
       'Garažu može preimenovati samo administrator';
 
   @override
-  String get householdDelete => 'Izbriši garažu';
+  String get householdDelete => 'Obriši garažu';
 
   @override
-  String get householdDeleteTitle => 'Izbrisati ovu garažu?';
+  String get householdDeleteTitle => 'Obrisati ovu garažu?';
 
   @override
   String get householdDeleteBody =>
@@ -3657,11 +3663,11 @@ class AppLocalizationsHr extends AppLocalizations {
   String get timelineSearch => 'Pretraži povijest';
 
   @override
-  String get timelineNoMatches => 'Ništa ne odgovara tome.';
+  String get timelineNoMatches => 'Ništa ne odgovara pretrazi.';
 
   @override
   String get timelineSearchCovers =>
-      'Pretraga obuhvaća vrstu unosa, vozilo, tko ga je unio, datum i bilješke.';
+      'Pretraživanje obuhvaća vrstu unosa, vozilo, osobu koja ga je unijela, datum i bilješke.';
 
   @override
   String get timelineFilterVehicle => 'Vozilo';
@@ -3765,17 +3771,17 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get authConfirmChecking => 'Potvrđujemo tvoju e-mail adresu…';
+  String get authConfirmChecking => 'Potvrđujemo tvoju e-adresu…';
 
   @override
-  String get authConfirmFailedTitle => 'Poveznica nije uspjela';
+  String get authConfirmFailedTitle => 'Poveznica ne radi';
 
   @override
   String get authConfirmFailedBody =>
-      'Poveznice za potvrdu vrijede jednom i istječu. Zatraži novu prijavom ili se registriraj ponovno.';
+      'Poveznica za potvrdu vrijedi samo jednom i s vremenom istječe. Novu ćeš dobiti kad se prijaviš, a možeš i ponovno otvoriti račun.';
 
   @override
-  String get authConfirmNoLink => 'Ovdje nema ničega za potvrditi.';
+  String get authConfirmNoLink => 'Ovdje nema ničega za potvrdu.';
 
   @override
   String get authConfirmSignIn => 'Idi na prijavu';
@@ -3803,7 +3809,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get settingsSettlementHint =>
-      'Dijeli sve zabilježeno ravnomjerno među članovima i računa tko kome duguje. Korisno kad dijeliš auto, a novac ti je odvojen.';
+      'Sve zabilježeno dijeli na jednake dijelove među članovima i računa tko kome duguje. Korisno kad s nekim dijeliš auto, ali ne i novac.';
 
   @override
   String get settingsSettlementEnable => 'Računaj tko kome duguje';
@@ -3815,12 +3821,12 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String tyreWindowWhenWintry(String from, String to) {
-    return 'Zimske gume od $from do $to, kad su zimski uvjeti';
+    return 'Zimske gume od $from do $to, kad su na cesti zimski uvjeti';
   }
 
   @override
   String get tyreWindowSituational =>
-      'Nema fiksnih datuma: zimske gume kad su zimski uvjeti';
+      'Bez fiksnih datuma: zimske gume kad su na cesti zimski uvjeti';
 
   @override
   String get notificationSwapToWinter => 'Stavi zimske gume';
@@ -3833,13 +3839,13 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get guestLendIntro =>
-      'Daj nekome kod i moći će bilježiti na ovaj auto, i ništa drugo, dok kod ne istekne. Ne ulazi u tvoju garažu. Uvijek vidi podatke o samom autu, stanje kilometraže, do kada vrijede papiri, otvorene probleme i gume; ostalo iz tvojih zapisa ostaje skriveno dok to ne dopustiš.';
+      'Daj nekome kod i do njegova isteka ta će osoba moći bilježiti unose za ovaj auto i ni za što drugo. Ne ulazi u tvoju garažu. Uvijek vidi podatke o samom autu, kilometražu, do kada vrijede dokumenti, otvorene probleme i gume; ostali tvoji zapisi ostaju skriveni dok to ne dopustiš.';
 
   @override
   String get guestLendLabel => 'Za koga je';
 
   @override
-  String get guestLendLabelHint => 'Samo za tvoju evidenciju; oni to ne vide.';
+  String get guestLendLabelHint => 'Samo za tebe: ta osoba to ne vidi.';
 
   @override
   String get guestLendAllowFuel => 'Bilježenje točenja';
@@ -3855,13 +3861,13 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get guestLendAllowHistoryHint =>
-      'Isključeno: vide samo ono što su sami zabilježili.';
+      'Zadano isključeno: osoba vidi samo ono što je sama zabilježila.';
 
   @override
   String get guestLendAction => 'Napravi kod';
 
   @override
-  String get guestLendCreated => 'Predaj ovaj kod';
+  String get guestLendCreated => 'Proslijedi ovaj kod';
 
   @override
   String get guestLendCopy => 'Kopiraj kod';
@@ -3910,11 +3916,11 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get guestPassRevokeConfirm =>
-      'Povući ovaj kod? Odmah gube pristup. Sve što su zabilježili ostaje.';
+      'Povući ovaj kod? Osoba odmah gubi pristup, a sve što je zabilježila ostaje.';
 
   @override
   String get guestRedeemFailed =>
-      'Taj kod ne radi. Možda je istekao, povučen je ili ga netko već koristi.';
+      'Taj kod ne vrijedi. Možda je istekao ili povučen, ili ga netko već koristi.';
 
   @override
   String get guestBorrowedBadge => 'Posuđeno tebi';
@@ -3926,13 +3932,13 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get guestHistoryHidden =>
-      'Vidiš samo vlastite zapise. Ranije stavke vlasnika ostaju privatne.';
+      'Vidiš samo vlastite zapise. Vlasnikovi raniji unosi ostaju privatni.';
 
   @override
-  String get householdMakeAdmin => 'Postavi za administratora';
+  String get householdMakeAdmin => 'Učini administratorom';
 
   @override
-  String get householdRemoveAdmin => 'Ukloni administratora';
+  String get householdRemoveAdmin => 'Ukloni ulogu administratora';
 
   @override
   String householdRoleChanged(String name) {
@@ -3946,7 +3952,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String householdLastAdminKept(String name) {
-    return 'Garaža uvijek ima administratora, pa je uloga prešla na $name.';
+    return 'Garaža uvijek mora imati administratora, pa je to sada $name.';
   }
 
   @override
@@ -3954,7 +3960,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String householdStepDownBody(String name) {
-    return 'Ti si jedini administrator, pa uloga prelazi na $name. Samo administrator ti je može vratiti.';
+    return 'Ti si jedini administrator, pa će to sada postati $name. Samo administrator ti tu ulogu može vratiti.';
   }
 
   @override
@@ -3973,7 +3979,7 @@ class AppLocalizationsHr extends AppLocalizations {
       'Svako vozilo, cijela njegova povijest i svi iz druge garaže sele ovamo. Druga se garaža zatim briše. Ovo se ne može poništiti.';
 
   @override
-  String get householdMergeNone => 'Niste administrator nijedne druge garaže.';
+  String get householdMergeNone => 'Nisi administrator nijedne druge garaže.';
 
   @override
   String get householdMergePick => 'Koja se garaža seli ovamo?';
@@ -3988,7 +3994,7 @@ class AppLocalizationsHr extends AppLocalizations {
     String vehicles,
     String people,
   ) {
-    return 'Preseliti sve iz garaže $name u $survivor? Dolazi $vehicles i $people, garaža $name se briše, a ovo se ne može poništiti.';
+    return 'Preseliti sve iz garaže $name u garažu $survivor? Prelaze: $vehicles i $people. Garaža $name bit će obrisana i to se ne može poništiti.';
   }
 
   @override
@@ -4059,14 +4065,14 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get syncPendingIntro =>
-      'Ovo je spremljeno na tvoj telefon dok nije bilo veze. Poslat će se samo od sebe čim veza bude dostupna.';
+      'Ovi su unosi spremljeni na telefonu dok nije bilo veze. Poslat će se sami čim veza bude dostupna.';
 
   @override
   String get syncPendingEmpty => 'Sve je poslano.';
 
   @override
   String syncStaleBanner(String when) {
-    return 'Nema veze. Prikazano je stanje od $when.';
+    return 'Nema internetske veze. Prikazano je stanje od $when.';
   }
 
   @override
@@ -4107,7 +4113,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get syncKindFuel => 'Točenje';
 
   @override
-  String get syncKindOdometer => 'Stanje kilometraže';
+  String get syncKindOdometer => 'Očitanje kilometraže';
 
   @override
   String syncQueuedAt(String when) {
@@ -4144,7 +4150,7 @@ class AppLocalizationsHr extends AppLocalizations {
       'Ova adresa ne vodi nikamo u aplikaciji. Možda je krivo upisana ili dolazi iz starije verzije.';
 
   @override
-  String get notFoundHome => 'Otvori pregled';
+  String get notFoundHome => 'Otvori Pregled';
 
   @override
   String get observationsTitle => 'Problemi';
@@ -4155,7 +4161,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get observationsEmpty =>
-      'Nema bilješki. Sve neobično (lupanje, lampica, zvuk nakon rupe) ide ovdje.';
+      'Ništa nije zabilježeno. Sve neobično, poput lupanja, lampice upozorenja ili zvuka nakon rupe na cesti, zabilježi ovdje.';
 
   @override
   String get observationAdd => 'Zabilježi problem';
@@ -4245,7 +4251,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tripPrepReturnNone => 'Nije postavljeno';
 
   @override
-  String get tripPrepDistance => 'Otprilike koliko kilometara';
+  String get tripPrepDistance => 'Približna udaljenost';
 
   @override
   String get tripPrepCheck => 'Provjeri put';
@@ -4254,11 +4260,11 @@ class AppLocalizationsHr extends AppLocalizations {
   String get tripPrepDeadlines => 'Ističe dok si na putu';
 
   @override
-  String get tripPrepForecast => 'Očekuje se da dođe na red';
+  String get tripPrepForecast => 'Predviđeno dospijeće';
 
   @override
   String get tripPrepForecastNote =>
-      'Procjena prema tome kako se auto zadnje vrijeme vozi, a ne datum koji je netko zapisao.';
+      'Procjena prema tome kako se auto u posljednje vrijeme vozi, a ne datum koji je netko zapisao.';
 
   @override
   String tripPrepKmAway(String distance) {
@@ -4266,7 +4272,7 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get tripPrepAlreadyPast => 'već je prošlo';
+  String get tripPrepAlreadyPast => 'rok je već prošao';
 
   @override
   String get tripPrepNothing =>
@@ -4274,7 +4280,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get tripPrepNoOdometer =>
-      'Nema nedavnog stanja kilometraže pa se ništa nije moglo usporediti s udaljenošću. Upiši ga i provjeri ponovno.';
+      'Nema nedavnog očitanja kilometraže pa se ništa nije moglo usporediti s udaljenošću. Upiši ga i provjeri ponovno.';
 
   @override
   String get tripPrepOwnList => 'Tvoj popis';
@@ -4296,14 +4302,14 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get reportHandoverHint =>
-      'Što ne valja, što dolazi na red i što je nedavno rađeno';
+      'Što ne valja, što dolazi na red i što je nedavno obavljeno';
 
   @override
   String get reportHandoverProblems => 'Što je vozač primijetio';
 
   @override
   String get reportHandoverStillThere =>
-      'Zahvat je obavljen, ali nije prestalo';
+      'Zahvat je obavljen, ali problem nije nestao';
 
   @override
   String get reportHandoverComing => 'Dolazi na red';
@@ -4321,7 +4327,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get reportHandoverFooter =>
-      'Sastavljeno iz vlasnikovih vlastitih zapisa. Ovo nije pregled i ne potvrđuje stanje vozila.';
+      'Sastavljeno iz vlasnikovih zapisa. Ovo nije pregled vozila i ne potvrđuje njegovo stanje.';
 
   @override
   String get routeLabel => 'Ruta';
@@ -4336,7 +4342,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get routeNameLabel => 'Nazovi ovo putovanje';
 
   @override
-  String get routeNameHint => 'Doma → Posao';
+  String get routeNameHint => 'Kuća → Posao';
 
   @override
   String get routeSaveFailed =>
@@ -4347,14 +4353,13 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get tripNotComparableHint =>
-      'Zaobilaznica, usputno obavljanje, zatvorena cesta. Vožnja ostaje zabilježena, samo ne ulazi u trend rute.';
+      'Obilazak, usputni posao, zatvorena cesta. Vožnja ostaje zabilježena, samo ne ulazi u trend rute.';
 
   @override
   String get routeTrendsTitle => 'Rute';
 
   @override
-  String get routeTrendsSubtitle =>
-      'Koliko putovanje koje često radiš zapravo traje';
+  String get routeTrendsSubtitle => 'Koliko zapravo traje put koji često voziš';
 
   @override
   String get routeTrendsEmpty =>
@@ -4371,22 +4376,22 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String routeTrendSpread(String low, String high) {
-    return 'Srednja polovica od $low do $high min';
+    return 'Srednjih 50 % vožnji: od $low do $high min';
   }
 
   @override
   String routeTrendSlower(String minutes, String label) {
-    return '$minutes min sporije nego $label';
+    return '$minutes min sporije u odnosu na $label';
   }
 
   @override
   String routeTrendFaster(String minutes, String label) {
-    return '$minutes min brže nego $label';
+    return '$minutes min brže u odnosu na $label';
   }
 
   @override
   String routeTrendUnchanged(String label) {
-    return 'Bez promjene od $label';
+    return 'Bez promjene u odnosu na $label';
   }
 
   @override
@@ -4403,7 +4408,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get routeTrendSparse =>
-      'Neka razdoblja počivaju na vrlo malo putovanja pa promjena može biti slučajna.';
+      'Neka se razdoblja temelje na vrlo malo putovanja pa promjena može biti slučajna.';
 
   @override
   String get routeTrendCaveat =>
@@ -4413,7 +4418,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get routeTrendGroupMonth => 'Po mjesecu';
 
   @override
-  String get routeTrendGroupQuarter => 'Po kvartalu';
+  String get routeTrendGroupQuarter => 'Po tromjesečju';
 
   @override
   String get routeTrendWeekdays => 'Samo radnim danima';
@@ -4481,9 +4486,9 @@ class AppLocalizationsHr extends AppLocalizations {
     String _temp0 = intl.Intl.pluralLogic(
       count,
       locale: localeName,
-      other: 'i još $count vožnji',
-      few: 'i još $count vožnje',
-      one: 'i još $count vožnja',
+      other: 'i još $count putovanja',
+      few: 'i još $count putovanja',
+      one: 'i još $count putovanje',
     );
     return '$_temp0';
   }
@@ -4500,13 +4505,13 @@ class AppLocalizationsHr extends AppLocalizations {
   String get reportMileageYear => 'Godina';
 
   @override
-  String get reportMileageReading => 'Stanje';
+  String get reportMileageReading => 'Kilometraža';
 
   @override
   String get reportMileageDriven => 'Prijeđeno';
 
   @override
-  String get reportMileageRecords => 'Zapisa';
+  String get reportMileageRecords => 'Zapisi';
 
   @override
   String get reportMileagePartialNote =>
@@ -4514,18 +4519,18 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get reportMileageGapNote =>
-      '† Mjereno od zadnjeg očitanja prije godine bez ijednog zapisa.';
+      '† Mjereno od posljednjeg očitanja prije godine bez ijednog zapisa.';
 
   @override
   String get reportSellersFooter =>
-      'Sastavljeno iz vlasnikovih vlastitih zapisa u ovoj aplikaciji. Ovo nije službena potvrda o kilometraži i ne može prikazati ono što se dogodilo izvan nje.';
+      'Sastavljeno iz vlasnikovih zapisa u ovoj aplikaciji. Ovo nije službena potvrda o kilometraži i ne može prikazati ono što se dogodilo izvan aplikacije.';
 
   @override
   String get featureRoutes => 'Rute';
 
   @override
   String get featureRoutesBlurb =>
-      'Imenuj putovanje koje često radiš i vidiš koliko obično traje, uz raspon oko toga i broj putovanja na kojima svaki podatak počiva.';
+      'Imenuj put koji često voziš i vidi koliko obično traje, koliko odstupa i na koliko se vožnji temelji svaki podatak.';
 
   @override
   String get featureObservations => 'Zapažanja';
@@ -4561,11 +4566,11 @@ class AppLocalizationsHr extends AppLocalizations {
   String get guestLendStartsToday => 'Danas';
 
   @override
-  String get guestLendAllowPrices => 'Prikaži koliko je radnja koštala';
+  String get guestLendAllowPrices => 'Prikaži cijene radova';
 
   @override
   String get guestLendAllowPricesHint =>
-      'Isključeno: serviser vidi što je i kada napravljeno, ali ne i koliko je plaćeno.';
+      'Isključeno: serviser vidi što je napravljeno i kada, ali ne i koliko je to plaćeno.';
 
   @override
   String get guestPassExtend => 'Produlji';
@@ -4584,14 +4589,13 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get lentHistoryTitle => 'Što je napravljeno';
+  String get lentHistoryTitle => 'Što je obavljeno';
 
   @override
-  String get lentHistoryEmpty => 'Za ovaj automobil nije ništa zabilježeno.';
+  String get lentHistoryEmpty => 'Za ovaj auto još ništa nije zabilježeno.';
 
   @override
-  String get lentHistoryPricesHidden =>
-      'Vlasnik nije podijelio koliko je radnja koštala.';
+  String get lentHistoryPricesHidden => 'Vlasnik nije podijelio cijene radova.';
 
   @override
   String odometerJumpWarning(String distance, String date) {
@@ -4600,7 +4604,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String runningCostOwnSpan(String distance, String date) {
-    return 'Mjereno preko $distance zabilježenih od $date, jer samo za to razdoblje aplikacija ima očitanja.';
+    return 'Izračunano na temelju $distance zabilježenih od $date, jer samo za to razdoblje aplikacija ima očitanja.';
   }
 
   @override
@@ -4640,7 +4644,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get partsDelete => 'Obriši';
 
   @override
-  String get partsDeleteConfirm => 'Obrisati što ovaj auto treba za taj posao?';
+  String get partsDeleteConfirm => 'Obrisati podatke za taj posao?';
 
   @override
   String partsOnService(String spec) {
@@ -4673,7 +4677,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String briefingNoticedOn(String date) {
-    return 'zamijećeno $date';
+    return 'primijećeno $date';
   }
 
   @override
@@ -4705,12 +4709,12 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String codeBoxTransfer(String vehicle) {
-    return '$vehicle postaje tvoj, s cijelom poviješću. Odavde se to ne može poništiti.';
+    return 'Vozilo $vehicle postat će tvoje, s cijelom poviješću. Odavde se to ne može poništiti.';
   }
 
   @override
   String codeBoxInvite(String subject) {
-    return 'Pridružuješ se garaži $subject i dijeliš njezina vozila.';
+    return 'Pridružit ćeš se garaži $subject i dijeliti njezina vozila.';
   }
 
   @override
@@ -4720,7 +4724,8 @@ class AppLocalizationsHr extends AppLocalizations {
   String get passEdit => 'Promijeni što dopušta';
 
   @override
-  String get passEditNote => 'Promjene vrijede odmah, na kodu koji već imaju.';
+  String get passEditNote =>
+      'Promjene vrijede odmah, i za kod koji je osoba već dobila.';
 
   @override
   String passFinished(int count) {
@@ -4767,15 +4772,15 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get csvCarScannerParked =>
-      'Ova snimka nikamo nije otišla. To je skener ostavljen upaljen u parkiranom autu, a ne vožnja.';
+      'Na ovoj se snimci auto nije pomaknuo. To je skener ostavljen uključen u parkiranom autu, a ne vožnja.';
 
   @override
   String get csvCarScannerNoDistance =>
-      'U ovoj snimci nema kilometraže. Upiši koliko je vožnja bila duga.';
+      'U ovoj snimci nema prijeđene udaljenosti. Upiši koliko je vožnja bila duga.';
 
   @override
   String get csvCarScannerNoDate =>
-      'Naziv datoteke ne govori kada je vožnja bila, pa datum treba upisati.';
+      'Iz naziva datoteke ne vidi se kada je vožnja bila pa datum treba upisati.';
 
   @override
   String get csvCarScannerPickDate => 'Odaberi datum';
@@ -4784,7 +4789,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get csvCarScannerImport => 'Uvezi kao vožnju';
 
   @override
-  String get csvCarScannerImported => 'Vožnja uvezena.';
+  String get csvCarScannerImported => 'Vožnja je uvezena.';
 
   @override
   String get companyTitle => 'Tvrtka';
@@ -4805,7 +4810,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String companyPlanLapsed(String date) {
-    return 'Poslovni plan istekao je $date. Sve ostaje; predaja vozila vozaču, novi vozač i šesto vozilo čekaju plan.';
+    return 'Poslovni plan istekao je $date. Svi podaci ostaju, a predaja vozila vozaču, dodavanje vozača i vozila iznad besplatnih pet čekaju obnovu plana.';
   }
 
   @override
@@ -4829,7 +4834,7 @@ class AppLocalizationsHr extends AppLocalizations {
       'Ispisuje se u zaglavlju paketa za knjigovođu.';
 
   @override
-  String get companyDetailsSaved => 'Podaci o tvrtki spremljeni';
+  String get companyDetailsSaved => 'Podaci o tvrtki su spremljeni';
 
   @override
   String get companyOibInvalid => 'OIB ima jedanaest znamenki.';
@@ -4881,7 +4886,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get companyHandOverNoDrivers =>
-      'Nema kome: prvo pozovi osobu i učini je vozačem.';
+      'Nemaš kome predati vozilo: najprije pozovi nekoga i učini ga vozačem.';
 
   @override
   String get companyEarlierDrivers => 'Ranije';
@@ -4901,7 +4906,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String companyRemoveAssignmentBody(String from, String name) {
-    return 'Dnevnik zaboravlja da je $name imao vozilo od $from. Očitanja upisana pri predaji ostaju.';
+    return 'Iz dnevnika nestaje zaduženje: $name, od $from. Očitanja upisana pri predaji ostaju.';
   }
 
   @override
@@ -4978,7 +4983,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get companyMyCarsEmpty =>
-      'Danas ti nije dodijeljeno nijedno vozilo. Administrator ga predaje.';
+      'Danas ti nije dodijeljeno nijedno vozilo. Vozilo ti dodjeljuje administrator.';
 
   @override
   String get companyDriverNoticeTitle => 'Što vidi tvoj administrator';
@@ -4992,7 +4997,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String companyConfirmHandoverTitle(String date, String vehicle) {
-    return 'Preuzeo/la si $vehicle dana $date';
+    return 'Vozilo $vehicle preuzeto je $date';
   }
 
   @override
@@ -5038,7 +5043,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get companyReimbursementUnassigned => 'Bez vozača tih dana';
 
   @override
-  String get companyMarkPaid => 'Označi isplaćeno';
+  String get companyMarkPaid => 'Označi kao isplaćeno';
 
   @override
   String companyMarkPaidTitle(String amount, String name) {
@@ -5047,7 +5052,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get companyMarkPaidBody =>
-      'Unosi se označavaju kao vraćeni s današnjim datumom. Aplikacija to ne može poništiti.';
+      'Unosi će se označiti kao isplaćeni s današnjim datumom. Aplikacija to ne može poništiti.';
 
   @override
   String get companyMarkedPaid => 'Označeno kao isplaćeno';
@@ -5069,7 +5074,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get incidentsHint =>
-      'Ogrebotina, kazna, kvar. Tko je taj dan imao vozilo čita se iz dnevnika, i zato je kazna nečija.';
+      'Ogrebotina, kazna, kvar. Tko je toga dana imao vozilo, vidi se iz dnevnika, pa se zna čija je kazna.';
 
   @override
   String get incidentAdd => 'Prijavi nezgodu';
@@ -5130,7 +5135,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get incidentStatusClosed => 'Zatvoreno';
 
   @override
-  String get incidentSaved => 'Nezgoda zabilježena';
+  String get incidentSaved => 'Nezgoda je zabilježena';
 
   @override
   String get incidentsEmpty => 'Ništa nije prijavljeno.';
@@ -5142,11 +5147,11 @@ class AppLocalizationsHr extends AppLocalizations {
   String get incidentReopen => 'Ponovno otvori';
 
   @override
-  String get incidentDelete => 'Izbriši';
+  String get incidentDelete => 'Obriši';
 
   @override
   String get incidentDeleteConfirm =>
-      'Izbrisati ovu nezgodu? S njom odlaze i fotografije.';
+      'Obrisati ovu nezgodu? S njom odlaze i fotografije.';
 
   @override
   String get incidentsFilterAll => 'Sve';
@@ -5165,7 +5170,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get companyPackHint =>
-      'Po jedan PDF za svako vozilo s unosima mjeseca i svim računima, izvorne datoteke i tablice. Sve se slaže po vozilu, jer tako uzorkuje porezna.';
+      'Po jedan PDF za svako vozilo s unosima za taj mjesec i svim računima, izvorne datoteke i tablice. Sve je složeno po vozilu jer Porezna uprava tako odabire uzorke za provjeru.';
 
   @override
   String get companyPackMonth => 'Mjesec';
@@ -5192,7 +5197,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String companyReminderSent(String name) {
-    return 'Podsjetnik poslan: $name';
+    return 'Podsjetnik je poslan: $name';
   }
 
   @override
@@ -5224,7 +5229,7 @@ class AppLocalizationsHr extends AppLocalizations {
 
   @override
   String get reportPackFooter =>
-      'Sastavljeno iz vlastitih zapisa garaže za prikazano razdoblje. Račun koji nije fotografija nalazi se u arhivi uz ovu datoteku.';
+      'Sastavljeno iz zapisa garaže za prikazano razdoblje. Račun koji nije fotografija nalazi se u arhivi uz ovu datoteku.';
 
   @override
   String get incidentsNoneOpen => 'Nema otvorenih nezgoda.';
@@ -5244,7 +5249,7 @@ class AppLocalizationsHr extends AppLocalizations {
   }
 
   @override
-  String get webUpdateReady => 'Nova verzija aplikacije Garage je spremna';
+  String get webUpdateReady => 'Nova verzija Garaže je spremna';
 
   @override
   String get webUpdateReload => 'Osvježi';
@@ -5269,7 +5274,7 @@ class AppLocalizationsHr extends AppLocalizations {
   String get dateFieldLabel => 'Datum';
 
   @override
-  String get shortcutsTitle => 'Prečaci na tipkovnici';
+  String get shortcutsTitle => 'Tipkovnički prečaci';
 
   @override
   String get shortcutsSearch => 'Pretraži ovu stranicu';

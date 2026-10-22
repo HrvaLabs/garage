@@ -67,7 +67,7 @@ void main() {
     await showRow(tester);
 
     expect(tester.takeException(), isNull);
-    expect(find.byTooltip('Prekini kopiranje'), findsOneWidget);
+    expect(find.byTooltip('Isključi automatsko kopiranje'), findsOneWidget);
   });
 
   testWidgets('fits in Croatian on a narrow phone at a large font', (

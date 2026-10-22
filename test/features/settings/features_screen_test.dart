@@ -91,7 +91,7 @@ void main() {
     );
     await tester.pumpAndSettle();
 
-    expect(find.text('Što Garage može'), findsOneWidget);
+    expect(find.text('Što Garaža može'), findsOneWidget);
     expect(find.text('Planer'), findsOneWidget);
   });
 
@@ -113,7 +113,7 @@ void main() {
   // row, and the Italian list runs to some 12,700 pixels. Tall enough that
   // the list builds every card, which the last one proves.
   const longLanguages = {
-    'hr': 'koliko prijeđeš s punim spremnikom',
+    'hr': 'domet s punim spremnikom',
     'it': 'quanta strada fai con un pieno',
   };
 

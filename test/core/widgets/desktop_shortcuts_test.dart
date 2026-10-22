@@ -246,7 +246,7 @@ void main() {
 
     await pressQuestion(tester);
 
-    expect(find.text('Prečaci na tipkovnici'), findsOneWidget);
+    expect(find.text('Tipkovnički prečaci'), findsOneWidget);
     expect(find.text('Dodaj točenje, servis ili trošak'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });

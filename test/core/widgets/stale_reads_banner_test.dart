@@ -112,7 +112,7 @@ void main() {
     stale.value = StaleReads({'fuel/v1': DateTime(2026, 9, 18, 14, 2)});
     await tester.pump();
 
-    expect(find.textContaining('Nema veze'), findsOneWidget);
+    expect(find.textContaining('Nema internetske veze'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

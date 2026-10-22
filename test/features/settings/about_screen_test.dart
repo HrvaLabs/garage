@@ -193,7 +193,7 @@ void main() {
         tester,
         locale: Locale(language),
         textScale: 1.5,
-        surface: const Size(320, 3000),
+        surface: const Size(320, 3400),
       );
 
       expect(find.textContaining(promise), findsOneWidget);
