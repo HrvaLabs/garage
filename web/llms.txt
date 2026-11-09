@@ -1,0 +1,23 @@
+# Garage
+
+> Garage is a vehicle tracker for fuel logs, maintenance reminders and running costs, shared live between the people who share a car. It runs on Android and the web, is free for a small garage and has no ads and no tracking.
+
+Garage records fuel fills and works out real full-tank economy, projects maintenance due dates from how the car is actually driven, and tracks insurance, tyres, tolls and other costs. A garage can be shared with the other people who use the same vehicles, and everyone sees the same history. Live Croatian fuel station prices come from MZOE open data. The app is available in English, Croatian and Italian. It is built with Flutter on a Supabase (EU) backend.
+
+- Name: Garage, a HrvaLabs project (https://hrvalabs.net/)
+- Author: Karlo Hrvačić (https://karlo.cc)
+- Licence: AGPL-3.0
+- Android app: https://play.google.com/store/apps/details?id=cc.hrva.garage
+- Web app: https://garage.hrva.cc/
+
+## Pages
+
+- [Garage web app](https://garage.hrva.cc/): fuel and maintenance tracking in the browser
+- [Features](https://garage.hrva.cc/features): what the app does, with screenshots
+- [API](https://garage.hrva.cc/api): a read-only feed of one garage's data, for that garage's own automation
+- [Delete your account](https://garage.hrva.cc/delete-account): how to delete an account and its data
+- [Privacy policy](https://garage.hrva.cc/privacy): what is stored and for how long
+
+## Source
+
+- [Source code](https://github.com/HrvaLabs/garage): Flutter app and Supabase backend
